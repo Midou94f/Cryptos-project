@@ -100,8 +100,8 @@ start_app <- function() {
         }
         current_question <- "risk"
       }
-      
-      if(current_question == "risk") {
+      ##########      
+      if (current_question == "risk") {
         repeat {
           cat("\nComment vous percevez-vous face au risque ?\n")
           cat("1. Risquophobe\n")
@@ -109,93 +109,131 @@ start_app <- function() {
           cat("3. Neutre au risque\n")
           cat("Votre choix (1-3 ou 0 pour revenir à la question précédente) : ")
           state$risk <- readline()
-          if(state$risk == "0") {
+          if (state$risk == "0") {
             current_question <- "age"
             next
           }
-          while(!state$risk %in% c("1", "2", "3")) {
+          while (!state$risk %in% c("1", "2", "3")) {
             cat("Veuillez entrer 1, 2 ou 3 : ")
             state$risk <- readline()
           }
           
-          if(state$risk == "1") {
-            cat("\nEn choisissant 'risquophobe', cela signifie que vous êtes susceptible d'accepter une perte maximale ou un gain maximal de 5% de vos placements.\n")
+          if (state$risk == "1") { # Risquophobe
+            cat("\nEn choisissant 'risquophobe', cela signifie que vous êtes à l'aise uniquement avec des placements comportant une perte ou un gain maximal d'environ 5%.\n")
             cat("Êtes-vous d'accord avec cette définition ? (oui/non) : ")
             confirm <- tolower(readline())
-            while(!confirm %in% c("oui", "non")) {
+            while (!confirm %in% c("oui", "non")) {
               cat("Veuillez répondre par 'oui' ou 'non' : ")
               confirm <- tolower(readline())
             }
-            if(confirm == "oui") {
-              cat("\nATTENTION: L'investissement en cryptomonnaies comporte des risques élevés non adaptés aux personnes risquophobes.\n")
-              cat("Voici quelques alternatives plus adaptées à votre profil :\n")
-              cat("- Assurance vie (rendement souvent inférieur à 3%)\n")
-              cat("- Comptes d'épargne rémunérés\n")
-              cat("- Obligations d'État\n")
-              cat("- Actions d'entreprises historiques et solides\n")
-              cat("\nSouhaitez-vous quand même continuer ? (oui/non) : ")
+            if (confirm == "oui") {
+              cat("\nATTENTION : Les Cryptomonnaies ne garantissent pas le capital. L'investissement en cryptomonnaies comporte des risques élevés non adaptés aux personnes risquophobes.\n")
+              cat("Votre profil de risque n'est donc pas adapté au marché des cryptomonnaies. Cependant, voici une liste de placements alternatifs :\n")
+              cat("- Comptes d'épargne : Rendement espéré inférieur à 2%, risque très faible.\n")
+              cat("- Obligations d'État : Rendement espéré inférieur à 4%, risque faible.\n")
+              cat("- Fonds en euros (assurances-vie) : Rendement espéré inférieur à 3%, risque très faible.\n")
+              cat("- Obligations indexées sur l'inflation : Rendement espéré inférieur à 3,5%, risque faible.\n")
+              cat("- ETF obligataires ou peu volatils : Rendement espéré inférieur à 5%, risque faiblement modéré.\n")
+              cat("\nNote : Les rendements des produits cités dépendent fortement des conditions de marché et des contrats associés.\n")
+              cat("Souhaitez-vous quand même continuer ? (oui/non) : ")
               response <- tolower(readline())
-              while(!response %in% c("oui", "non")) {
+              while (!response %in% c("oui", "non")) {
                 cat("Veuillez répondre par 'oui' ou 'non' : ")
                 response <- tolower(readline())
               }
-              if(response == "oui") {
-                break
-              } else {
+              if (response == "non") {
                 cat("\nMerci de votre visite. N'hésitez pas à explorer ces alternatives pour sécuriser votre capital.\n")
                 return(NULL)
+              } else {
+                break
               }
             }
           }
           
-          if(state$risk == "2") {
-            cat("\nEn choisissant 'risquophile', cela signifie que vous êtes prêt à subir ou obtenir une perte/gain supérieur à 20% de vos placements.\n")
+          if (state$risk == "2") { # Risquophile
+            cat("\nEn choisissant 'risquophile', cela signifie que vous êtes prêt à tolérer des fluctuations importantes, pouvant dépasser 20%, en quête de gains élevés.\n")
             cat("Êtes-vous d'accord avec cette définition ? (oui/non) : ")
             confirm <- tolower(readline())
-            while(!confirm %in% c("oui", "non")) {
+            while (!confirm %in% c("oui", "non")) {
               cat("Veuillez répondre par 'oui' ou 'non' : ")
               confirm <- tolower(readline())
             }
-            if(confirm == "oui") {
-              cat("\nNotez qu'il existe des alternatives d'investissement moins risquées comme les ETF ou les actions.\n")
-              break
+            if (confirm == "oui") {
+              cat("\nVotre profil risque est compatible avec le marché des cryptomonnaies. Cependant, ce marché est hautement spéculatif et comparable à :\n")
+              cat("- Le trading à effet de levier : Rendement espéré non plafonné, risque très élevé.\n")
+              cat("- Les options ou produits dérivés à court terme : Rendement espéré non plafonné, risque très élevé.\n")
+              cat("- Les investissements dans des start-ups : Rendement espéré supérieur à 15% sur le long terme, risque fort.\n")
+              cat("\nExemple concret des risques liés aux cryptos :\n")
+              cat("- Bitcoin (BTC) : Rendement annuel moyen de 200% sur 5 ans, mais baisse de plus de 80% entre 2017 et 2018.\n")
+              cat("\nNote : Les cryptomonnaies doivent être considérées comme des investissements spéculatifs, nécessitant une compréhension approfondie et une tolérance élevée à la volatilité.\n")
+              cat("Souhaitez-vous quand même continuer ? (oui/non) : ")
+              response <- tolower(readline())
+              while (!response %in% c("oui", "non")) {
+                cat("Veuillez répondre par 'oui' ou 'non' : ")
+                response <- tolower(readline())
+              }
+              if (response == "non") {
+                cat("\nMerci de votre visite. N'hésitez pas à explorer d'autres options.\n")
+                return(NULL)
+              } else {
+                break
+              }
             }
           }
           
-          if(state$risk == "3") {
-            cat("\nEn choisissant 'neutre au risque', cela signifie que vous êtes prêt à accepter une perte/gain autour de 10% de vos placements.\n")
+          if (state$risk == "3") { # Neutre au risque
+            cat("\nEn choisissant 'neutre au risque', cela signifie que vous êtes disposé à accepter une fluctuation modérée, avec des pertes ou des gains autour de 10%.\n")
             cat("Êtes-vous d'accord avec cette définition ? (oui/non) : ")
             confirm <- tolower(readline())
-            while(!confirm %in% c("oui", "non")) {
+            while (!confirm %in% c("oui", "non")) {
               cat("Veuillez répondre par 'oui' ou 'non' : ")
               confirm <- tolower(readline())
             }
-            if(confirm == "oui") {
-              cat("\nNotez qu'il existe des alternatives d'investissement comme les fonds diversifiés ou les ETF.\n")
-              break
+            if (confirm == "oui") {
+              cat("\nVotre profil de risque est partiellement compatible avec le marché des cryptomonnaies. Cependant, il reste important de noter que ce marché est extrêmement volatil.\n")
+              cat("Voici une liste de placements modérément risqués pouvant convenir à votre profil :\n")
+              cat("- ETF diversifiés : Rendement espéré inférieur à 10%, risque modéré.\n")
+              cat("- Fonds équilibrés : Rendement espéré inférieur à 8%, risque modéré.\n")
+              cat("- Obligations d'entreprise bien notées : Rendement espéré inférieur à 6%, risque faiblement modéré.\n")
+              cat("- Immobilier papier (SCPI) : Rendement espéré inférieur à 6%, risque faible à modéré.\n")
+              cat("- Actions avec dividendes : Rendement espéré inférieur à 7%, risque modéré.\n")
+              cat("\nNote : Bien que modérément risqués, ces placements ne présentent pas les fluctuations extrêmes des cryptomonnaies.\n")
+              cat("Souhaitez-vous quand même continuer ? (oui/non) : ")
+              response <- tolower(readline())
+              while (!response %in% c("oui", "non")) {
+                cat("Veuillez répondre par 'oui' ou 'non' : ")
+                response <- tolower(readline())
+              }
+              if (response == "non") {
+                cat("\nMerci de votre visite. N'hésitez pas à explorer d'autres options.\n")
+                return(NULL)
+              } else {
+                break
+              }
             }
           }
           
-          if(confirm == "non") {
+          if (confirm == "non") {
             cat("\nSouhaitez-vous réajuster votre profil de risque ou quitter le module d'investissement ?\n")
             cat("1. Réajuster le profil\n")
             cat("2. Quitter le module\n")
             action <- readline()
-            while(!action %in% c("1", "2")) {
+            while (!action %in% c("1", "2")) {
               cat("Veuillez entrer 1 ou 2 : ")
               action <- readline()
             }
-            if(action == "1") {
-              next
-            } else {
+            if (action == "2") {
               cat("\nMerci pour votre visite.\n")
               return(NULL)
+            } else {
+              next
             }
           }
         }
+        
+        #################################      
         current_question <- "revenus_mensuels"
       }
-      
       if(current_question == "revenus_mensuels") {
         cat("\nDonnez-nous une estimation à vue de nez de vos revenus totaux nets mensuels.\n")
         cat("(Incluez vos revenus du travail mais aussi tout autre revenu comme les allocations, investissements, etc.)\n")
@@ -399,4 +437,3 @@ start_app <- function() {
 
 # Lancer l'application
 result <- start_app()
-
