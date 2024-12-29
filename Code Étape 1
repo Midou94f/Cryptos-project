@@ -37,7 +37,12 @@ get_top_cryptos <- function() {
   }
 }
 
+##############
 show_recap <- function(state) {
+  # Calcul de l'épargne de précaution et du montant maximal d'investissement
+  epargne_precaution <- state$revenus_mensuels * 6
+  montant_max_invest <- max(0, state$epargne_totale - epargne_precaution)
+  
   cat("\nOK, maintenant nous pouvons vous proposer un récapitulatif de votre profil :\n\n")
   cat("1. Prénom : ", state$prenom, "\n")
   cat("2. Âge : ", state$age, "\n")
@@ -46,8 +51,10 @@ show_recap <- function(state) {
              ifelse(state$risk == "2", "Risquophile", "Neutre au risque")), "\n")
   cat("4. Revenus mensuels : ", sprintf("%.2f", state$revenus_mensuels), " euros\n")
   cat("5. Épargne totale : ", sprintf("%.2f", state$epargne_totale), " euros\n")
-  cat("6. Montant à investir : ", sprintf("%.2f", state$investissement), " euros\n")
-  cat("7. Horizon d'investissement : ", 
+  cat("6. Épargne de précaution estimée : ", sprintf("%.2f", epargne_precaution), " euros\n")
+  cat("7. Montant maximal conseillé pour l'investissement : ", sprintf("%.2f", montant_max_invest), " euros\n")
+  cat("8. Montant à investir : ", sprintf("%.2f", state$investissement), " euros\n")
+  cat("9. Horizon d'investissement : ", 
       switch(state$horizon,
              "1" = "Long terme",
              "2" = "Moyen long terme",
@@ -100,7 +107,7 @@ start_app <- function() {
         }
         current_question <- "risk"
       }
-      ##########      
+      
       if (current_question == "risk") {
         repeat {
           cat("\nComment vous percevez-vous face au risque ?\n")
@@ -231,7 +238,7 @@ start_app <- function() {
           }
         }
         
-        #################################      
+        
         current_question <- "revenus_mensuels"
       }
       if(current_question == "revenus_mensuels") {
@@ -261,7 +268,7 @@ start_app <- function() {
             response <- tolower(readline())
           }
           if(response != "oui") {
-            cat("\nAu revoir. Revenez lorsque vous aurez une meilleure sécurité financière.\n")
+            cat("\nAu revoir. N'hésitez pas à revenir lorsque vous aurez une meilleure sécurité financière.\n")
             return(NULL)
           }
         }
@@ -270,7 +277,7 @@ start_app <- function() {
       
       if(current_question == "epargne_totale") {
         cat("\nÀ vue de nez, combien estimez-vous votre épargne totale disponible en euros ?\n")
-        cat("(Cela inclut votre épargne liquide (comptes courants) et moyennement liquide (PEA, etc.), mais exclut les actifs immobilisés comme l'immobilier.)\n")
+        cat("*Cela inclut votre épargne liquide (comptes courants) et moyennement liquide (PEA, etc.), mais exclut les actifs immobilisés comme l'immobilier.\n")
         cat("(Entrez 0 pour revenir à la question précédente) : ")
         state$epargne_totale <- readline()
         if(state$epargne_totale == "0") {
@@ -284,11 +291,11 @@ start_app <- function() {
         state$epargne_totale <- as.numeric(state$epargne_totale)
         
         epargne_precaution <- state$revenus_mensuels * 6
-        cat(sprintf("\nD'après nos estimations, une épargne de précaution équivalente à six mois de revenus devrait être d'environ %.2f euros.\n", epargne_precaution))
+        cat(sprintf("\ En règle générale, il est conseillé de disposer d'une épargne de précaution équivalente à six mois de revenus. D'après vos déclarations, nous estimons que cette épargne nécessaire serait d'environ %.2f euros.\n", epargne_precaution))
         
         if(state$epargne_totale < epargne_precaution) {
           cat("\nATTENTION: Votre épargne est inférieure à l'épargne de précaution recommandée.\n")
-          cat("Il est déconseillé d'investir sur le marché crypto dans cette situation.\n")
+          cat("Ce qui signifie qu'il vous est déconseillé d'investir sur le marché crypto dans cette situation.\n")
           cat("Souhaitez-vous quand même continuer ? (oui/non) : ")
           response <- tolower(readline())
           while(!response %in% c("oui", "non")) {
@@ -296,7 +303,7 @@ start_app <- function() {
             response <- tolower(readline())
           }
           if(response != "oui") {
-            cat("\nAu revoir. Revenez lorsque vous aurez constitué une épargne de précaution suffisante.\n")
+            cat("\nAu revoir. N'hésitez pas à revenir sur notre plateforme lorsque vous aurez constitué une épargne de précaution suffisante pour investir sur le marché des Cryptos.\n")
             return(NULL)
           }
         } else {
@@ -321,9 +328,9 @@ start_app <- function() {
         state$investissement <- as.numeric(state$investissement)
         
         if(state$investissement > (state$epargne_totale - epargne_precaution)) {
-          cat("\nATTENTION: Vous souhaitez investir un montant supérieur à votre capacité d'investissement calculée.\n")
+          cat("\nATTENTION: Vous souhaitez investir un montant supérieur à votre capacité d'investissement calculée par nos soins.\n")
           cat("Cela peut exposer votre situation financière à un risque important.\n")
-          cat("Souhaitez-vous réajuster ce montant ? (oui/non) : ")
+          cat("Souhaitez-vous donc réajuster le montant désirée ? (oui/non) : ")
           response <- tolower(readline())
           while(!response %in% c("oui", "non")) {
             cat("Veuillez répondre par 'oui' ou 'non' : ")
@@ -338,102 +345,138 @@ start_app <- function() {
           current_question <- "horizon"
         }
       }
-      
-      if(current_question == "horizon") {
+      #######################################################################    
+      if (current_question == "horizon") {
+        # Message indicatif général
+        cat("\n *Rappel théorique important : Investir \u00e0 court terme est plus risqu\u00e9 car les march\u00e9s financiers sont plus volatils sur de courtes p\u00e9riodes. Cela laisse moins de temps pour compenser d'\u00e9ventuelles pertes et rend l\u2019investissement plus vuln\u00e9rable aux fluctuations impr\u00e9visibles. \u00c0 l\u2019inverse, un horizon long permet de lisser les rendements et de b\u00e9n\u00e9ficier des cycles de march\u00e9 pour r\u00e9duire le risque.\n")
+        
+        # Question sur l'horizon d'investissement
         cat("\nQuel est votre horizon d'investissement ?\n")
         cat("1. Long terme (> 1 an)\n")
         cat("2. Moyen long terme (6 mois)\n")
         cat("3. Moyen court terme (1 mois)\n")
         cat("4. Court terme (1 semaine)\n")
-        cat("5. Très court terme (journalier)\n")
-        cat("Votre choix (1-5 ou 0 pour revenir à la question précédente) : ")
+        cat("5. Tr\u00e8s court terme (journalier)\n")
+        cat("Votre choix (1-5 ou 0 pour revenir \u00e0 la question pr\u00e9c\u00e9dente) : ")
         state$horizon <- readline()
-        if(state$horizon == "0") {
+        
+        if (state$horizon == "0") {
           current_question <- "investissement"
           next
         }
-        while(!state$horizon %in% c("1", "2", "3", "4", "5")) {
+        
+        while (!state$horizon %in% c("1", "2", "3", "4", "5")) {
           cat("Veuillez entrer un chiffre entre 1 et 5 : ")
           state$horizon <- readline()
         }
         
-        # Création du dataframe
-        profil_df <- data.frame(
-          prenom = state$prenom,
-          age = state$age,
-          profil_risque = ifelse(state$risk == "1", "Risquophobe", 
-                                 ifelse(state$risk == "2", "Risquophile", "Neutre au risque")),
-          revenus_mensuels = state$revenus_mensuels,
-          epargne_totale = state$epargne_totale,
-          montant_invest = state$investissement,
-          horizon_invest = switch(state$horizon,
-                                  "1" = "Long terme",
-                                  "2" = "Moyen long terme",
-                                  "3" = "Moyen court terme",
-                                  "4" = "Court terme",
-                                  "5" = "Très court terme"),
-          stringsAsFactors = FALSE
-        )
-        
-        # Boucle de validation/modification
-        profile_validated <- FALSE
-        while(!profile_validated) {
-          # Afficher le récapitulatif
-          cat("\nOK, maintenant nous pouvons vous proposer un récapitulatif de votre profil :\n\n")
-          cat("1. Prénom : ", profil_df$prenom, "\n")
-          cat("2. Âge : ", profil_df$age, "\n")
-          cat("3. Profil de risque : ", profil_df$profil_risque, "\n")
-          cat("4. Revenus mensuels : ", sprintf("%.2f", profil_df$revenus_mensuels), " euros\n")
-          cat("5. Épargne totale : ", sprintf("%.2f", profil_df$epargne_totale), " euros\n")
-          cat("6. Montant à investir : ", sprintf("%.2f", profil_df$montant_invest), " euros\n")
-          cat("7. Horizon d'investissement : ", profil_df$horizon_invest, "\n")
+        # Gestion des choix court terme
+        if (state$horizon %in% c("4", "5")) {
+          cat("\nAttention : Les investissements \u00e0 court terme comportent des risques importants.\n")
+          cat("Les march\u00e9s financiers sont tr\u00e8s volatils sur de courtes p\u00e9riodes, ce qui peut entra\u00eener des pertes significatives.\n")
+          cat("Ce type d'investissement est souvent r\u00e9serv\u00e9 \u00e0 des profils exp\u00e9riment\u00e9s et tol\u00e9rants au risque.\n")
+          cat("Souhaitez-vous toujours continuer avec un horizon \u00e0 court terme ? (oui/non) : ")
           
-          cat("\nÊtes-vous d'accord avec les informations telles que présentées ? (oui/non) : ")
-          confirm <- tolower(readline())
-          while(!confirm %in% c("oui", "non")) {
-            cat("Veuillez répondre par 'oui' ou 'non' : ")
-            confirm <- tolower(readline())
+          confirmation <- readline()
+          
+          while (!confirmation %in% c("oui", "non")) {
+            cat("Veuillez r\u00e9pondre par 'oui' ou 'non' : ")
+            confirmation <- readline()
           }
           
-          if(confirm == "oui") {
-            profile_validated <- TRUE
-            cat("\nParfait ! Votre profil est maintenant validé.\n")
-            cat("\n=== Passage à l'étape 2 : Évaluation de vos connaissances ===\n")
-            cat("\nNous allons maintenant évaluer vos connaissances sur les marchés financiers")
-            cat("\net le monde des cryptomonnaies pour vous proposer un accompagnement adapté.\n\n")
-          } else {
-            cat("\nQuelle information souhaitez-vous modifier ? (entrez le numéro correspondant) : ")
-            choice <- readline()
-            while(!choice %in% c("1", "2", "3", "4", "5", "6", "7")) {
-              cat("Veuillez entrer un numéro entre 1 et 7 : ")
-              choice <- readline()
-            }
-            
-            # Obtenir la nouvelle valeur selon le champ choisi
-            field <- switch(choice,
-                            "1" = "prenom",
-                            "2" = "age",
-                            "3" = "profil_risque",
-                            "4" = "revenus_mensuels",
-                            "5" = "epargne_totale",
-                            "6" = "montant_invest",
-                            "7" = "horizon_invest")
-            
-            cat(sprintf("\nValeur actuelle : %s\n", profil_df[[field]]))
-            cat("Nouvelle valeur : ")
-            new_value <- readline()
-            
-            # Mise à jour de la valeur dans le dataframe
-            profil_df[[field]] <- ifelse(field %in% c("age", "revenus_mensuels", "epargne_totale", "montant_invest"),
-                                         as.numeric(new_value), new_value)
+          if (confirmation == "non") {
+            cat("\nNous vous recommandons de r\u00e9ajuster votre horizon d'investissement.\n")
+            cat("Reprenons la question sur l'horizon temporel.\n")
+            next
           }
         }
-        break
       }
+      
+      ####################  
+      profil_df <- data.frame(
+        prenom = state$prenom,
+        age = state$age,
+        profil_risque = ifelse(state$risk == "1", "Risquophobe", 
+                               ifelse(state$risk == "2", "Risquophile", "Neutre au risque")),
+        revenus_mensuels = state$revenus_mensuels,
+        epargne_totale = state$epargne_totale,
+        montant_invest = state$investissement,
+        horizon_invest = switch(state$horizon,
+                                "1" = "Long terme",
+                                "2" = "Moyen long terme",
+                                "3" = "Moyen court terme",
+                                "4" = "Court terme",
+                                "5" = "Très court terme"),
+        # Ajout des nouvelles variables
+        epargne_precaution_estimee = state$revenus_mensuels * 6,
+        montant_max_invest_conseille = max(0, state$epargne_totale - (state$revenus_mensuels * 6)),
+        stringsAsFactors = FALSE
+      )
+      
+      # Boucle de validation/modification
+      profile_validated <- FALSE
+      while (!profile_validated) {
+        # Afficher le récapitulatif
+        cat("\nOK, maintenant nous pouvons vous proposer un récapitulatif de votre profil :\n\n")
+        cat("1. Prénom : ", profil_df$prenom, "\n")
+        cat("2. Âge : ", profil_df$age, "\n")
+        cat("3. Profil de risque : ", profil_df$profil_risque, "\n")
+        cat("4. Revenus mensuels : ", sprintf("%.2f", profil_df$revenus_mensuels), " euros\n")
+        cat("5. Épargne totale : ", sprintf("%.2f", profil_df$epargne_totale), " euros\n")
+        cat("6. Épargne de précaution estimée : ", sprintf("%.2f", profil_df$epargne_precaution_estimee), " euros\n")
+        cat("7. Montant maximal conseillé pour l'investissement : ", sprintf("%.2f", profil_df$montant_max_invest_conseille), " euros\n")
+        cat("8. Montant à investir : ", sprintf("%.2f", profil_df$montant_invest), " euros\n")
+        cat("9. Horizon d'investissement : ", profil_df$horizon_invest, "\n")
+        
+        cat("\nÊtes-vous d'accord avec les informations telles que présentées ? (oui/non) : ")
+        confirm <- tolower(readline())
+        while (!confirm %in% c("oui", "non")) {
+          cat("Veuillez répondre par 'oui' ou 'non' : ")
+          confirm <- tolower(readline())
+        }
+        
+        if (confirm == "oui") {
+          profile_validated <- TRUE
+          cat("\nParfait ! Votre profil est maintenant validé.\n")
+          cat("\n=== Passage à l'étape 2 : Évaluation de vos connaissances ===\n")
+          cat("\nNous allons maintenant évaluer vos connaissances sur les marchés financiers")
+          cat("\net le monde des cryptomonnaies pour vous proposer un accompagnement adapté.\n\n")
+        } else {
+          cat("\nQuelle information souhaitez-vous modifier ? (entrez le numéro correspondant) : ")
+          choice <- readline()
+          while (!choice %in% c("1", "2", "3", "4", "5", "6", "7")) {
+            cat("Veuillez entrer un numéro entre 1 et 7 : ")
+            choice <- readline()
+          }
+          
+          # Obtenir la nouvelle valeur selon le champ choisi
+          field <- switch(choice,
+                          "1" = "prenom",
+                          "2" = "age",
+                          "3" = "profil_risque",
+                          "4" = "revenus_mensuels",
+                          "5" = "epargne_totale",
+                          "6" = "montant_invest",
+                          "7" = "horizon_invest")
+          
+          cat(sprintf("\nValeur actuelle : %s\n", profil_df[[field]]))
+          cat("Nouvelle valeur : ")
+          new_value <- readline()
+          
+          # Mise à jour de la valeur dans le dataframe
+          profil_df[[field]] <- ifelse(field %in% c("age", "revenus_mensuels", "epargne_totale", "montant_invest"),
+                                       as.numeric(new_value), new_value)
+        }
+      }
+      
+      #####################
+      break
     }
   }
+  
   return(profil_df)
 }
 
 # Lancer l'application
 result <- start_app()
+
