@@ -550,7 +550,7 @@ start_app <- function() {
             stringsAsFactors = FALSE
           )
           profile_validated <- TRUE
-          cat(question_style("\nParfait ! Votre profil est maintenant validé.\n"))
+          cat(info_style("\nParfait ! Votre profil est maintenant validé nous pouvons désomrais passer à la prochaine étape.\n"))
           cat(info_style("\n=== Passage à l'étape 2 : Évaluation de vos connaissances ===\n"))
         } else {
           # Modification demandée
