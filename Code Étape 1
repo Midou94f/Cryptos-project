@@ -1,97 +1,164 @@
-# Packages nécessaires
-library(httr)
-library(jsonlite)
-library(dplyr)
-library(crayon)  # Ajout du package crayon
+##### Projet de programmation ##### 
+
+# Chargement des bibliothèques nécessaires
+library(openxlsx)
+library(crayon)
 
 # Définition des styles
-question_style <- blue$bold      # Questions en bleu gras
-info_style <- white$italic     # Notes informatives en blanc italique
-warning_style <- red$bold      # Avertissements en rouge gras
+question_style <- blue$bold            # Questions en bleu gras
+info_style <- white$italic            # Notes informatives en blanc italique
+warning_style <- red$bold            # Avertissements en rouge gras
+success_style <- green$bold          # Messages de succès en vert gras
+highlight_style <- yellow$bold       # Points importants en jaune gras
+info_secondary_style <- cyan$italic  # Informations secondaires en cyan italique
+error_style <- red$bold$underline    # Erreurs critiques en rouge gras souligné
+section_title_style <- magenta$bold$underline  # Titres de sections en magenta gras souligné
 
-show_welcome_message <- function() {
-  cat(question_style("\n=== Bienvenue dans notre application d'aide à la décision pour l'investissement en cryptomonnaies. Conçue pour être éthique, responsable et pédagogique, elle offre un accompagnement objectif, idéal notamment pour les novices souhaitant explorer ce domaine ===\n\n"))
-  cat(info_style("Notre application vous accompagnera de manière pédagogique et sécurisée dans\n"))
-  cat(info_style("votre parcours d'investissement sur le marché des cryptomonnaies.\n\n"))
-  cat("Pour une meilleure lisibilité :\n")
-  cat("- Les questions seront affichées en ", question_style("bleu gras"), "\n")
-  cat("- Les notes informatives seront en ", info_style("blanc italique"), "\n")
-  cat("- Les avertissements seront en ", warning_style("rouge gras"), "\n\n")
-  cat("Votre parcours se déroulera en 3 étapes :\n")
-  cat("1. ", question_style("Établissement de votre profil d'investisseur\n"))
-  cat("2. ", question_style("Évaluation de vos connaissances et accompagnement pédagogique\n"))
-  cat("3. ", question_style("Visualisation du marché et conseils financiers personnalisés\n\n"))
-  cat(info_style("Vos données resteront strictement confidentielles et ne seront jamais partagées.\n"))
-  cat("\nCommençons par établir votre profil d'investisseur...\n\n")
-}
+# Texte d'introduction
+intro_text <- c(
+  section_title_style("\nCryptoWise Copilote : Votre conseiller éthique, responsable et pédagogique 🚀\n"),
+  success_style("Bienvenue sur CryptoWise Copilote, votre allié pour découvrir et investir de manière éclairée dans le monde fascinant des cryptomonnaies !\n"),
+  info_style("CryptoWise Copilote est bien plus qu'une application d'aide à la décision d'investissement. "),
+  info_style("C'est un compagnon personnalisé qui combine éthique, pédagogie et innovation pour vous accompagner avec transparence et responsabilité dans vos choix financiers.\n\n"),
+  section_title_style("Fonctionnalité phare : SmartProfile\n"),
+  highlight_style("Grâce à SmartProfile, nous analysons votre type d'investisseur en combinant :\n"),
+  info_secondary_style("- Vos préférences de risque\n"),
+  info_secondary_style("- Vos revenus et votre capacité financière\n"),
+  info_secondary_style("- Votre niveau de connaissance générale en finance et en cryptos\n"),
+  info_style("Cette analyse attribuera à chaque utilisateur une personnalité parmi 27 profils types, chacun défini par des caractéristiques précises. Ces personnalités reflètent les résultats de notre analyse approfondie.\n\n"),
+  section_title_style("Les fonctionnalités accessibles et disponibles :\n"),
+  highlight_style("1. CryptoAcademy : "),
+  info_secondary_style("Développez vos compétences grâce à une plateforme éducative immersive, idéale pour les novices qui souhaitent découvir ce magnifique univers.\n"),
+  highlight_style("2. PépiteHunter : "),
+  info_secondary_style("Grâce à notre outil unique qui analyse les tendances de recherche sur le web, identifiez rapidement les cryptos susceptibles de déclencher un run. "),
+  info_secondary_style("Pour éviter les FOMO et prendre des décisions éclairées sur les opportunités à ne pas manquer.\n"),
+  highlight_style("3. RegAlert : "),
+  info_secondary_style("Suivez les actualités réglementaires et anticipez les impacts sur vos investissements.\n"),
+  highlight_style("4. BitcoinPulse : "),
+  info_secondary_style("Analysez la position actuelle du Bitcoin par rapport à son historique.\n"),
+  highlight_style("5. AltcoinTracker : "),
+  info_secondary_style("Identifiez les moments où les altcoins dominent ou où Bitcoin reprend la tête.\n"),
+  highlight_style("6. MarketScope : "),
+  info_secondary_style("Visualisez le marché, les cryptos à forte capitalisation, suivez les tendances générales du marché.\n"),
+  highlight_style("7. CryptoFocus : "),
+  info_secondary_style("Analysez en détail une cryptomonnaie spécifique pour prendre des décisions éclairées.\n\n"),
+  success_style("CryptoWise Copilote, c'est l'outil parfait pour apprendre à investir avec confiance, éthique et stratégie.\n"),
+  section_title_style("Note explicative sur l'accès aux fonctionnalités selon le profil utilisateur\n"),
+  info_style("Chez CryptoWise, nous adoptons une démarche responsable et pédagogique pour accompagner chaque utilisateur en fonction de son profil type. Voici les règles d'accès à nos fonctionnalités :\n"),
+  highlight_style("1. Profils à qui il sera déconseillé d'entrer sur le marché :\n"),
+  info_secondary_style("Animaux associés : Dodo 🦤, Singe hurleur 🐒, Hérisson 🦔, Lapin 🐇, Chèvre des falaises 🐐\n"),
+  info_style("Ces utilisateurs présentent une combinaison de faible capacité d’investissement, faible ou moyen niveau de connaissances et appétit pour le risque. "),
+  info_style("Pour protéger ces profils d’une prise de risque inconsidérée et éviter des pertes importantes, ils pourront avoir accès uniquement à CryptoAcademy. "),
+  info_style("L'objectif serait de leur permettre de renforcer leurs connaissances avant de considérer un investissement éventuel.\n\n"),
+  highlight_style("2. Profils pouvant investir avec des efforts supplémentaires :\n"),
+  info_secondary_style("Animaux associés : Canard 🦆, Loutre 🦦, Dauphin 🐬, Castor 🦫, Mangouste 🦦, Chameau 🐪\n"),
+  info_style("Ces utilisateurs disposent de capacités financières ou d’un appétit pour le risque modéré, mais un manque de connaissances peut freiner leur réussite. "),
+  info_style("Ils auront la possibilité de débloquer l'accès aux outils avancés après avoir suivi les modules éducatifs proposés et réussi les tests d'évaluation. "),
+  info_style("Cela leur permettrait d'investir en toute confiance et avec une meilleure maîtrise du marché.\n\n"),
+  highlight_style("3. Profils experts et totalement capables d'investir :\n"),
+  info_secondary_style("Animaux associés : Aigle impérial 🦅, Tigre 🐅, Loup gris 🐺, Lynx 🐱, Éléphant 🐘, Ours brun 🐻, Faucon pèlerin 🦅\n"),
+  info_style("Ces utilisateurs combinent une solide capacité d'investissement, des connaissances approfondies et un appétit pour le risque qui peut être maîtrisé et assumé. "),
+  info_style("Ils auront un accès immédiat à toutes les fonctionnalités, sans restrictions, dès leur inscription.\n\n"),
+  success_style("Conclusion :"),
+  info_style("Notre approche garantit que chaque utilisateur dispose des outils adaptés à son niveau. Vous progressez à votre rythme avec des choix éclairés et sécurisés.\n\n")
+)
 
-show_recap <- function(state) {
-  # Calcul des variables dépendantes
-  revenus_annuels <- state$revenus_mensuels * 12
-  epargne_precaution <- state$revenus_mensuels * 6
-  montant_max_invest <- max(0, state$epargne_totale - epargne_precaution)
+# Texte de bienvenue
+welcome_message_text <- c(
+  success_style("--- Bienvenue dans l'univers de CryptoWise Copilote ! ---\n"),
+  info_style("Merci d'avoir accepté de commencer ce voyage avec nous.\n"),
+  info_style("Nous allons explorer ensemble votre potentiel d'investissement et obtenir des informations clés sur votre profil.\n\n"),
   
-  # Affichage du récapitulatif
-  cat(info_style("\nOK, maintenant nous pouvons vous proposer un récapitulatif de votre profil :\n\n"))
-  cat("1. Prénom : ", question_style(state$prenom), "\n")
-  cat("2. Âge : ", question_style(state$age), "\n")
-  cat("3. Profil de risque : ", question_style(
-    ifelse(state$risk == "1", "Risquophobe", 
-           ifelse(state$risk == "2", "Risquophile", "Neutre au risque"))), "\n")
-  cat("4. Revenus mensuels : ", question_style(sprintf("%.2f", state$revenus_mensuels)), " euros\n")
-  cat("5. Revenus annuels estimés : ", green(sprintf("%.2f", revenus_annuels)), " euros\n")
-  cat("6. Épargne totale : ", question_style(sprintf("%.2f", state$epargne_totale)), " euros\n")
-  cat("7. Épargne de précaution estimée : ", green(sprintf("%.2f", epargne_precaution)), " euros\n")
-  cat("8. Montant maximal conseillé pour l'investissement : ", green(sprintf("%.2f", montant_max_invest)), " euros\n")
-  cat("9. Montant d'investissement crypto souhaité : ", question_style(sprintf("%.2f", state$investissement)), " euros\n")
-  cat("10. Horizon d'investissement : ", question_style(
-    switch(state$horizon,
-           "1" = "Long terme",
-           "2" = "Moyen long terme",
-           "3" = "Moyen court terme",
-           "4" = "Court terme",
-           "5" = "Très court terme")), "\n")
-}
+  section_title_style("Voici comment cela va se dérouler :\n"),
+  
+  highlight_style("1. Construire votre profil d'investisseur :\n"),
+  info_secondary_style(" - Vous répondrez à une série de questions pour analyser vos préférences de risque, vos capacités financières, et vos connaissances générales.\n"),
+  info_secondary_style(" - À la fin de cette étape, nous obtiendrons des premières informations essentielles pour déterminer votre profil type. "),
+  info_secondary_style("Cependant, pour établir votre profil animal comportemental d'investisseur, il faudra compléter la deuxième étape.\n\n"),
+  
+  highlight_style("2. Tester vos connaissances :\n"),
+  info_secondary_style(" - Cette étape permettra en effet d'évaluer vos connaissances actuelles afin de mieux comprendre votre niveau.\n"),
+  info_secondary_style(" - Ce n’est qu’après cette étape que vous découvrirez en détail votre comportement d'investisseur et l'annimal qui sommeil en vous.\n\n"),
+  
+  info_style("Basé sur ce résultat final, nous pourrons dès lors vous proposer les différentes fonctionnalités de notre application adaptées à votre profil.\n")
+)
 
+
+#####################################################################################################################
+# Fonction pour démarrer l'application
+#####################################################################################################################
 
 start_app <- function() {
-  show_welcome_message()
+  # Afficher le texte d'introduction avec style
+  cat(intro_text, sep = "\n")
+  
+  # Poser la première question
+  cat(question_style("\nSouhaitez-vous révolutionner votre approche d’investissement et de découverte des cryptos ? (oui/non) : "))
+  response <- tolower(readline())
+  
+  if (response == "oui") {
+    # Afficher le message de bienvenue avec style
+    cat(welcome_message_text, sep = "\n")
+    
+    # Poser la question de démarrage
+    cat(question_style("\nÊtes-vous prêt à commencer la première étape ? (oui/non) : "))
+    start_response <- tolower(readline())
+    
+    if (start_response == "oui") {
+      cat(success_style("\nParfait, lançons l'application et commençons ! 🚀\n"))
+    } else {
+      cat(warning_style("\nD'accord, vous pouvez revenir quand vous serez prêt. À bientôt !\n"))
+    }
+  } else {
+    cat(warning_style("\nOh non, nous sommes trop tristes de ne pas pouvoir initier ce voyage ensemble. Revenez quand vous voulez !\n"))
+    return(NULL)
+  }
   
   # Variables pour stocker les réponses
-  state <- list(prenom = NULL, age = NULL, risk = NULL, revenus_mensuels = NULL, 
-                epargne_totale = NULL, investissement = NULL, horizon = NULL)
+  state <- list(
+    prenom = NULL,
+    age = NULL,
+    risk = NULL,
+    revenus_mensuels = NULL,
+    epargne_totale = NULL,
+    investissement = NULL,
+    horizon = NULL
+  )
   
   profile_validated <- FALSE
   
-  while(!profile_validated) {
+  while (!profile_validated) {
     current_question <- "prenom"
     
     # Boucle principale du questionnaire
-    while(TRUE) {
-      if(current_question == "prenom") {
-        cat(question_style("Quel est votre prénom ? "))
+    while (TRUE) {
+      if (current_question == "prenom") {
+        cat(question_style("\nQuel est votre prénom ? "))
         state$prenom <- readline()
-        while(nchar(state$prenom) == 0 || grepl("[0-9\\W]", state$prenom)) {
-          cat(warning_style("Veuillez entrer un prénom valide (lettres uniquement, sans caractères spéciaux) : "))
+        
+        while (nchar(state$prenom) == 0 || grepl("[0-9\\W]", state$prenom)) {
+          cat(warning_style("\nVeuillez entrer un prénom valide (lettres uniquement, sans caractères spéciaux) : "))
           state$prenom <- readline()
         }
         current_question <- "age"
       }
       
-      if(current_question == "age") {
+      if (current_question == "age") {
         cat(question_style("\nQuel est votre âge ? (entrez uniquement le chiffre ou 0 pour revenir à la question précédente) "))
         state$age <- readline()
-        if(state$age == "0") {
+        
+        if (state$age == "0") {
           current_question <- "prenom"
           next
         }
-        while(!grepl("^[0-9]+$", state$age)) {
-          cat(warning_style("Veuillez entrer uniquement des chiffres : "))
+        
+        while (!grepl("^[0-9]+$", state$age)) {
+          cat(warning_style("\nVeuillez entrer uniquement des chiffres : "))
           state$age <- readline()
         }
         state$age <- as.numeric(state$age)
         
-        if(state$age < 18) {
+        if (state$age < 18) {
           cat(warning_style("\nDésolé, vous n'avez pas l'âge requis pour utiliser notre plateforme.\n"))
           cat(info_style("Revenez lorsque vous aurez 18 ans révolus.\n"))
           return(NULL)
@@ -99,10 +166,9 @@ start_app <- function() {
         current_question <- "risk"
       }
       
-      ###################
       
       ################################################################
-      # Partie RISK 
+      # Partie RISK
       ################################################################
       
       if (current_question == "risk") {
@@ -145,11 +211,11 @@ start_app <- function() {
             if (confirm == "oui") {
               cat(warning_style("\nATTENTION : Les Cryptomonnaies ne garantissent pas le capital. L'investissement en cryptomonnaies comporte des risques élevés non adaptés aux personnes risquophobes.\n"))
               cat(info_style("Votre profil de risque n'est donc pas adapté au marché des cryptomonnaies. Cependant, voici une liste de placements alternatifs :\n"))
-              cat(info_style("- Comptes d'épargne : Rendement espéré inférieur à 2%, risque très faible.\n"))
-              cat(info_style("- Obligations d'État : Rendement espéré inférieur à 4%, risque faible.\n"))
-              cat(info_style("- Fonds en euros (assurances-vie) : Rendement espéré inférieur à 3%, risque très faible.\n"))
-              cat(info_style("- Obligations indexées sur l'inflation : Rendement espéré inférieur à 3,5%, risque faible.\n"))
-              cat(info_style("- ETF obligataires ou peu volatils : Rendement espéré inférieur à 5%, risque faiblement modéré.\n"))
+              cat(info_secondary_style("- Comptes d'épargne : Rendement espéré inférieur à 2%, risque très faible.\n"))
+              cat(info_secondary_style("- Obligations d'État : Rendement espéré inférieur à 4%, risque faible.\n"))
+              cat(info_secondary_style("- Fonds en euros (assurances-vie) : Rendement espéré inférieur à 3%, risque très faible.\n"))
+              cat(info_secondary_style("- Obligations indexées sur l'inflation : Rendement espéré inférieur à 3,5%, risque faible.\n"))
+              cat(info_secondary_style("- ETF obligataires ou peu volatils : Rendement espéré inférieur à 5%, risque faiblement modéré.\n"))
               cat(info_style("\nNote : Les rendements des produits cités dépendent fortement des conditions de marché et des contrats associés.\n"))
               cat(question_style("Souhaitez-vous quand même continuer ? (oui/non) : "))
               response <- tolower(readline())
@@ -158,7 +224,7 @@ start_app <- function() {
                 response <- tolower(readline())
               }
               if (response == "non") {
-                cat(info_style("\nMerci de votre visite. N'hésitez pas à contacter votre banquier ou tout autres profesionnels afin d'explorer des alternatives de placement pour sécuriser votre capital.\n"))
+                cat(info_style("\nMerci de votre visite. N'hésitez pas à contacter votre banquier ou tout autre professionnel afin d'explorer des alternatives de placement pour sécuriser votre capital.\n"))
                 return(NULL)
               } else {
                 break  # on sort du repeat => risk validé
@@ -178,12 +244,11 @@ start_app <- function() {
             }
             if (confirm == "oui") {
               cat(warning_style("\nVotre profil risque est compatible avec le marché des cryptomonnaies. Cependant, ce marché est hautement spéculatif et comparable à :\n"))
-              cat(info_style("- Le trading à effet de levier : Rendement espéré non plafonné, risque très élevé.\n"))
-              cat(info_style("- Les options ou produits dérivés à court terme : Rendement espéré non plafonné, risque très élevé.\n"))
-              cat(info_style("- Les investissements dans des start-ups : Rendement espéré supérieur à 15% sur le long terme, risque fort.\n"))
-              cat(info_style("\nExemple concret des risques liés aux cryptos :\n"))
-              cat(warning_style("- Example : Bitcoin (BTC) : Rendement annuel moyen de 200% sur 5 ans, mais baisse de plus de 80% entre 2017 et 2018.\n"))
-              cat(warning_style("\n *Note : Les cryptomonnaies doivent être considérées comme des investissements spéculatifs, nécessitant une compréhension approfondie et une tolérance élevée à la volatilité.\n"))
+              cat(info_secondary_style("- Le trading à effet de levier : Rendement espéré non plafonné, risque très élevé.\n"))
+              cat(info_secondary_style("- Les options ou produits dérivés à court terme : Rendement espéré non plafonné, risque très élevé.\n"))
+              cat(info_secondary_style("- Les investissements dans des start-ups : Rendement espéré supérieur à 15% sur le long terme, risque fort.\n"))
+              cat(info_secondary_style("\nExemple concret des risques liés aux cryptos :\n"))
+              cat(warning_style("- Exemple : Bitcoin (BTC) : Rendement annuel moyen de 200% sur 5 ans, mais baisse de plus de 80% entre 2017 et 2018.\n"))
               cat(question_style("Souhaitez-vous quand même continuer ? (oui/non) : "))
               response <- tolower(readline())
               while (!response %in% c("oui", "non")) {
@@ -211,13 +276,8 @@ start_app <- function() {
             }
             if (confirm == "oui") {
               cat(info_style("\nVotre profil de risque est partiellement compatible avec le marché des cryptomonnaies. Cependant, il reste important de noter que ce marché est extrêmement volatil.\n"))
-              cat(info_style("Voici une liste de placements modérément risqués pouvant convenir à votre profil :\n"))
-              cat(info_style("- ETF diversifiés : Rendement espéré inférieur à 10%, risque modéré.\n"))
-              cat(info_style("- Fonds équilibrés : Rendement espéré inférieur à 8%, risque modéré.\n"))
-              cat(info_style("- Obligations d'entreprise bien notées : Rendement espéré inférieur à 6%, risque faiblement modéré.\n"))
-              cat(info_style("- Immobilier papier (SCPI) : Rendement espéré inférieur à 6%, risque faible à modéré.\n"))
-              cat(info_style("- Actions avec dividendes : Rendement espéré inférieur à 7%, risque modéré.\n"))
-              cat(warning_style("\n *Note : Bien que modérément risqués, ces placements ne présentent pas les fluctuations extrêmes des cryptomonnaies.\n"))
+              cat(info_secondary_style("- ETF diversifiés : Rendement espéré inférieur à 10%, risque modéré.\n"))
+              cat(info_secondary_style("- Fonds équilibrés : Rendement espéré inférieur à 8%, risque modéré.\n"))
               cat(question_style("Souhaitez-vous quand même continuer ? (oui/non) : "))
               response <- tolower(readline())
               while (!response %in% c("oui", "non")) {
@@ -234,7 +294,7 @@ start_app <- function() {
           }
           
           # ---------------------------------------------------------
-          # Si confirm == "non" final => propose réajustement / quitter
+          # Vérifier si l'utilisateur souhaite réajuster son profil ou quitter
           if (confirm == "non") {
             cat(question_style("\nSouhaitez-vous réajuster votre profil de risque ou quitter le module d'investissement ?\n"))
             cat("1. ", question_style("Réajuster le profil\n"))
@@ -256,20 +316,19 @@ start_app <- function() {
           break
         } # fin repeat
         
-        # Après la boucle 'repeat', on vérifie si user_return a été activé
+        # Si l'utilisateur veut revenir à "age"
         if (user_return) {
-          # => l'utilisateur a tapé 0 => on veut revenir à "age"
-          # => on skippe la logique "on va à la question suivante"
           next
         } else {
-          # => On passe à la question suivante
           current_question <- "revenus_mensuels"
           next
         }
       }
       
-      ######################### Partie Revenus Mensuels #########################
-      ######################### #########################
+      
+      ##################################################
+      ######################### Partie Recvenus Mensuels
+      ##################################################
       
       if (current_question == "revenus_mensuels") {
         user_return <- FALSE
@@ -295,7 +354,7 @@ start_app <- function() {
           
           state$revenus_mensuels <- as.numeric(state$revenus_mensuels)
           revenus_annuels <- state$revenus_mensuels * 12
-          cat(info_style(sprintf("\nD'après nos estimations, vos revenus annuels sont de %s euros.\n", green(sprintf("%.2f", revenus_annuels)))))
+          cat(success_style(sprintf("\nD'après nos estimations, vos revenus annuels sont de %s euros.\n", green(sprintf("%.2f", revenus_annuels)))))
           
           if (revenus_annuels < 19000) {
             cat(warning_style("\nATTENTION: Vos revenus indiquent que vous n'avez peut-être pas de sécurité financière suffisante.\n"))
@@ -323,7 +382,6 @@ start_app <- function() {
       }
       
       ######################### Partie Épargne #########################
-      
       if (current_question == "epargne_totale") {
         user_return <- FALSE
         
@@ -348,7 +406,7 @@ start_app <- function() {
           
           state$epargne_totale <- as.numeric(state$epargne_totale)
           epargne_precaution <- state$revenus_mensuels * 6
-          cat(info_style(sprintf("\nEn règle générale, il est conseillé d'avoir une épargne de précaution équivalente à six mois de revenus. Cette épargne nécessaire serait de %s euros.\n", green(sprintf("%.2f", epargne_precaution)))))
+          cat(success_style(sprintf("\nEn règle générale, il est conseillé d'avoir une épargne de précaution équivalente à six mois de revenus. Cette épargne nécessaire serait de %s euros.\n", green(sprintf("%.2f", epargne_precaution)))))
           
           if (state$epargne_totale < epargne_precaution) {
             cat(warning_style("\nATTENTION: Votre épargne est inférieure à l'épargne de précaution recommandée.\n"))
@@ -367,7 +425,7 @@ start_app <- function() {
             }
           } else {
             montant_investissable <- state$epargne_totale - epargne_precaution
-            cat(info_style(sprintf("\nD'après nos estimations, vous avez la capacité d'investir jusqu'à %s euros.\n", green(sprintf("%.2f", montant_investissable)))))
+            cat(success_style(sprintf("\nD'après nos estimations, vous avez la capacité d'investir jusqu'à %s euros.\n", green(sprintf("%.2f", montant_investissable)))))
           }
           
           # Étape validée, passer à l'investissement
@@ -379,7 +437,6 @@ start_app <- function() {
       }
       
       ######################### Partie Investissement #########################
-      
       if (current_question == "investissement") {
         user_return <- FALSE
         
@@ -421,7 +478,7 @@ start_app <- function() {
               break
             }
           } else {
-            cat(info_style("\nTrès bien, le montant désiré correspond à votre capacité d'investissement.\n"))
+            cat(success_style("\nTrès bien, le montant désiré correspond à votre capacité d'investissement.\n"))
             cat(info_style("Nous passons à la question suivante.\n"))
             current_question <- "horizon"
             break
@@ -432,9 +489,8 @@ start_app <- function() {
       }
       
       #############################################
-      ################ Horizon d'investissement
-      ############################################
-      
+      # Horizon d'investissement
+      #############################################
       
       if (current_question == "horizon") {
         while (TRUE) { # Boucle pour relancer la question si nécessaire
@@ -488,6 +544,8 @@ start_app <- function() {
         }
       }
       
+      
+      ###################################################################
       ################################# RECAP PROFIL
       ####################################################
       
@@ -498,6 +556,16 @@ start_app <- function() {
         revenus_annuels <- state$revenus_mensuels * 12
         epargne_precaution <- state$revenus_mensuels * 6
         montant_max_invest <- max(0, state$epargne_totale - epargne_precaution)
+        
+        # Calcul de la capacité d'investissement
+        capacite_investissement <- ifelse(
+          montant_max_invest == 0 || (montant_max_invest / epargne_precaution) < 0.1, 
+          "Faible", 
+          ifelse((montant_max_invest / epargne_precaution) < 0.3, 
+                 "Moyen", 
+                 "Élevé"
+          )
+        )
         
         # Afficher le récapitulatif
         cat(info_style("\nOK, maintenant nous pouvons vous proposer un récapitulatif de votre profil :\n\n"))
@@ -511,8 +579,9 @@ start_app <- function() {
         cat("6. Épargne totale : ", question_style(sprintf("%.2f", state$epargne_totale)), " euros\n")
         cat("7. Épargne de précaution estimée : ", green(sprintf("%.2f", epargne_precaution)), " euros\n")
         cat("8. Montant maximal conseillé pour l'investissement : ", green(sprintf("%.2f", montant_max_invest)), " euros\n")
-        cat("9. Montant d'investissement crypto souhaité : ", question_style(sprintf("%.2f", state$investissement)), " euros\n")
-        cat("10. Horizon d'investissement : ", question_style(
+        cat("9. Capacité d'investissement estimée : ", highlight_style(capacite_investissement), "\n")
+        cat("10. Montant d'investissement crypto souhaité : ", question_style(sprintf("%.2f", state$investissement)), " euros\n")
+        cat("11. Horizon d'investissement : ", question_style(
           switch(state$horizon,
                  "1" = "Long terme",
                  "2" = "Moyen long terme",
@@ -540,6 +609,7 @@ start_app <- function() {
             epargne_totale = state$epargne_totale,
             epargne_precaution_estimee = epargne_precaution,
             montant_max_invest_conseille = montant_max_invest,
+            capacite_investissement = capacite_investissement, # Nouvelle variable
             montant_invest = state$investissement,
             horizon_invest = switch(state$horizon,
                                     "1" = "Long terme",
@@ -549,15 +619,20 @@ start_app <- function() {
                                     "5" = "Très court terme"),
             stringsAsFactors = FALSE
           )
+          
+          # Enregistrement en format Excel
+          write.xlsx(profil_df, file = "/Users/mehdifehri/Desktop/Technique de programmation/Data work/profil_user.xlsx", rowNames = FALSE)
+          cat(info_style("\nLe profil utilisateur a été enregistré avec succès dans le fichier 'profil_user.xlsx'.\n"))
+          
           profile_validated <- TRUE
-          cat(info_style("\nParfait ! Votre profil est maintenant validé nous pouvons désomrais passer à la prochaine étape.\n"))
+          cat(success_style("\nParfait ! Votre profil est maintenant validé. Nous pouvons désormais passer à la prochaine étape.\n"))
           cat(info_style("\n=== Passage à l'étape 2 : Évaluation de vos connaissances ===\n"))
         } else {
           # Modification demandée
-          cat(question_style("\nQuelle information souhaitez-vous modifier ? (n'entrez que le numéro correspondant :1, 2, 3, 4, 6, 9 ou 10, les autres champs ne sont pas modifiables) : "))
+          cat(question_style("\nQuelle information souhaitez-vous modifier ? (n'entrez que le numéro correspondant :1, 2, 3, 4, 6, 10 ou 11, les autres champs ne sont pas modifiables) : "))
           choice <- readline()
-          while (!choice %in% c("1", "2", "3", "4", "6", "9", "10")) {
-            cat(warning_style("Veuillez entrer un numéro valide (1, 2, 3, 4, 6, 9 ou 10) : "))
+          while (!choice %in% c("1", "2", "3", "4", "6", "10", "11")) {
+            cat(warning_style("Veuillez entrer un numéro valide (1, 2, 3, 4, 6, 10 ou 11) : "))
             choice <- readline()
           }
           
@@ -605,7 +680,7 @@ start_app <- function() {
               state$epargne_totale <- readline()
             }
             state$epargne_totale <- as.numeric(state$epargne_totale)
-          } else if (choice == "9") {
+          } else if (choice == "10") {
             # Montant d'investissement
             cat(question_style("Nouveau montant d'investissement : "))
             state$investissement <- readline()
@@ -614,7 +689,7 @@ start_app <- function() {
               state$investissement <- readline()
             }
             state$investissement <- as.numeric(state$investissement)
-          } else if (choice == "10") {
+          } else if (choice == "11") {
             # Horizon d'investissement
             cat(question_style("Nouvel horizon d'investissement (1 = Long terme, 2 = Moyen long terme, 3 = Moyen court terme, 4 = Court terme, 5 = Très court terme) : "))
             state$horizon <- readline()
@@ -625,6 +700,7 @@ start_app <- function() {
           }
         }
       }
+      
       
       
       break
