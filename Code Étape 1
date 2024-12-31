@@ -144,7 +144,7 @@ start_app <- function() {
       }
       
       if (current_question == "age") {
-        cat(question_style("\nQuel est votre âge ? (entrez uniquement le chiffre ou 0 pour revenir à la question précédente) "))
+        cat(question_style("\nQuel est votre âge ? (entrez uniquement le nombre ou 0 pour revenir à la question précédente) "))
         state$age <- readline()
         
         if (state$age == "0") {
