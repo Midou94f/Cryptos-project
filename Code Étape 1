@@ -92,22 +92,31 @@ start_app <- function() {
   # Afficher le texte d'introduction avec style
   cat(intro_text, sep = "\n")
   
-  # Poser la première question
-  cat(question_style("\nSouhaitez-vous révolutionner votre approche d’investissement et de découverte des cryptos ? (oui/non) : "))
-  response <- tolower(readline())
+  # Poser la première question avec validation stricte
+  repeat {
+    cat(question_style("\nSouhaitez-vous révolutionner votre approche d’investissement et de découverte des cryptos ? (oui/non) : "))
+    response <- tolower(readline())
+    if (response %in% c("oui", "non")) break
+    cat(warning_style("\nVeuillez répondre uniquement par 'oui' ou 'non'.\n"))
+  }
   
   if (response == "oui") {
     # Afficher le message de bienvenue avec style
     cat(welcome_message_text, sep = "\n")
     
-    # Poser la question de démarrage
-    cat(question_style("\nÊtes-vous prêt à commencer la première étape ? (oui/non) : "))
-    start_response <- tolower(readline())
+    # Poser la deuxième question avec validation stricte
+    repeat {
+      cat(question_style("\nÊtes-vous prêt à commencer la première étape ? (oui/non) : "))
+      start_response <- tolower(readline())
+      if (start_response %in% c("oui", "non")) break
+      cat(warning_style("\nVeuillez répondre uniquement par 'oui' ou 'non'.\n"))
+    }
     
     if (start_response == "oui") {
       cat(success_style("\nParfait, lançons l'application et commençons ! 🚀\n"))
     } else {
       cat(warning_style("\nD'accord, vous pouvez revenir quand vous serez prêt. À bientôt !\n"))
+      return(NULL)
     }
   } else {
     cat(warning_style("\nOh non, nous sommes trop tristes de ne pas pouvoir initier ce voyage ensemble. Revenez quand vous voulez !\n"))
@@ -144,7 +153,7 @@ start_app <- function() {
       }
       
       if (current_question == "age") {
-        cat(question_style("\nQuel est votre âge ? (entrez uniquement le nombre ou 0 pour revenir à la question précédente) "))
+        cat(question_style("\nQuel est votre âge ? (entrez uniquement le chiffre ou 0 pour revenir à la question précédente) "))
         state$age <- readline()
         
         if (state$age == "0") {
@@ -548,6 +557,9 @@ start_app <- function() {
       ###################################################################
       ################################# RECAP PROFIL
       ####################################################
+      ###################################################################
+      ################################# RECAP PROFIL
+      ####################################################
       
       # Boucle de validation/modification
       profile_validated <- FALSE
@@ -565,6 +577,17 @@ start_app <- function() {
                  "Moyen", 
                  "Élevé"
           )
+        )
+        
+        # Calcul du score d'appétit pour le risque
+        risk_score <- switch(state$risk, "1" = 2, "3" = 4, "2" = 6)  # Risquophobe=2, Neutre=4, Risquophile=6
+        horizon_score <- as.numeric(state$horizon)  # Long terme=1, Très court terme=5
+        appetit_risque_score <- risk_score + horizon_score
+        
+        # Déterminer la catégorie d'appétit pour le risque
+        appetit_risque_categorie <- ifelse(
+          appetit_risque_score <= 5, "Faible", 
+          ifelse(appetit_risque_score <= 8, "Moyen", "Élevé")
         )
         
         # Afficher le récapitulatif
@@ -588,6 +611,7 @@ start_app <- function() {
                  "3" = "Moyen court terme",
                  "4" = "Court terme",
                  "5" = "Très court terme")), "\n")
+        cat("12. Score d'appétit pour le risque : ", highlight_style(appetit_risque_score), " (", appetit_risque_categorie, ")\n")
         
         # Demander confirmation
         cat(question_style("\nÊtes-vous d'accord avec les informations telles que présentées ? (oui/non) : "))
@@ -609,7 +633,7 @@ start_app <- function() {
             epargne_totale = state$epargne_totale,
             epargne_precaution_estimee = epargne_precaution,
             montant_max_invest_conseille = montant_max_invest,
-            capacite_investissement = capacite_investissement, # Nouvelle variable
+            capacite_investissement = capacite_investissement, 
             montant_invest = state$investissement,
             horizon_invest = switch(state$horizon,
                                     "1" = "Long terme",
@@ -617,6 +641,8 @@ start_app <- function() {
                                     "3" = "Moyen court terme",
                                     "4" = "Court terme",
                                     "5" = "Très court terme"),
+            appetit_risque_score = appetit_risque_score,
+            appetit_risque_categorie = appetit_risque_categorie,
             stringsAsFactors = FALSE
           )
           
@@ -700,8 +726,6 @@ start_app <- function() {
           }
         }
       }
-      
-      
       
       break
     }
