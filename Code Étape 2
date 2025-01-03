@@ -388,63 +388,63 @@ matrice_profils <- list(
   list(capacite = "Faible", connaissance = "Faible", risque = "Moyen", animal = "🦔 Hérisson", description = "Timide et prudent, l’Hérisson se recroqueville au moindre signe de danger. Cette attitude le protège des grandes catastrophes, mais peut aussi lui faire rater des opportunités intéressantes. Il avance petit à petit, préférant la sécurité au risque", 
        conseil = "Diversifiez vos investissements, mais osez sortir un peu de votre zone de confort. Parfois, un petit risque calculé peut ouvrir des portes insoupçonnées."),
   list(capacite = "Faible", connaissance = "Faible", risque = "Faible", animal = "🐇 Lapin", description = "Le Lapin est nerveux par nature. Toujours sur le qui-vive, il fuit face aux opportunités, de peur de se tromper ou de perdre gros. Cette hyperactivité mentale peut l'épuiser et le rendre incapable de prendre des décisions solides."
-,conseil= "Apprenez à calmer vos craintes et à évaluer les opportunités rationnellement. Un bon plan structuré peut vous éviter de passer à côté d’investissements fructueux."),
+       ,conseil= "Apprenez à calmer vos craintes et à évaluer les opportunités rationnellement. Un bon plan structuré peut vous éviter de passer à côté d’investissements fructueux."),
   list(capacite = "Faible", connaissance = "Moyen", risque = "Élevé", animal = "🐐 Chèvre des falaises", description = "Intrépide et déterminé, la Chèvre des falaises n’a pas peur de gravir des terrains accidentés. Cependant, sa témérité l’expose à des chutes parfois spectaculaires. Elle manque parfois de recul pour évaluer les risques.",
-conseil =" Apprenez à canaliser votre courage en prenant des risques mesurés. Ne grimpez pas sans avoir une corde de sécurité : ayez toujours une stratégie de repli."),
+       conseil =" Apprenez à canaliser votre courage en prenant des risques mesurés. Ne grimpez pas sans avoir une corde de sécurité : ayez toujours une stratégie de repli."),
   list(capacite = "Faible", connaissance = "Moyen", risque = "Moyen", animal = "🦦 Loutre", description = "Curieuse et joueuse, la Loutre avance tranquillement dans la vie. Elle sait utiliser ses ressources limitées avec pragmatisme, préférant progresser lentement mais sûrement. Elle aime apprendre tout en s’amusant.",
-conseil= "Restez fidèle à votre style détendu, mais investissez dans des produits stables et peu volatils pour bâtir lentement un portefeuille durable."),
+       conseil= "Restez fidèle à votre style détendu, mais investissez dans des produits stables et peu volatils pour bâtir lentement un portefeuille durable."),
   list(capacite = "Faible", connaissance = "Moyen", risque = "Faible", animal = "🦆 Canard", description = "Le Canard est calme, observateur, et préfère naviguer paisiblement à la surface des choses. Il est rarement pris de panique, mais son attitude nonchalante peut l’empêcher d’agir au bon moment.",
-conseil= "Utilisez votre patience comme un atout, mais ne restez pas trop passif. Repérez les bons moments pour agir et faites des mouvements réfléchis."),
+       conseil= "Utilisez votre patience comme un atout, mais ne restez pas trop passif. Repérez les bons moments pour agir et faites des mouvements réfléchis."),
   list(capacite = "Faible", connaissance = "Élevé", risque = "Élevé", animal = "🐍 Serpent", description = "Opportuniste et rusé, le Serpent est un maître stratège. Il sait attendre patiemment son heure pour attaquer au bon moment. Agile et calculateur, il maximise chaque opportunité, mais son goût pour le risque peut parfois le mettre en danger.",
-conseil= "Continuez à optimiser vos choix, mais ne mettez pas tout en jeu sur un seul coup. Pensez à diversifier pour limiter vos risques tout en profitant de vos compétences."),
+       conseil= "Continuez à optimiser vos choix, mais ne mettez pas tout en jeu sur un seul coup. Pensez à diversifier pour limiter vos risques tout en profitant de vos compétences."),
   list(capacite = "Faible", connaissance = "Élevé", risque = "Moyen", animal = "🦉 Hibou", description = "Sage et réfléchi, l’Hibou observe tout depuis les hauteurs. Il ne se précipite jamais, préférant analyser les faits avant d’agir. Sa clairvoyance lui permet de prendre des décisions avisées, bien qu’il puisse manquer d’audace.",
-conseil="Continuez à vous appuyer sur vos connaissances, mais prenez un peu plus de risques calculés. La prudence est un atout, mais ne vous freinez pas trop.
+       conseil="Continuez à vous appuyer sur vos connaissances, mais prenez un peu plus de risques calculés. La prudence est un atout, mais ne vous freinez pas trop.
 
 "),
   list(capacite = "Faible", connaissance = "Élevé", risque = "Faible", animal = "🐧 Manchot", description = "Résilient et méthodique, le Manchot compense ses limitations physiques par une incroyable capacité d’adaptation. Sa patience lui permet de résister aux épreuves et d’avancer malgré les vents contraires.",
-conseil="Conservez votre discipline et votre approche rigoureuse. Investissez dans des produits à long terme qui correspondent à votre endurance."),
+       conseil="Conservez votre discipline et votre approche rigoureuse. Investissez dans des produits à long terme qui correspondent à votre endurance."),
   list(capacite = "Moyenne", connaissance = "Faible", risque = "Élevé", animal = "🐒 Singe hurleur", description = "Curieux et plein d’énergie, le Singe hurleur s’aventure souvent sur des terrains inconnus sans véritable plan. Désorganisé et impulsif, il agit sous l’excitation du moment, parfois au détriment de la prudence. Son enthousiasme est contagieux, mais il doit apprendre à le canaliser.",
-conseil="Prenez le temps de structurer vos choix. Votre curiosité est un atout, mais couplez-la à une recherche approfondie pour éviter de prendre des risques inutiles."),
+       conseil="Prenez le temps de structurer vos choix. Votre curiosité est un atout, mais couplez-la à une recherche approfondie pour éviter de prendre des risques inutiles."),
   list(capacite = "Moyenne", connaissance = "Faible", risque = "Moyen", animal = " 🦡 blaireau", description = "Endurant et déterminé, le Blaireau avance avec ténacité malgré les obstacles. Il est connu pour sa résilience et son courage, mais il manque parfois de connaissances pour optimiser ses efforts. Sa capacité à s'adapter dans des environnements variés en fait un exemple de persévérance. Toutefois, il peut se montrer un peu borné face à des conseils extérieurs.",
-conseil="Votre ténacité est un atout précieux, mais apprenez à élargir vos connaissances avant d’agir. Diversifiez vos investissements et entourez-vous de conseils éclairés pour tirer pleinement parti de votre endurance."),
+       conseil="Votre ténacité est un atout précieux, mais apprenez à élargir vos connaissances avant d’agir. Diversifiez vos investissements et entourez-vous de conseils éclairés pour tirer pleinement parti de votre endurance."),
   list(capacite = "Moyenne", connaissance = "Faible", risque = "Faible", animal = "🦥 Paresseux", description = "Le Paresseux est l’incarnation de la tranquillité. Lent et détaché, il préfère observer la vie passer plutôt que de se précipiter dans des décisions. Cette attitude le protège des risques, mais le rend aussi passif face à des opportunités intéressantes.",
-conseil= "Apprenez à sortir de votre confort et à agir. Une dose d’audace pourrait transformer votre approche en une stratégie gagnante."),
+       conseil= "Apprenez à sortir de votre confort et à agir. Une dose d’audace pourrait transformer votre approche en une stratégie gagnante."),
   list(capacite = "Moyenne", connaissance = "Moyen", risque = "Élevé", animal = "🦅 Faucon pèlerin", description = "Stratège et visionnaire, le Faucon pèlerin repère rapidement ses opportunités et plonge avec précision. Cependant, son audace et sa rapidité peuvent le rendre imprudent s’il ne prend pas le temps d’évaluer tous les facteurs.",
-conseil="Continuez à viser haut, mais prenez quelques instants pour vérifier vos hypothèses avant de foncer. Une stratégie bien calibrée vous permettra de voler encore plus haut.
+       conseil="Continuez à viser haut, mais prenez quelques instants pour vérifier vos hypothèses avant de foncer. Une stratégie bien calibrée vous permettra de voler encore plus haut.
 
 "),
   list(capacite = "Moyenne", connaissance = "Moyen", risque = "Moyen", animal = "🦫 Castor", description = "Travailleur acharné, le Castor aime bâtir méthodiquement. Équilibré et prévoyant, il consacre du temps à construire des fondations solides, mais il sait aussi s’adapter quand la situation l’exige.",
-conseil="Poursuivez votre stratégie structurée. Les fondations solides que vous posez aujourd’hui deviendront un atout précieux pour des investissements à long terme."),
+       conseil="Poursuivez votre stratégie structurée. Les fondations solides que vous posez aujourd’hui deviendront un atout précieux pour des investissements à long terme."),
   list(capacite = "Moyenne", connaissance = "Moyen", risque = "Faible", animal = "🐼 Panda", description = "Paisible et réfléchi, le Panda préfère la sécurité et le confort. Bien qu’il ait une personnalité charmante, il peut manquer d’initiative pour sortir de sa zone de confort et explorer de nouvelles opportunités.",
-conseil="Exploitez votre calme pour investir dans des options stables, mais osez expérimenter des choix légèrement plus audacieux pour diversifier votre portefeuille.
+       conseil="Exploitez votre calme pour investir dans des options stables, mais osez expérimenter des choix légèrement plus audacieux pour diversifier votre portefeuille.
 
 "),
   list(capacite = "Moyenne", connaissance = "Élevé", risque = "Élevé", animal = "🐅 Tigre", description = "Puissant et agile, le Tigre combine force et rapidité pour maximiser ses résultats. Son instinct de chasseur lui permet de repérer les meilleures opportunités, mais son goût du risque peut parfois le mettre en danger.",
-conseil="Continuez à maximiser vos gains, mais gardez un œil sur vos limites. Diversifiez vos investissements pour sécuriser vos succès."),
+       conseil="Continuez à maximiser vos gains, mais gardez un œil sur vos limites. Diversifiez vos investissements pour sécuriser vos succès."),
   list(capacite = "Moyenne", connaissance = "Élevé", risque = "Moyen", animal = "🦊 Lynx", description = "Silencieux et observateur, le Lynx est un expert en évaluation des opportunités. Il avance discrètement et n’agit qu’après avoir soigneusement étudié son environnement. Cette approche méthodique lui permet d’éviter les erreurs.",
-conseil="Restez fidèle à votre approche analytique. Elle est un atout pour détecter les opportunités à moyen terme tout en limitant les risques."),
+       conseil="Restez fidèle à votre approche analytique. Elle est un atout pour détecter les opportunités à moyen terme tout en limitant les risques."),
   list(capacite = "Moyenne", connaissance = "Élevé", risque = "Faible", animal = "🐨 Koala", description = "Paisible et prudent, le Koala avance avec sérénité. Il choisit toujours des chemins sûrs et préfère éviter toute forme de stress. Bien qu’il soit parfois trop précautionneux, sa constance est un véritable atout.",
-conseil="Continuez à miser sur des placements stables et sécurisés. Cependant, ouvrez-vous à quelques options modérément risquées pour augmenter légèrement votre rendement."),
+       conseil="Continuez à miser sur des placements stables et sécurisés. Cependant, ouvrez-vous à quelques options modérément risquées pour augmenter légèrement votre rendement."),
   list(capacite = "Élevé", connaissance = "Faible", risque = "Élevé", animal = "🐆 Guépard", description = "Rapide et impressionnant, le Guépard est un sprinter hors pair. Il agit avec une énergie explosive, mais son impulsivité peut le rendre inconséquent. Il manque parfois de vision à long terme et peut s'épuiser rapidement s'il ne gère pas ses ressources.",
-conseil="Utilisez votre dynamisme pour saisir des opportunités ponctuelles, mais apprenez à équilibrer vos efforts. Pensez à investir dans des produits à court terme tout en élaborant une stratégie durable."),
+       conseil="Utilisez votre dynamisme pour saisir des opportunités ponctuelles, mais apprenez à équilibrer vos efforts. Pensez à investir dans des produits à court terme tout en élaborant une stratégie durable."),
   list(capacite = "Élevé", connaissance = "Faible", risque = "Moyen", animal = "🐫 Chameau", description = "Résilient et endurant, le Chameau avance avec détermination malgré des ressources parfois limitées. Il sait s’adapter à des environnements difficiles et garde un œil sur ses priorités. Cependant, son pragmatisme peut le rendre un peu rigide face aux nouvelles opportunités.",
-conseil="Misez sur des stratégies équilibrées et à long terme, mais restez ouvert à des options plus dynamiques pour diversifier votre portefeuille."),
+       conseil="Misez sur des stratégies équilibrées et à long terme, mais restez ouvert à des options plus dynamiques pour diversifier votre portefeuille."),
   list(capacite = "Élevé", connaissance = "Faible", risque = "Faible", animal = "🦌 Cerf", description = "Timide et précautionneux, le Cerf préfère éviter les risques et rester dans un environnement sécurisé. Bien qu’il soit doté d’une grande capacité, il hésite souvent à l’exploiter pleinement par peur de l’échec.",
-conseil="Votre prudence est un atout, mais osez exploiter vos capacités. Investissez dans des actifs sûrs tout en explorant prudemment des options à faible risque.
+       conseil="Votre prudence est un atout, mais osez exploiter vos capacités. Investissez dans des actifs sûrs tout en explorant prudemment des options à faible risque.
 
 "),
   list(capacite = "Élevé", connaissance = "Moyen", risque = "Élevé", animal = "🦩 Héron", description = "Agile et précis, le Héron est un expert pour repérer les bonnes opportunités. Il sait attendre patiemment le moment idéal pour agir, mais son goût pour les décisions rapides et risquées peut parfois lui jouer des tours.",
-conseil="Continuez à repérer les opportunités avec précision, mais prenez le temps d’évaluer les risques avant d’agir. Une vision claire et une stratégie mesurée seront vos meilleurs alliés."),
+       conseil="Continuez à repérer les opportunités avec précision, mais prenez le temps d’évaluer les risques avant d’agir. Une vision claire et une stratégie mesurée seront vos meilleurs alliés."),
   list(capacite = "Élevé", connaissance = "Moyen", risque = "Moyen", animal = "🐻 Ours brun", description = "Puissant et stable, l’Ours brun avance avec force et prudence. Sa patience et sa robustesse lui permettent de gérer les défis sans perdre son calme. Cependant, il peut parfois être trop lent à réagir face à des opportunités urgentes.",
-conseil="Profitez de votre stabilité pour bâtir un portefeuille solide. Restez attentif aux tendances du marché afin de ne pas manquer des occasions à moyen terme."),
+       conseil="Profitez de votre stabilité pour bâtir un portefeuille solide. Restez attentif aux tendances du marché afin de ne pas manquer des occasions à moyen terme."),
   list(capacite = "Élevé", connaissance = "Moyen", risque = "Faible", animal = "🐢 Tortue géante", description = "Sage et méthodique, la Tortue géante avance lentement mais sûrement. Elle privilégie la sécurité et prend des décisions réfléchies. Bien que sa lenteur lui permette d’éviter les erreurs, elle pourrait parfois accélérer pour capter des opportunités.",
-conseil="Continuez à miser sur des placements stables et à long terme, mais incluez quelques investissements dynamiques pour équilibrer votre approche."),
+       conseil="Continuez à miser sur des placements stables et à long terme, mais incluez quelques investissements dynamiques pour équilibrer votre approche."),
   list(capacite = "Élevé", connaissance = "Élevé", risque = "Élevé", animal = "🦅 Aigle impérial", description = "Visionnaire et puissant, l’Aigle impérial survole les situations avec une perspective unique. Il sait repérer les opportunités stratégiques grâce à une vue d’ensemble impressionnante, mais son audace peut parfois le pousser à prendre des risques excessifs.",
-conseil="Exploitez votre vision stratégique, mais gardez un œil sur vos limites. Diversifiez vos placements pour assurer une croissance stable tout en maintenant un potentiel élevé."),
+       conseil="Exploitez votre vision stratégique, mais gardez un œil sur vos limites. Diversifiez vos placements pour assurer une croissance stable tout en maintenant un potentiel élevé."),
   list(capacite = "Élevé", connaissance = "Élevé", risque = "Moyen", animal = "🐺 Loup gris", description = "Intelligent et prudent, le Loup gris est un fin stratège. Il évalue soigneusement les situations avant d’agir et maximise ses gains avec une efficacité redoutable. Sa capacité à travailler en équipe ou en solo lui donne une grande flexibilité.",
-conseil="Continuez à évaluer et optimiser vos choix. Exploitez votre prudence naturelle pour équilibrer vos risques et bâtir une stratégie robuste."),
+       conseil="Continuez à évaluer et optimiser vos choix. Exploitez votre prudence naturelle pour équilibrer vos risques et bâtir une stratégie robuste."),
   list(capacite = "Élevé", connaissance = "Élevé", risque = "Faible", animal = "🐘 Éléphant", description = "Imposant et réfléchi, l’Éléphant avance avec assurance. Sa sagesse et sa mémoire exceptionnelle lui permettent de prendre des décisions éclairées. Bien qu’il avance lentement, il ne recule jamais devant un objectif ambitieux.",
-conseil="Restez fidèle à votre approche méthodique et réfléchie. Concentrez-vous sur des placements stables tout en explorant quelques options innovantes pour maintenir une croissance régulière.
+       conseil="Restez fidèle à votre approche méthodique et réfléchie. Concentrez-vous sur des placements stables tout en explorant quelques options innovantes pour maintenir une croissance régulière.
 
 ")
 )
@@ -600,8 +600,22 @@ start_app <- function() {
   }
 }
 
+# Création du DataFrame profil_recap
+profil_recap <- updated_profil_df %>%
+  mutate(
+    type_animal = animal_result$animal_type,
+    description = animal_result$animal_description,
+    conseil = determine_animal_type(
+      capacite = updated_profil_df$capacite_investissement,
+      connaissance = updated_profil_df$niveau_connaissance,
+      risque = updated_profil_df$appetit_risque_categorie,
+      matrice_profils = matrice_profils
+    )$conseil
+  )
+
+# Enregistrement du DataFrame profil_recap
+chemin_profil_recap <- "/Users/mehdifehri/Desktop/Technique de programmation/Data work/profil_recap.xlsx"
+write_xlsx(profil_recap, chemin_profil_recap)
+
 # Appel de la fonction principale pour lancer l'application
 start_app()
-
-
-
