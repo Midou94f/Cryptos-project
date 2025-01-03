@@ -1,0 +1,240 @@
+library(crayon)
+
+# Définition des styles
+question_style <- blue$bold
+info_style <- white$italic
+warning_style <- red$bold
+success_style <- green$bold
+highlight_style <- yellow$bold
+info_secondary_style <- cyan$italic
+error_style <- red$bold$underline
+section_title_style <- magenta$bold$underline
+
+
+
+welcome_message <- function() {
+  cat(success_style("Bienvenue dans notre module : CryptoAcademy, une fonctionnalité de notre application Cryptowise - Copilote !
+
+"))
+  cat(info_style("Plongez dans l'univers fascinant des cryptomonnaies grâce à notre bibliothèque riche et immersive.
+
+"))
+  cat(info_style("Nous avons soigneusement conçu 10 chapitres pour explorer les bases, les usages, les innovations et les défis du monde crypto.
+
+"))
+  cat(info_secondary_style("Ce module n'est pas qu'un simple cours, mais un voyage interactif où vous pourrez naviguer à votre rythme.
+
+"))
+  cat(info_secondary_style("Apprenez, réfléchissez, et préparez-vous à tester vos connaissances pour maîtriser cet univers en pleine expansion.
+
+"))
+  cat(info_style("À chaque étape, vous aurez le choix : explorer davantage, approfondir vos compétences, ou passer à autre chose.
+
+"))
+  cat(success_style("Nous sommes ravis de vous accompagner dans cette aventure éducative unique. Bon apprentissage !
+
+"))
+}
+
+# Fonction pour afficher le sommaire
+show_sommaire <- function() {
+  cat(section_title_style("\nSommaire principal\n\n"))
+  
+  sommaire <- list(
+    "1" = list(title = "Chapitre 1 : Introduction : Les bases des cryptomonnaies", sections = c(
+      "a. Qu'est-ce qu'une cryptomonnaie ?",
+      "b. Histoire des cryptos : naissance de Bitcoin"
+    )),
+    "2" = list(title = "Chapitre 2 : Fonctionnement des cryptomonnaies", sections = c(
+      "c. La blockchain : Technologie sous-jacente",
+      "d. Les transactions en crypto : Clés privées et publiques",
+      "e. Proof-of-Work (PoW) vs Proof-of-Stake (PoS)"
+    )),
+    "3" = list(title = "Chapitre 3 : Les cryptos majeures et leurs usages", sections = c(
+      "f. Les principales cryptomonnaies",
+      "g. Les stablecoins",
+      "h. Les NFT et leur impact"
+    )),
+    "4" = list(title = "Chapitre 4 : Acquérir et utiliser des cryptos", sections = c(
+      "i. Acheter des cryptomonnaies : Les exchanges",
+      "j. Les wallets crypto : types et sécurité",
+      "k. Envoyer et recevoir des cryptos"
+    )),
+    "5" = list(title = "Chapitre 5 : Investissement et trading", sections = c(
+      "l. Comment évaluer une cryptomonnaie ?",
+      "m. Risques et volatilité",
+      "n. Les bulles et cycles de marché"
+    )),
+    "6" = list(title = "Chapitre 6 : Régulation et sécurité", sections = c(
+      "o. L'environnement réglementaire mondial",
+      "p. Les risques de sécurité : Fraudes et hacks"
+    )),
+    "7" = list(title = "Chapitre 7 : Applications et innovations", sections = c(
+      "q. La finance décentralisée (DeFi)",
+      "r. Les cas d’usage réels des cryptos",
+      "s. L’impact environnemental"
+    )),
+    "8" = list(title = "Chapitre 8 : Perspectives et tendances futures", sections = c(
+      "t. Le futur des cryptomonnaies"
+    )),
+    "9" = list(title = "Chapitre 9 : Les risques inhérents à l'investissement en cryptomonnaies", sections = c(
+      "u. Volatilité",
+      "v. Sécurité",
+      "w. Régulation"
+    )),
+    "10" = list(title = "Chapitre 10 : Aller plus loin dans l’univers des cryptomonnaies", sections = c(
+      "x. Informations supplémentaires sur les passionnés",
+      "y. Conseils pour aller plus loin : où se renseigner, quels outils utiliser ?",
+      "z. Conclusion"
+    ))
+  )
+  
+  for (chapitre in names(sommaire)) {
+    cat(section_title_style(paste0(chapitre, " - ", sommaire[[chapitre]]$title)), "\n")
+    for (section in sommaire[[chapitre]]$sections) {
+      cat("   -", highlight_style(section), "\n")
+    }
+  }
+}
+
+# Navigation dans les chapitres et sous-sections
+navigate_chapter <- function() {
+  sommaire <- list(
+    "1" = list(title = "Chapitre 1 : Introduction : Les bases des cryptomonnaies", sections = c(
+      "a. Qu'est-ce qu'une cryptomonnaie ?",
+      "b. Histoire des cryptos : naissance de Bitcoin"
+    )),
+    "2" = list(title = "Chapitre 2 : Fonctionnement des cryptomonnaies", sections = c(
+      "c. La blockchain : Technologie sous-jacente",
+      "d. Les transactions en crypto : Clés privées et publiques",
+      "e. Proof-of-Work (PoW) vs Proof-of-Stake (PoS)"
+    )),
+    "3" = list(title = "Chapitre 3 : Les cryptos majeures et leurs usages", sections = c(
+      "f. Les principales cryptomonnaies",
+      "g. Les stablecoins",
+      "h. Les NFT et leur impact"
+    )),
+    "4" = list(title = "Chapitre 4 : Acquérir et utiliser des cryptos", sections = c(
+      "i. Acheter des cryptomonnaies : Les exchanges",
+      "j. Les wallets crypto : types et sécurité",
+      "k. Envoyer et recevoir des cryptos"
+    )),
+    "5" = list(title = "Chapitre 5 : Investissement et trading", sections = c(
+      "l. Comment évaluer une cryptomonnaie ?",
+      "m. Risques et volatilité",
+      "n. Les bulles et cycles de marché"
+    )),
+    "6" = list(title = "Chapitre 6 : Régulation et sécurité", sections = c(
+      "o. L'environnement réglementaire mondial",
+      "p. Les risques de sécurité : Fraudes et hacks"
+    )),
+    "7" = list(title = "Chapitre 7 : Applications et innovations", sections = c(
+      "q. La finance décentralisée (DeFi)",
+      "r. Les cas d’usage réels des cryptos",
+      "s. L’impact environnemental"
+    )),
+    "8" = list(title = "Chapitre 8 : Perspectives et tendances futures", sections = c(
+      "t. Le futur des cryptomonnaies"
+    )),
+    "9" = list(title = "Chapitre 9 : Les risques inhérents à l'investissement en cryptomonnaies", sections = c(
+      "u. Volatilité",
+      "v. Sécurité",
+      "w. Régulation"
+    )),
+    "10" = list(title = "Chapitre 10 : Aller plus loin dans l’univers des cryptomonnaies", sections = c(
+      "x. Informations supplémentaires sur les passionnés",
+      "y. Conseils pour aller plus loin : où se renseigner, quels outils utiliser ?",
+      "z. Conclusion"
+    ))
+  )
+  
+  repeat {
+    user_input <- readline(question_style("Choisissez le chapitre qui vous intéresse (1-10) ou une sous-section spécifique (a-z) : "))
+    
+    while (!(user_input %in% names(sommaire) || user_input %in% letters)) {
+      cat(error_style("\nEntrée invalide. Veuillez choisir une lettre de section ou un numéro de chapitre valide.\n"))
+      user_input <- readline(question_style("Choisissez un chapitre (1-10) ou une sous-section (a-z) : "))
+    }
+    
+    # Vérifier si l'entrée est un numéro de chapitre
+    if (user_input %in% names(sommaire)) {
+      cat(success_style("\nVous avez choisi le chapitre : "), sommaire[[user_input]]$title, "\n")
+      for (section in sommaire[[user_input]]$sections) {
+        cat("   -", highlight_style(section), "\n")
+      }
+      readline(success_style("
+Appuyez sur Entrée lorsque vous avez fini votre lecture : "))
+    }
+    # Vérifier si l'entrée est une sous-section
+    else if (user_input %in% letters) {
+      section_found <- FALSE
+      for (chapitre in names(sommaire)) {
+        sections <- sommaire[[chapitre]]$sections
+        section_match <- grep(paste0("^", user_input, "\\. "), sections)
+        if (length(section_match) > 0) {
+          cat(success_style("\nVous avez choisi la sous-section : "), sections[section_match], "\n")
+          readline(success_style("\nEntrez OK lorsque vous avez fini votre lecture : "))
+          section_found <- TRUE
+          break
+        }
+      }
+      if (!section_found) {
+        cat(error_style("\nSous-section invalide. Veuillez choisir une lettre valide.\n"))
+      }
+    }
+    
+    # Proposer les options après la lecture
+    repeat {
+      choice <- readline(success_style(paste0(
+        "\nTrès bien, maintenant que vous avez fini votre lecture, que souhaitez-vous faire ?\n",
+        highlight_style("1. Revenir au sommaire principal\n"),
+        highlight_style("2. Tester vos connaissances\n"),
+        highlight_style("3. Quitter le module\n"),
+        "Votre choix : ")))
+      
+      while (!(choice %in% c("1", "2", "3"))) {
+        cat(error_style("\nChoix invalide. Veuillez entrer 1, 2 ou 3.\n"))
+        choice <- readline(success_style(paste0(
+          "\nTrès bien, maintenant que vous avez fini votre lecture, que souhaitez-vous faire ?\n",
+          highlight_style("1. Revenir au sommaire principal\n"),
+          highlight_style("2. Tester vos connaissances\n"),
+          highlight_style("3. Quitter le module\n"),
+          "Votre choix : ")))
+      }
+      
+      if (choice == "1") {
+        break
+      } else if (choice == "2") {
+        cat(success_style("\nOption de test de connaissances en cours de développement. Revenez bientôt !\n"))
+        break
+      } else if (choice == "3") {
+        cat(warning_style("\nMerci d'avoir utilisé CryptoAcademy. À bientôt !\n"))
+        return()
+      }
+    }
+  }
+}
+
+# Fonction principale
+crypto_academy <- function() {
+  cat(section_title_style("\nCRYPTO ACADEMY - CRYPTOWISE COPILOTE\n\n"))
+  welcome_message()
+  ready <- readline(question_style("Êtes-vous prêt à parcourir notre outil pédagogique ? (oui/non) : "))
+  
+  while (!(tolower(ready) %in% c("oui", "non"))) {
+    cat(error_style("\nRéponse invalide, veuillez répondre par 'oui' ou 'non'.\n"))
+    ready <- readline(question_style("Êtes-vous prêt à parcourir notre outil pédagogique ? (oui/non) : "))
+  }
+  
+  if (tolower(ready) == "oui") {
+    show_sommaire()
+    navigate_chapter()
+  } else if (tolower(ready) == "non") {
+    cat(warning_style("Oh nooooon ! Dommage, revenez quand vous voudrez. La connaissance est une lumière dans l'obscurité, toujours prête à éclairer ceux qui la recherchent. Revenez quand vous serez prêt, elle vous attendra avec patience.\n"))
+    return()
+  }
+}
+
+# Lancer le programme
+crypto_academy()
+
