@@ -78,9 +78,9 @@ show_sommaire <- function() {
       "t. Le futur des cryptomonnaies"
     )),
     "9" = list(title = "Chapitre 9 : Les risques inhérents à l'investissement en cryptomonnaies", sections = c(
-      "u. Volatilité",
-      "v. Sécurité",
-      "w. Régulation"
+      "u. Les risques liés au marché",
+      "v. Les risques réglementaires et technologiques",
+      "w. Les risques liés à la sécurité et aux arnaques"
     )),
     "10" = list(title = "Chapitre 10 : Aller plus loin dans l’univers des cryptomonnaies", sections = c(
       "x. Informations supplémentaires sur les passionnés",
@@ -96,6 +96,37 @@ show_sommaire <- function() {
     }
   }
 }
+
+# Ajouter les textes détaillés ici
+# Ajouter les textes détaillés ici
+details <- list(
+  "1a" = "blablabalba", # Qu'est-ce qu'une cryptomonnaie ?
+  "1b" = "", # Histoire des cryptos : naissance de Bitcoin
+  "2c" = "", # La blockchain : Technologie sous-jacente
+  "2d" = "", # Les transactions en crypto : Clés privées et publiques
+  "2e" = "", # Proof-of-Work (PoW) vs Proof-of-Stake (PoS)
+  "3f" = "", # Les principales cryptomonnaies
+  "3g" = "", # Les stablecoins
+  "3h" = "ddssdxxxxxxx", # Les NFT et leur impact
+  "4i" = "", # Acheter des cryptomonnaies : Les exchanges
+  "4j" = "", # Les wallets crypto : types et sécurité
+  "4k" = "", # Envoyer et recevoir des cryptos
+  "5l" = "", # Comment évaluer une cryptomonnaie ?
+  "5m" = "", # Risques et volatilité
+  "5n" = "", # Les bulles et cycles de marché
+  "6o" = "", # L'environnement réglementaire mondial
+  "6p" = "", # Les risques de sécurité : Fraudes et hacks
+  "7q" = "", # La finance décentralisée (DeFi)
+  "7r" = "", # Les cas d’usage réels des cryptos
+  "7s" = "", # L’impact environnemental
+  "8t" = "", # Le futur des cryptomonnaies
+  "9u" = "skdsldsnjglsdgjn glnjksg ljgsj sgn lgng klg", # Volatilité
+  "9v" = "", # Sécurité
+  "9w" = "", # Régulation
+  "10x" = "", # Informations supplémentaires sur les passionnés
+  "10y" = "", # Conseils pour aller plus loin : où se renseigner, quels outils utiliser ?
+  "10z" = ""  # Conclusion
+)
 
 # Navigation dans les chapitres et sous-sections
 navigate_chapter <- function() {
@@ -137,9 +168,9 @@ navigate_chapter <- function() {
       "t. Le futur des cryptomonnaies"
     )),
     "9" = list(title = "Chapitre 9 : Les risques inhérents à l'investissement en cryptomonnaies", sections = c(
-      "u. Volatilité",
-      "v. Sécurité",
-      "w. Régulation"
+      "u. Les risques liés au marché",
+      "v. Les risques réglementaires et technologiques",
+      "w. Les risques liés à la sécurité et aux arnaques"
     )),
     "10" = list(title = "Chapitre 10 : Aller plus loin dans l’univers des cryptomonnaies", sections = c(
       "x. Informations supplémentaires sur les passionnés",
@@ -151,43 +182,57 @@ navigate_chapter <- function() {
   repeat {
     user_input <- readline(question_style("Choisissez le chapitre qui vous intéresse (1-10) ou une sous-section spécifique (a-z) : "))
     
-    while (!(user_input %in% names(sommaire) || user_input %in% letters)) {
-      cat(error_style("\nEntrée invalide. Veuillez choisir une lettre de section ou un numéro de chapitre valide.\n"))
-      user_input <- readline(question_style("Choisissez un chapitre (1-10) ou une sous-section (a-z) : "))
-    }
-    
-    # Vérifier si l'entrée est un numéro de chapitre
+    # Affichage du chapitre complet
     if (user_input %in% names(sommaire)) {
-      cat(success_style("\nVous avez choisi le chapitre : "), sommaire[[user_input]]$title, "\n")
-      for (section in sommaire[[user_input]]$sections) {
-        cat("   -", highlight_style(section), "\n")
+      chapitre <- sommaire[[user_input]]
+      cat(success_style("\nVous avez choisi de lire le : "), chapitre$title, "\n")
+      
+      for (i in seq_along(chapitre$sections)) {
+        section_name <- chapitre$sections[i]
+        section_letter <- substr(section_name, 1, 1) # Extraire la lettre (ex. 'a')
+        detail_key <- paste0(user_input, section_letter) # Clé dans `details` (ex. '1a')
+        
+        # Supprimé : cat("   -", highlight_style(section_name), "\n")
+        if (detail_key %in% names(details)) {
+          cat("\n", details[[detail_key]], "\n")
+        }
       }
-      readline(success_style("
-Appuyez sur Entrée lorsque vous avez fini votre lecture : "))
-    }
-    # Vérifier si l'entrée est une sous-section
+      
+      readline(success_style("\nAppuyez sur Entrée lorsque vous avez fini votre lecture : "))
+    } 
+    # Affichage de la section spécifique
     else if (user_input %in% letters) {
-      section_found <- FALSE
-      for (chapitre in names(sommaire)) {
-        sections <- sommaire[[chapitre]]$sections
-        section_match <- grep(paste0("^", user_input, "\\. "), sections)
-        if (length(section_match) > 0) {
-          cat(success_style("\nVous avez choisi la sous-section : "), sections[section_match], "\n")
-          readline(success_style("\nEntrez OK lorsque vous avez fini votre lecture : "))
-          section_found <- TRUE
+      found <- FALSE
+      for (chapitre_id in names(sommaire)) {
+        chapitre <- sommaire[[chapitre_id]]
+        section_index <- which(substr(chapitre$sections, 1, 1) == user_input)
+        
+        if (length(section_index) > 0) {
+          detail_key <- paste0(chapitre_id, user_input)
+          cat(success_style("\nVous lisez la section : "), chapitre$sections[section_index], "\n")
+          if (detail_key %in% names(details)) {
+            cat("\n", details[[detail_key]], "\n")
+          }
+          readline(success_style("\nAppuyez sur Entrée lorsque vous avez fini votre lecture : "))
+          found <- TRUE
           break
         }
       }
-      if (!section_found) {
-        cat(error_style("\nSous-section invalide. Veuillez choisir une lettre valide.\n"))
+      
+      if (!found) {
+        cat(error_style("\nLa section que vous avez choisie n'existe pas.\n"))
       }
+    } 
+    # Entrée invalide
+    else {
+      cat(error_style("\nEntrée invalide. Veuillez choisir une lettre de section ou un numéro de chapitre valide.\n"))
     }
     
     # Proposer les options après la lecture
     repeat {
       choice <- readline(success_style(paste0(
         "\nTrès bien, maintenant que vous avez fini votre lecture, que souhaitez-vous faire ?\n",
-        highlight_style("1. Revenir au sommaire principal\n"),
+        highlight_style("1. Revenir au sommaire principal pour poursuivre votre lecture\n"),
         highlight_style("2. Tester vos connaissances\n"),
         highlight_style("3. Quitter le module\n"),
         "Votre choix : ")))
@@ -203,6 +248,7 @@ Appuyez sur Entrée lorsque vous avez fini votre lecture : "))
       }
       
       if (choice == "1") {
+        show_sommaire()  # Affiche le sommaire
         break
       } else if (choice == "2") {
         cat(success_style("\nOption de test de connaissances en cours de développement. Revenez bientôt !\n"))
@@ -237,4 +283,3 @@ crypto_academy <- function() {
 
 # Lancer le programme
 crypto_academy()
-
