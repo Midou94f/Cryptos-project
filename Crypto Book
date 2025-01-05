@@ -18,22 +18,22 @@ details <- list(
     section_title_style("\nChapitre 1 : Introduction : Les bases des cryptomonnaies\n"),
     highlight_style("Sous-section (A) : Qu'est-ce qu'une cryptomonnaie ?\n\n"),
     
-    info_secondary_style("• Définition :\n"),
+    info_secondary_style("• Définition :\n\n"),
     
-    info_style("Une "), highlight_style("cryptomonnaie"), info_style(" est une monnaie numérique ou virtuelle qui utilise la cryptographie pour sécuriser les transactions. Elle fonctionne de manière décentralisée, souvent via une technologie appelée "), highlight_style("blockchain"), info_style(".\n\n"),
+    info_style("Une "), highlight_style("cryptomonnaie"), info_style(" est une monnaie numérique ou virtuelle qui utilise la cryptographie pour sécuriser les transactions. Elle fonctionne de manière décentralisée, souvent via une technologie appelée \n\n "), highlight_style("blockchain"), info_style(".\n\n"),
     
-    info_secondary_style("• Origine :\n"),
+    info_secondary_style("• Origine :\n\n"),
     
     info_style("Contrairement aux monnaies traditionnelles ("), highlight_style("dollars, euros"), info_style("), les cryptomonnaies ne sont pas émises ou contrôlées par une autorité centrale comme une banque centrale. Elles sont créées et gérées par un réseau décentralisé de participants.\n\n"),
     
-    info_secondary_style("• Différences avec les monnaies traditionnelles :\n"),
+    info_secondary_style("• Différences avec les monnaies traditionnelles :\n\n"),
     
     info_style("1. "), highlight_style("Centralisation vs Décentralisation"), info_style(": Les monnaies fiduciaires (ex : euro) sont émises et gérées par des banques centrales, tandis que les cryptomonnaies sont décentralisées.\n"),
     info_style("2. "), highlight_style("Physique vs Numérique"), info_style(": Les cryptos existent uniquement sous forme numérique.\n"),
     info_style("3. "), highlight_style("Transparence"), info_style(": Les transactions en cryptos sont visibles publiquement sur la blockchain, contrairement aux transactions bancaires.\n"),
     info_style("4. "), highlight_style("Contrôle de l'offre"), info_style(": Le Bitcoin, par exemple, a une limite fixe (21 millions de BTC), alors que les banques centrales peuvent imprimer davantage de monnaie.\n\n"),
     
-    info_secondary_style("• Caractéristiques principales :\n"),
+    info_secondary_style("• Caractéristiques principales :\n\n"),
     
     info_style("1. "), highlight_style("Décentralisation"), info_style(": Les cryptomonnaies fonctionnent sur un réseau distribué, où aucune entité unique ne contrôle l’ensemble des données.\n"),
     info_style("2. "), highlight_style("Transparence"), info_style(": Toutes les transactions sont enregistrées publiquement sur une blockchain accessible à tous.\n"),
@@ -45,35 +45,37 @@ details <- list(
     section_title_style("\nChapitre 1 : Introduction : Les bases des cryptomonnaies\n"),
     highlight_style("Sous-section (B) : Histoire des cryptos : naissance de Bitcoin\n\n"),
     
-    info_secondary_style("• Création de Bitcoin :\n"),
+    info_secondary_style("• Création de Bitcoin :\n\n"),
     
     info_style("  "), highlight_style("Le Bitcoin"), info_style(" a été créé en 2009 par une personne ou un groupe sous le pseudonyme de "), highlight_style("Satoshi Nakamoto"), info_style(".\n"),
     info_style("Son but principal était de proposer une alternative au système financier traditionnel après la crise financière de 2008, en offrant une monnaie décentralisée et indépendante des banques centrales.\n\n"),
     
-    info_secondary_style("• Première transaction en Bitcoin :\n"),
+    info_secondary_style("• Première transaction en Bitcoin :\n\n"),
     info_style("  En 2010, la première utilisation commerciale du Bitcoin a eu lieu lorsqu'un développeur a acheté deux pizzas pour "), highlight_style("10 000 BTC"), info_style(".\n\n"),
     
-    info_secondary_style("• Origine du concept :\n"),
+    info_secondary_style("• Origine du concept :\n\n"),
     
     info_style("  Le concept repose sur un livre blanc publié par Nakamoto intitulé "), highlight_style("\"Bitcoin: A Peer-to-Peer Electronic Cash System\""), info_style(", qui explique comment les transactions peuvent être sécurisées et validées sans passer par une autorité centrale.\n\n"),
     
-    info_secondary_style("• Évolution de l’écosystème :\n"),
+    info_secondary_style("• Évolution de l’écosystème :\n\n"),
     
-    info_style("  1. "), highlight_style("Altcoins :\n"),
+    info_style("  1. "), highlight_style("Altcoins :\n\n"),
+    
     info_style("Après le succès initial de Bitcoin, de nombreuses autres cryptomonnaies ont vu le jour, souvent appelées \"altcoins\" (cryptos alternatives).\n"),
     info_style("Exemples :\n"),
     info_style("      - "), highlight_style("Ethereum (2015)"), info_style(" : Introduit les smart contracts, permettant des applications décentralisées.\n"),
     info_style("      - "), highlight_style("Litecoin (2011)"), info_style(" : Une version plus rapide et légère de Bitcoin.\n"),
-    info_style("      - "), highlight_style("Ripple (2012)"), info_style(" : Conçu pour les paiements internationaux rapides et à faible coût.\n"),
+    info_style("      - "), highlight_style("Ripple (2012)"), info_style(" : Conçu pour les paiements internationaux rapides et à faible coût.\n\n"),
     
-    info_style("  2. "), highlight_style("Diversification :\n"),
+    info_style("  2. "), highlight_style("Diversification :\n\n"),
+    
     info_style("Aujourd’hui, l’écosystème crypto s’est élargi pour inclure des milliers de projets avec des cas d’usage variés : finance décentralisée (DeFi), jetons non fongibles (NFT), et plus encore.\n\n"),
     
-    info_secondary_style("• Impact révolutionnaire :\n"),
+    info_secondary_style("• Impact révolutionnaire :\n\n"),
     
     info_style(""), highlight_style("Le Bitcoin"), info_style(" a changé la manière dont nous concevons la monnaie, introduisant des concepts comme la "), highlight_style("rareté numérique"), info_style(", la "), highlight_style("transparence totale"), info_style(", et une indépendance vis-à-vis des institutions financières traditionnelles.\n\n"),
     
-    info_secondary_style("Concepts clés à retenir :\n"),
+    info_secondary_style("Concepts clés à retenir :\n\n"),
     
     info_style("  1. "), highlight_style("Cryptomonnaie"), info_style(" : Monnaie numérique décentralisée et sécurisée par la cryptographie.\n"),
     info_style("  2. "), highlight_style("Blockchain"), info_style(" : Technologie sous-jacente qui enregistre les transactions de manière transparente et immuable.\n"),
@@ -86,11 +88,11 @@ details <- list(
     section_title_style("\nChapitre 2 : Fonctionnement des cryptomonnaies\n"),
     highlight_style("Sous-section (C) : La blockchain : Technologie sous-jacente\n\n"),
     
-    info_secondary_style("• Définition :\n"),
+    info_secondary_style("• Définition :\n\n"),
     
     info_style("La "), highlight_style("blockchain"), info_style(" est une technologie décentralisée qui enregistre les transactions dans un registre distribué et sécurisé. Elle est souvent décrite comme un \"grand livre numérique\".\n\n"),
     
-    info_secondary_style("• Comment fonctionne une blockchain ?\n"),
+    info_secondary_style("• Comment fonctionne une blockchain ?\n\n"),
     
     info_style("1. "), highlight_style("Transactions"), info_style(": Lorsqu’une transaction est initiée (ex : transfert de cryptos), elle est envoyée au réseau pour validation.\n"),
     info_style("2. "), highlight_style("Validation"), info_style(": Les nœuds du réseau vérifient l’authenticité des transactions grâce à des mécanismes de consensus.\n"),
@@ -98,7 +100,7 @@ details <- list(
     info_style("4. "), highlight_style("Ajout au registre"), info_style(": Le bloc est ajouté à la chaîne de blocs existante (blockchain).\n"),
     info_style("5. "), highlight_style("Immutabilité"), info_style(": Une fois dans la blockchain, les transactions ne peuvent plus être modifiées.\n\n"),
     
-    info_secondary_style("• Structure des blocs :\n"),
+    info_secondary_style("• Structure des blocs :\n\n"),
     
     info_style("Chaque bloc contient :\n"),
     info_style("  o "), highlight_style("Les transactions"), info_style(": Une liste des transactions incluses.\n"),
@@ -106,7 +108,7 @@ details <- list(
     info_style("  o "), highlight_style("Le timestamp"), info_style(": L’horodatage de création du bloc.\n"),
     info_style("  o "), highlight_style("Le nonce"), info_style(": Une valeur utilisée dans le processus de minage.\n\n"),
     
-    info_secondary_style("• Minage et nœuds :\n"),
+    info_secondary_style("• Minage et nœuds :\n\n"),
     
     info_style("  o "), highlight_style("Minage"), info_style(": Processus où des mineurs résolvent des problèmes mathématiques complexes pour valider les blocs (Proof-of-Work).\n"),
     info_style("  o "), highlight_style("Nœuds"), info_style(": Ordinateurs connectés au réseau qui stockent une copie complète de la blockchain et participent à la validation.\n\n")
@@ -116,35 +118,35 @@ details <- list(
     section_title_style("\nChapitre 2 : Fonctionnement des cryptomonnaies\n"),
     highlight_style("Sous-section (D) : Les transactions en crypto : Clés privées et publiques\n\n"),
     
-    info_secondary_style("• Clé publique et clé privée : Définition et rôle\n"),
+    info_secondary_style("• Clé publique et clé privée : Définition et rôle\n\n"),
     
     info_style("  o "), highlight_style("Clé publique"), info_style(": Fonctionne comme une adresse de réception pour les cryptos. Elle est visible par tous et partagée.\n"),
-    info_style("  o "), highlight_style("Clé privée"), info_style(": Fonctionne comme un mot de passe qui permet de signer et d’autoriser les transactions. Elle doit rester confidentielle.\n"),
+    info_style("  o "), highlight_style("Clé privée"), info_style(": Fonctionne comme un mot de passe qui permet de signer et d’autoriser les transactions. Elle doit rester confidentielle.\n\n"),
     
-    info_secondary_style("  o Interaction :\n"),
+    info_secondary_style("• Interaction :\n\n"),
     
     info_style("1. Une clé publique est dérivée d’une clé privée grâce à un algorithme cryptographique.\n"),
     info_style("2. Lorsqu’une transaction est initiée, elle est signée avec la clé privée pour prouver son authenticité.\n\n"),
     
-    info_secondary_style("• Rôle des clés dans les transactions :\n"),
+    info_secondary_style("• Rôle des clés dans les transactions :\n\n"),
     
     info_style("1. "), highlight_style("Initiation"), info_style(": Le propriétaire utilise sa clé privée pour signer une transaction.\n"),
     info_style("2. "), highlight_style("Validation"), info_style(": Les nœuds du réseau utilisent la clé publique pour vérifier que la transaction est légitime.\n"),
     info_style("3. "), highlight_style("Enregistrement"), info_style(": Une fois validée, la transaction est inscrite dans la blockchain.\n\n"),
     
-    info_secondary_style("Exemple concret :\n"),
-    info_style("  - Vous voulez envoyer 1 Bitcoin à un ami. Vous utilisez votre clé privée pour signer la transaction. Votre ami reçoit le Bitcoin grâce à sa clé publique.\n\n")
+    info_secondary_style("Exemple concret :\n\n"),
+    info_style("Vous voulez envoyer 1 Bitcoin à un ami. Vous utilisez votre clé privée pour signer la transaction. Votre ami reçoit le Bitcoin grâce à sa clé publique.\n\n")
   ),
   
   "2e" = paste0(
     section_title_style("\nChapitre 2 : Fonctionnement des cryptomonnaies\n"),
     highlight_style("Sous-section (E) : Proof-of-Work (PoW) vs Proof-of-Stake (PoS)\n\n"),
     
-    info_secondary_style("• Mécanismes de consensus : Définition\n"),
+    info_secondary_style("• Mécanismes de consensus : Définition\n\n"),
     
     info_style("Les mécanismes de consensus garantissent que toutes les transactions sur la blockchain sont vérifiées et sécurisées.\n\n"),
     
-    info_secondary_style("• Proof-of-Work (PoW) :\n"),
+    info_secondary_style("• Proof-of-Work (PoW) :\n\n"),
     
     info_style("  o "), highlight_style("Principe"), info_style(": Les mineurs résolvent des problèmes mathématiques complexes pour valider un bloc.\n"),
     info_style("  o "), highlight_style("Caractéristiques"), info_style(":\n"),
@@ -154,16 +156,16 @@ details <- list(
     info_style("    - Consommation énergétique élevée.\n"),
     info_style("    - Temps de traitement des transactions parfois long.\n\n"),
     
-    info_secondary_style("• Proof-of-Stake (PoS) :\n"),
+    info_secondary_style("• Proof-of-Stake (PoS) :\n\n"),
     
-    info_style("  o "), highlight_style("Principe"), info_style(": Les validateurs sont choisis en fonction de la quantité de cryptos qu’ils possèdent et \"stakent\" (mettent en garantie).\n"),
-    info_style("  o "), highlight_style("Caractéristiques"), info_style(":\n"),
+    info_style("o "), highlight_style("Principe"), info_style(": Les validateurs sont choisis en fonction de la quantité de cryptos qu’ils possèdent et \"stakent\" (mettent en garantie).\n"),
+    info_style("o "), highlight_style("Caractéristiques"), info_style(":\n"),
     info_style("    1. Plus économe en énergie.\n"),
     info_style("    2. Utilisé par des cryptos comme Ethereum 2.0, Cardano.\n"),
-    info_style("  o "), highlight_style("Inconvénients"), info_style(":\n"),
-    info_style("    - Avantage les riches participants, car plus on possède de cryptos, plus on a de chances d’être sélectionné comme validateur.\n\n"),
+    info_style("o "), highlight_style("Inconvénients"), info_style(":\n"),
+    info_style("Avantage les riches participants, car plus on possède de cryptos, plus on a de chances d’être sélectionné comme validateur.\n\n"),
     
-    info_secondary_style("• Différences principales :\n"),
+    info_secondary_style("• Différences principales :\n\n"),
     
     paste0(
       "\n| ", highlight_style("Critère"), "           | ", highlight_style("Proof-of-Work (PoW)"), "       | ", highlight_style("Proof-of-Stake (PoS)"), " |\n",
@@ -173,18 +175,18 @@ details <- list(
       "| Énergie            | Très énergivore        | Faible consommation       |\n",
       "|                    |                        | énergétique               |\n",
       "| Vitesse            | Plus lent              | Plus rapide               |\n",
-      "| Exemples           | Bitcoin, Litecoin      | Ethereum 2.0, Cardano     |\n"
-    ),
+      "| Exemples           | Bitcoin, Litecoin      | Ethereum 2.0, Cardano     |\n\n\n\n"
+      ),
     
     
-    info_secondary_style("Concepts clés à retenir :\n"),
+    info_secondary_style("Concepts clés à retenir :\n\n"),
     
     info_style("1. "), highlight_style("Blockchain"), info_style(": Technologie décentralisée et immuable qui enregistre les transactions.\n"),
     info_style("2. "), highlight_style("Structure des blocs"), info_style(": Contient les transactions, le hash, le nonce, et d'autres métadonnées.\n"),
     info_style("3. "), highlight_style("Clés publiques et privées"), info_style(": Système cryptographique garantissant la sécurité des transactions.\n"),
     info_style("4. "), highlight_style("Mécanismes de consensus"), info_style(":\n"),
     info_style("  o PoW : Sécurisé mais énergivore.\n"),
-    info_style("  o PoS : Efficace, mais avantage les riches validateurs.\n\n")
+    info_style("  o PoS : Efficace, mais avantage les riches validateurs.")
   ),
   
   "3f" = paste0(
@@ -508,29 +510,32 @@ details <- list(
     section_title_style("\nChapitre 3 : Les cryptos majeures et leurs usages\n"),
     highlight_style("Sous-section (H) : Les NFT et leur impact\n\n"),
     
-    info_secondary_style("• Que sont les Non-Fungible Tokens (NFT) ?\n"),
+    info_secondary_style("• Que sont les Non-Fungible Tokens (NFT) ?\n\n"),
     
-    info_style("  o "), highlight_style("Définition"), info_style(": Les NFT sont des actifs numériques uniques, non interchangeables (contrairement aux cryptos comme Bitcoin), enregistrés sur une blockchain.\n"),
+    info_style(""), highlight_style("Définition"), info_style(": Les NFT sont des actifs numériques uniques, non interchangeables (contrairement aux cryptos comme Bitcoin), enregistrés sur une blockchain.\n\n"),
     
-    info_secondary_style("  o Caractéristiques principales :\n"),
+    info_secondary_style("• Caractéristiques principales :\n\n"),
     
     info_style("    1. Chaque NFT possède une identité unique, souvent associée à un fichier numérique (image, vidéo, musique).\n"),
     info_style("    2. Basés principalement sur la blockchain Ethereum (ERC-721, ERC-1155).\n\n"),
     
-    info_secondary_style("• Usages des NFT :\n"),
+    info_secondary_style("• Usages des NFT :\n\n"),
     
-    info_style("1. "), highlight_style("Art numérique"), info_style(":\n"),
-    info_style("    - Les artistes utilisent les NFT pour vendre des œuvres d’art numériques, garantissant leur authenticité et leur rareté.\n"),
-    info_style("    - Exemple : Vente d'œuvres numériques à plusieurs millions de dollars (Beeple, CryptoPunks).\n"),
+    info_style(" 1. "), highlight_style("Art numérique"), info_style(":\n"),
+    info_style("  Les artistes utilisent les NFT pour vendre des œuvres d’art numériques, garantissant leur authenticité et leur rareté.\n"),
+    highlight_style("  Exemple"), info_style(": Vente d'œuvres numériques à plusieurs millions de dollars (Beeple, CryptoPunks).\n\n"),
+    
     info_style("2. "), highlight_style("Jeux vidéo"), info_style(":\n"),
-    info_style("    - Les NFT permettent d’acheter, vendre ou échanger des objets virtuels dans les jeux (armes, skins, terrains virtuels).\n"),
-    info_style("    - Exemple : Axie Infinity, Decentraland.\n"),
-    info_style("3. "), highlight_style("Certificats numériques"), info_style(":\n"),
-    info_style("    - Utilisés pour représenter des certificats d’authenticité, des billets d’événements ou des droits de propriété (immobilier, musique).\n"),
-    info_style("4. "), highlight_style("Mode et luxe"), info_style(":\n"),
-    info_style("    - Les marques créent des NFT pour proposer des objets exclusifs ou des collections numériques.\n\n"),
+    info_style("  Les NFT permettent d’acheter, vendre ou échanger des objets virtuels dans les jeux (armes, skins, terrains virtuels).\n\n"),
+    highlight_style("  Exemple"), info_style(": Axie Infinity, Decentraland.\n\n"),
     
-    info_secondary_style("• Impact des NFT :\n"),
+    info_style("3. "), highlight_style("Certificats numériques"), info_style(":\n"),
+    info_style("  Utilisés pour représenter des certificats d’authenticité, des billets d’événements ou des droits de propriété (immobilier, musique).\n\n"),
+    
+    info_style("4. "), highlight_style("Mode et luxe"), info_style(":\n"),
+    info_style("  Les marques créent des NFT pour proposer des objets exclusifs ou des collections numériques.\n\n"),
+    
+    info_secondary_style("• Impact des NFT :\n\n"),
     
     info_style("1. "), highlight_style("Révolution culturelle"), info_style(": Offrent une nouvelle manière de posséder et de monétiser du contenu numérique.\n"),
     info_style("2. "), highlight_style("Nouvelles opportunités économiques"), info_style(": Les créateurs conservent un contrôle total sur leurs œuvres et peuvent toucher des royalties à chaque revente.\n"),
@@ -538,7 +543,7 @@ details <- list(
     info_style("    - Consommation énergétique élevée.\n"),
     info_style("    - Risques de spéculation et de fraudes.\n\n"),
     
-    info_secondary_style("Concepts clés à retenir :\n"),
+    info_secondary_style("Concepts clés à retenir :\n\n"),
     
     info_style("1. "), highlight_style("Cryptos majeures"), info_style(":\n"),
     info_style("    - Bitcoin : Réserve de valeur et première crypto.\n"),
@@ -546,26 +551,26 @@ details <- list(
     info_style("    - Litecoin : Paiements rapides.\n"),
     info_style("    - Binance Coin : Utilisé pour les frais d’échange et le staking.\n"),
     info_style("2. "), highlight_style("Stablecoins"), info_style(": Cryptos stables, adossées à des actifs comme le dollar (USDT, USDC) ou décentralisées (DAI).\n"),
-    info_style("3. "), highlight_style("NFT"), info_style(": Actifs numériques uniques utilisés dans l’art, les jeux, et d’autres industries, avec des applications innovantes mais aussi des limites environnementales.\n\n")
+    info_style("3. "), highlight_style("NFT"), info_style(": Actifs numériques uniques utilisés dans l’art, les jeux, et d’autres industries, avec des applications innovantes mais aussi des limites environnementales.\n")
   ),
   
   "4i" = paste0(
     section_title_style("\nChapitre 4 : Acquérir et utiliser des cryptos\n"),
     highlight_style("Sous-section (I) : Acheter des cryptomonnaies : Les exchanges\n\n"),
     
-    info_secondary_style("• Fonctionnement des plateformes :\n"),
+    info_secondary_style("• Fonctionnement des plateformes :\n\n"),
     
     info_style("  o "), highlight_style("Exchanges centralisés (CEX)"), info_style(":\n"),
     info_style("    - Plateformes comme Binance, Coinbase, ou Kraken.\n"),
     info_style("    - Fonctionnent comme des intermédiaires centralisés pour acheter, vendre et échanger des cryptomonnaies.\n"),
-    info_style("    - Simples à utiliser, mais nécessitent souvent une vérification KYC (Know Your Customer).\n"),
+    info_style("    - Simples à utiliser, mais nécessitent souvent une vérification KYC (Know Your Customer).\n\n"),
     
     info_style("  o "), highlight_style("Exchanges décentralisés (DEX)"), info_style(":\n"),
     info_style("    - Plateformes comme Uniswap, PancakeSwap ou SushiSwap.\n"),
     info_style("    - Permettent d'échanger directement des cryptos entre utilisateurs via des smart contracts.\n"),
     info_style("    - Ne nécessitent pas d’intermédiaire ni de KYC, mais peuvent être plus complexes à utiliser.\n\n"),
     
-    cat(paste0(
+  
       "\n| ", highlight_style("Critères"), "             | ", highlight_style("Centralisés (CEX)"), "          | ", highlight_style("Décentralisés (DEX)"), "           |\n",
       "|---------------------|---------------------------|-----------------------------|\n",
       "| Contrôle            | Plateforme centralisée    | Contrôle total par          |\n",
@@ -576,7 +581,7 @@ details <- list(
       "| KYC                 | Obligatoire               | Non requis                  |\n",
       "| Frais               | Souvent fixes             | Variable en fonction du     |\n",
       "|                     |                           | réseau                      |\n"
-    ))
+    
     ),
     
 
@@ -584,19 +589,19 @@ details <- list(
     section_title_style("\nChapitre 4 : Acquérir et utiliser des cryptos\n"),
     highlight_style("Sous-section (J) : Les wallets crypto : types et sécurité\n\n"),
     
-    info_secondary_style("• Types de wallets :\n"),
+    info_secondary_style("• Types de wallets :\n\n"),
     
     info_style("  o "), highlight_style("Wallets matériels (hardware wallets)"), info_style(":\n"),
     info_style("    - Exemples : Ledger, Trezor.\n"),
     info_style("    - Appareils physiques qui stockent les clés privées hors ligne, offrant une sécurité maximale contre les cyberattaques.\n"),
-    info_style("    - Idéal pour les investisseurs à long terme.\n"),
+    info_style("    - Idéal pour les investisseurs à long terme.\n\n"),
     
     info_style("  o "), highlight_style("Wallets logiciels (software wallets)"), info_style(":\n"),
     info_style("    - Applications comme MetaMask, Trust Wallet ou Exodus.\n"),
     info_style("    - Pratiques pour gérer des cryptos sur ordinateur ou smartphone.\n"),
     info_style("    - Moins sécurisés car connectés à Internet.\n\n"),
     
-    info_secondary_style("• Hot wallets vs Cold wallets :\n"),
+    info_secondary_style("• Hot wallets vs Cold wallets :\n\n"),
     
     info_style("  o "), highlight_style("Hot wallets"), info_style(":\n"),
     info_style("    - Connectés à Internet (ex : MetaMask, wallets d’exchanges).\n"),
@@ -611,111 +616,121 @@ details <- list(
     section_title_style("\nChapitre 4 : Acquérir et utiliser des cryptos\n"),
     highlight_style("Sous-section (K) : Envoyer et recevoir des cryptos\n\n"),
     
-    info_secondary_style("• Étapes pratiques pour effectuer une transaction :\n"),
+    info_secondary_style("• Étapes pratiques pour effectuer une transaction :\n\n"),
     
-    info_style("  - Étape 1 : "), highlight_style("Obtenir l’adresse du destinataire"), info_style(": Exemple : Une clé publique unique.\n"),
-    info_style("  - Étape 2 : "), highlight_style("Initier la transaction"), info_style(": Depuis votre wallet, entrez l’adresse du destinataire, le montant à envoyer et validez.\n"),
-    info_style("  - Étape 3 : "), highlight_style("Paiement des frais de réseau (gas fees)"), info_style(": Nécessaire pour que les mineurs ou validateurs traitent la transaction.\n"),
-    info_style("  - Étape 4 : "), highlight_style("Validation et confirmation"), info_style(": La transaction est ajoutée à la blockchain après validation.\n\n"),
+    info_style("Étape 1 : "), highlight_style("Obtenir l’adresse du destinataire"), info_style(": Exemple : Une clé publique unique.\n"),
+    info_style("Étape 2 : "), highlight_style("Initier la transaction"), info_style(": Depuis votre wallet, entrez l’adresse du destinataire, le montant à envoyer et validez.\n"),
+    info_style("Étape 3 : "), highlight_style("Paiement des frais de réseau (gas fees)"), info_style(": Nécessaire pour que les mineurs ou validateurs traitent la transaction.\n"),
+    info_style("Étape 4 : "), highlight_style("Validation et confirmation"), info_style(": La transaction est ajoutée à la blockchain après validation.\n\n"),
     
-    info_secondary_style("• Frais de transaction (gas fees) :\n"),
+    info_secondary_style("• Frais de transaction (gas fees) :\n\n"),
     
-    info_style("  "), highlight_style("Définition"), info_style(": Les gas fees représentent les frais payés pour les opérations effectuées sur une blockchain.\n"),
+    info_style("  "), highlight_style("Définition"), info_style(": Les gas fees représentent les frais payés pour les opérations effectuées sur une blockchain.\n\n"),
+    
     info_style("  "), highlight_style("Exemples"), info_style(":\n"),
     info_style("    - Sur Ethereum, les frais dépendent de la congestion du réseau.\n"),
-    info_style("    - Sur Binance Smart Chain, les frais sont généralement plus faibles.\n"),
+    info_style("    - Sur Binance Smart Chain, les frais sont généralement plus faibles.\n\n"),
     
     info_style("  "), highlight_style("Facteurs influençant les frais"), info_style(":\n"),
     info_style("    - Complexité de la transaction.\n"),
     info_style("    - Congestion du réseau.\n"),
-    info_style("    - Vitesse de traitement souhaitée (frais plus élevés pour une validation rapide).\n\n")
+    info_style("    - Vitesse de traitement souhaitée (frais plus élevés pour une validation rapide).\n")
   ),
   
   "5l" = paste0(
     section_title_style("\nChapitre 5 : Investissement et trading\n"),
     highlight_style("Sous-section (L) : Comment évaluer une cryptomonnaie ?\n\n"),
     
-    info_secondary_style("• Critères d'évaluation d'une cryptomonnaie :\n"),
+    info_secondary_style("• Critères d'évaluation d'une cryptomonnaie :\n\n"),
     
-    info_style("  1. "), highlight_style("Market cap (capitalisation boursière)"), info_style(":\n"),
-    info_style("  Définition : Valeur totale de toutes les unités d’une cryptomonnaie en circulation.\n"),
-    info_style("  Formule : Market cap = Prix unitaire x Nombre total d’unités en circulation.\n"),
-    info_style("  Utilité :\n"),
+    info_style("1. "), success_style("Market cap (capitalisation boursière)"), info_style(":\n\n"),
+    
+    highlight_style(" Définition"), info_style(": Valeur totale de toutes les unités d’une cryptomonnaie en circulation.\n"),
+    highlight_style(" Formule"), info_style(": Market cap = Prix unitaire x Nombre total d’unités en circulation.\n"),
+    highlight_style("  Utilité :\n"),
     info_style("      - Une market cap élevée indique une crypto plus stable et établie (ex : Bitcoin, Ethereum).\n"),
-    info_style("      - Une market cap faible peut signifier un potentiel de croissance, mais aussi plus de risque.\n"),
+    info_style("      - Une market cap faible peut signifier un potentiel de croissance, mais aussi plus de risque.\n\n"),
     
-    info_style("  2. "), highlight_style("Volume de trading"), info_style(":\n"),
-    info_style("  Définition : Montant total de transactions effectuées sur une cryptomonnaie sur une période donnée (souvent 24 heures).\n"),
-    info_style("  Utilité :\n"),
+    success_style("2. "), highlight_style("Volume de trading"), info_style(":\n\n"),
+    
+    highlight_style(" Définition"), info_style(": Montant total de transactions effectuées sur une cryptomonnaie sur une période donnée (souvent 24 heures).\n"),
+    highlight_style(" Utilité :\n"),
     info_style("      - Un volume élevé indique une forte liquidité, ce qui facilite l'achat et la vente.\n"),
-    info_style("      - Un faible volume peut rendre difficile l’exécution des transactions.\n"),
+    info_style("      - Un faible volume peut rendre difficile l’exécution des transactions.\n\n"),
     
-    info_style("  3. "), highlight_style("Tokenomics"), info_style(":\n"),
-    info_style("    Étude de l’économie des tokens (offre, demande, utilité).\n"),
-    info_style("    Points clés à examiner :\n"),
+    success_style("3. "), highlight_style("Tokenomics"), info_style(":\n\n"),
+    
+    info_style(" Étude de l’économie des tokens (offre, demande, utilité).\n\n"),
+    
+    highlight_style(" Points clés à examiner :\n"),
     info_style("      - Offre maximale : Limite du nombre de tokens (ex : Bitcoin = 21 millions).\n"),
     info_style("      - Utilité : À quoi sert le token ? (paiements, staking, gouvernance).\n"),
     info_style("      - Distribution : Comment les tokens sont répartis (entre les développeurs, les investisseurs, etc.).\n\n"),
     
-    info_secondary_style("• Investir vs Trader :\n"),
+    info_secondary_style("• Investir vs Trader :\n\n"),
     
-    info_style(" o"), highlight_style("Investir"), info_style(":\n"),
-    info_style("    Objectif : Acheter et conserver des cryptos sur le long terme.\n"),
-    info_style("    Approche : Basée sur l’analyse fondamentale (projet, équipe, vision).\n"),
-    info_style("    Risques : Plus faible volatilité à long terme, mais sensible aux tendances du marché.\n"),
+    success_style(""), highlight_style("Investir"), info_style(":\n"),
+    highlight_style("- Objectif"), info_style(": Acheter et conserver des cryptos sur le long terme.\n"),
+    highlight_style("- Approche"), info_style(": Basée sur l’analyse fondamentale (projet, équipe, vision).\n"),
+    highlight_style("- Risques"),  info_style(": Plus faible volatilité à long terme, mais sensible aux tendances du marché.\n\n"),
     
-    info_style("  o"), highlight_style("Trader"), info_style(":\n"),
-    info_style("    Objectif : Profiter des fluctuations de prix à court terme.\n"),
-    info_style("    Approche : Basée sur l’analyse technique (graphiques, indicateurs).\n"),
-    info_style("    Risques : Plus élevé, nécessite une surveillance constante et une bonne maîtrise.\n\n")
+    success_style(""), highlight_style("Trader"), info_style(":\n"),
+    highlight_style("- Objectif"), info_style(": Profiter des fluctuations de prix à court terme.\n"),
+    highlight_style("- Approche"), info_style(": Basée sur l’analyse technique (graphiques, indicateurs).\n"),
+    highlight_style("- Risques"),  info_style(": Plus élevé, nécessite une surveillance constante et une bonne maîtrise.\n")
   ),
   
   "5m" = paste0(
     section_title_style("\nChapitre 5 : Investissement et trading\n"),
     highlight_style("Sous-section (M) : Risques et volatilité\n\n"),
     
-    info_secondary_style("• Facteurs influençant les prix des cryptos :\n"),
+    info_secondary_style("• Facteurs influençant les prix des cryptos :\n\n"),
     
-    info_style("  1. "), highlight_style("Offre et demande"), info_style(":\n"),
-    info_style("    - Une demande élevée et une offre limitée augmentent les prix.\n"),
-    info_style("    Exemples : La limite de 21 millions de Bitcoin soutient son prix.\n"),
-    info_style("  2. "), highlight_style("Régulations"), info_style(":\n"),
-    info_style("    - Les annonces gouvernementales peuvent fortement impacter les prix (ex : interdictions en Chine).\n"),
-    info_style("  3. "), highlight_style("Adoption"), info_style(":\n"),
-    info_style("    - Une adoption accrue par les entreprises et utilisateurs augmente la valeur (ex : PayPal acceptant Bitcoin).\n"),
-    info_style("  4. "), highlight_style("Sentiment du marché"), info_style(":\n"),
-    info_style("    -  La psychologie collective influence les prix (enthousiasme ou panique).\n"),
-    info_style("  5. "), highlight_style("Facteurs externes"), info_style(":\n"),
-    info_style("    - Événements globaux comme les crises économiques ou les tensions politiques.\n\n"),
+    info_style("1. "), highlight_style("Offre et demande"), info_style(":\n"),
+    info_style(" Une demande élevée et une offre limitée augmentent les prix.\n"),
+    info_style(" Exemples : La limite de 21 millions de Bitcoin soutient son prix.\n\n"),
     
-    info_secondary_style("• Importance de gérer les risques :\n"),
+    info_style("2. "), highlight_style("Régulations"), info_style(":\n"),
+    info_style(" Les annonces gouvernementales peuvent fortement impacter les prix (ex : interdictions en Chine).\n\n"),
     
-    info_style(""), highlight_style("Règle d'or"), info_style(": Ne jamais investir plus que ce qu’on est prêt à perdre.\n"),
-    info_style(""), highlight_style("Diversification"), info_style(":\n"),
-    info_style("  o Répartir ses investissements entre plusieurs cryptos pour limiter les pertes potentielles.\n"),
-    info_style(""), highlight_style("Analyse préalable"), info_style(":\n"),
-    info_style("  o Étudier le projet, les tokenomics et la liquidité avant d’investir.\n"),
-    info_style(""), highlight_style("Stratégies de sortie"), info_style(":\n"),
-    info_style("  o Définir à l’avance des seuils pour vendre (stop-loss, take-profit).\n\n")
+    info_style("3. "), highlight_style("Adoption"), info_style(":\n"),
+    info_style(" Une adoption accrue par les entreprises et utilisateurs augmente la valeur (ex : PayPal acceptant Bitcoin).\n\n"),
+    
+    info_style("4. "), highlight_style("Sentiment du marché"), info_style(":\n"),
+    info_style(" La psychologie collective influence les prix (enthousiasme ou panique).\n\n"),
+    
+    info_style("5. "), highlight_style("Facteurs externes"), info_style(":\n"),
+    info_style(" Événements globaux comme les crises économiques ou les tensions politiques.\n\n"),
+    
+    
+    info_secondary_style("• Importance de gérer les risques :\n\n"),
+    
+    info_style(""), highlight_style("Règle d'or"), info_style(": Ne jamais investir plus que ce qu’on est prêt à perdre.\n\n"),
+    
+    info_style(""), highlight_style("Diversification"), info_style(": Répartir ses investissements entre plusieurs cryptos pour limiter les pertes potentielles.\n\n"),
+    
+    info_style(""), highlight_style("Analyse préalable"), info_style(": Étudier le projet, les tokenomics et la liquidité avant d’investir.\n\n"),
+    
+    info_style(""), highlight_style("Stratégies de sortie"), info_style(": Définir à l’avance des seuils pour vendre (stop-loss, take-profit).\n")
   ),
   
   "5n" = paste0(
     section_title_style("\nChapitre 5 : Investissement et trading\n"),
     highlight_style("Sous-section (N) : Les bulles et cycles de marché\n\n"),
     
-    info_secondary_style("• Bull et bear markets :\n"),
+    info_secondary_style("• Bull et bear markets :\n\n"),
     
     info_style("  1. "), highlight_style("Bull market"), info_style(":\n"),
     info_style("    o Marché haussier caractérisé par une forte augmentation des prix.\n"),
     info_style("    o Typiquement associé à un optimisme généralisé et une forte adoption.\n"),
-    info_style("    o Exemple : La hausse spectaculaire de Bitcoin en 2021.\n"),
+    info_style("    o Exemple : La hausse spectaculaire de Bitcoin en 2021.\n\n"),
     
     info_style("  2. "), highlight_style("Bear market"), info_style(":\n"),
     info_style("    o Marché baissier marqué par une chute prolongée des prix.\n"),
     info_style("    o Lié à une perte de confiance ou des conditions économiques défavorables.\n"),
     info_style("    o Exemple : Le crash crypto de 2018 après le boom des ICO.\n\n"),
     
-    info_secondary_style("• Psychologie des investisseurs :\n"),
+    info_secondary_style("• Psychologie des investisseurs :\n\n"),
     
     info_style("  1. "), highlight_style("FOMO (Fear of Missing Out)"), info_style(":\n"),
     info_style("    o Peur de manquer une opportunité, poussant les investisseurs à acheter au plus haut.\n"),
@@ -726,46 +741,46 @@ details <- list(
     info_style("  3. "), highlight_style("Cycle des émotions"), info_style(":\n"),
     info_style("    o Euphorie → FOMO → Crash → Panique → Dépression → Récupération.\n\n"),
     
-    info_secondary_style("Concepts clés à retenir :\n"),
+    info_secondary_style("Concepts clés à retenir :\n\n"),
     
     info_style("  1. "), highlight_style("Évaluation des cryptos"), info_style(":\n"),
-    info_style("    - Market cap, volume de trading et tokenomics sont essentiels pour juger une crypto.\n"),
-    info_style("    - Différencier les stratégies d’investissement (long terme) et de trading (court terme).\n"),
+    info_style("  - Market cap, volume de trading et tokenomics sont essentiels pour juger une crypto.\n"),
+    info_style("  - Différencier les stratégies d’investissement (long terme) et de trading (court terme).\n"),
     info_style("  2. "), highlight_style("Gérer les risques"), info_style(":\n"),
-    info_style("   -  Connaître les facteurs influençant les prix.\n"),
-    info_style("   - Ne jamais investir plus que ce que l’on peut perdre.\n"),
+    info_style("  -  Connaître les facteurs influençant les prix.\n"),
+    info_style("  - Ne jamais investir plus que ce que l’on peut perdre.\n"),
     info_style("  3. "), highlight_style("Cycles de marché"), info_style(":\n"),
-    info_style("    - Apprendre à reconnaître les bulles et à gérer les émotions (FOMO, FUD).\n\n")
+    info_style("  - Apprendre à reconnaître les bulles et à gérer les émotions (FOMO, FUD).\n")
   ),
   
   "6o" = paste0(
     section_title_style("\nChapitre 6 : Régulation et sécurité\n"),
     highlight_style("Sous-section (o) : L'environnement réglementaire mondial\n\n"),
     
-    info_secondary_style("• Régulation en Europe : MiCA (Markets in Crypto-Assets)\n"),
+    info_secondary_style("• Régulation en Europe : MiCA (Markets in Crypto-Assets)\n\n"),
     
-    info_style(""), highlight_style("Définition"), info_style(": MiCA est un cadre réglementaire de l'Union européenne visant à harmoniser les règles pour les cryptomonnaies et les actifs numériques dans l'UE.\n"),
+    info_style(""), highlight_style("Définition"), info_style(": MiCA est un cadre réglementaire de l'Union européenne visant à harmoniser les règles pour les cryptomonnaies et les actifs numériques dans l'UE.\n\n"),
     
     info_style(""), highlight_style("Objectifs"), info_style(":\n"),
     info_style("    o Protéger les investisseurs contre les risques.\n"),
     info_style("    o Encadrer les émetteurs de cryptos (stablecoins, utility tokens).\n"),
-    info_style("    o Lutter contre le blanchiment d’argent et le financement du terrorisme.\n"),
+    info_style("    o Lutter contre le blanchiment d’argent et le financement du terrorisme.\n\n"),
     
     info_style(""), highlight_style("Impact"), info_style(":\n"),
     info_style("    o Une réglementation unique pour tous les pays membres.\n"),
     info_style("    o Plus de transparence pour les investisseurs et les entreprises crypto.\n\n"),
     
-    info_secondary_style("• Régulation aux États-Unis : SEC (Securities and Exchange Commission)\n"),
+    info_secondary_style("• Régulation aux États-Unis : SEC (Securities and Exchange Commission)\n\n"),
     
     info_style("  "), highlight_style("Rôle"), info_style(": La SEC régule les cryptomonnaies considérées comme des \"valeurs mobilières\" (securities).\n"),
     info_style("  "), highlight_style("Exemples de cas célèbres"), info_style(":\n"),
     info_style("    - Ripple (XRP) : En 2020, la SEC a accusé Ripple de vendre des titres non enregistrés.\n"),
     info_style("    - Les ICO : Souvent ciblées pour non-respect des lois sur les valeurs mobilières.\n"),
-    info_style("  "), highlight_style("Limites"), info_style(":\n"),
+    info_style("  "), warning_style("Limites"), info_style(":\n"),
     info_style("    o Absence d’un cadre réglementaire clair pour les cryptos.\n"),
     info_style("    o Conflits entre la SEC et d’autres agences comme la CFTC (Commodity Futures Trading Commission).\n\n"),
     
-    info_secondary_style("• Problèmes posés par la confidentialité\n"),
+    info_secondary_style("• Problèmes posés par la confidentialité\n\n"),
     
     info_style("  "), highlight_style("Monero (XMR) et Zcash (ZEC)"), info_style(":\n"),
     info_style("    o Ces cryptos axées sur la confidentialité rendent les transactions intraçables.\n"),
@@ -773,205 +788,227 @@ details <- list(
     info_style("    o Inconvénients : Souvent accusées de faciliter les activités illégales comme le blanchiment d’argent.\n"),
     info_style("  "), highlight_style("Défis pour les régulateurs"), info_style(":\n"),
     info_style("    o Difficile de surveiller ou d’identifier les parties impliquées dans une transaction.\n"),
-    info_style("    o Pressions pour interdire ou limiter leur utilisation.\n\n")
+    info_style("    o Pressions pour interdire ou limiter leur utilisation.\n")
   ),
   
   "6p" = paste0(
     section_title_style("\nChapitre 6 : Régulation et sécurité\n"),
     highlight_style("Sous-section (P) : Les risques de sécurité : Fraudes et hacks\n\n"),
     
-    info_secondary_style("• Types d’attaques :\n"),
+    info_secondary_style("• Types d’attaques :\n\n"),
     
-    info_style("  1. "), highlight_style("Phishing"), info_style(":\n"),
-    info_style("    o Attaque visant à obtenir les clés privées ou les informations sensibles d’un utilisateur via des e-mails ou des sites frauduleux.\n"),
-    info_style("    Exemple : Un faux site imitant un exchange comme Binance pour voler des identifiants.\n"),
-    info_style("  2. "), highlight_style("Rug pulls"), info_style(":\n"),
-    info_style("    o Arnaque où les développeurs abandonnent un projet après avoir collecté des fonds des investisseurs.\n"),
-    info_style("    Exemple : Un projet DeFi promettant des rendements élevés avant de disparaître.\n"),
-    info_style("  3. "), highlight_style("51% attacks"), info_style(":\n"),
-    info_style("    o Une entité contrôle plus de 50% du réseau blockchain, ce qui lui permet de manipuler les transactions.\n"),
-    info_style("    Exemple : Certaines blockchains à faible capitalisation sont vulnérables.\n"),
-    info_style("  4. "), highlight_style("Malwares"), info_style(":\n"),
-    info_style("    o Logiciels malveillants visant à voler les cryptos ou à miner sans autorisation (cryptojacking).\n\n"),
+    info_style("1. "), highlight_style("Phishing"), info_style(":\n"),
+    info_style(" Attaque visant à obtenir les clés privées ou les informations sensibles d’un utilisateur via des e-mails ou des sites frauduleux.\n"),
+    info_style(" Exemple : Un faux site imitant un exchange comme Binance pour voler des identifiants.\n\n"),
     
-    info_secondary_style("• Bonnes pratiques pour sécuriser ses fonds :\n"),
+    info_style("2. "), highlight_style("Rug pulls"), info_style(":\n"),
+    info_style(" Arnaque où les développeurs abandonnent un projet après avoir collecté des fonds des investisseurs.\n"),
+    info_style(" Exemple : Un projet DeFi promettant des rendements élevés avant de disparaître.\n\n"),
     
-    info_style("  1. "), highlight_style("Utiliser des wallets matériels"), info_style(":\n"),
-    info_style("    Exemples : Ledger, Trezor.\n"),
-    info_style("    - Stockage hors ligne pour éviter les risques de piratage.\n"),
-    info_style("  2. "), highlight_style("Activer la double authentification (2FA)"), info_style(":\n"),
-    info_style("    - Pour renforcer la sécurité des comptes sur les exchanges.\n"),
-    info_style("  3. "), highlight_style("Ne jamais partager sa clé privée"), info_style(":\n"),
-    info_style("    - Une clé privée compromise entraîne une perte totale des fonds.\n"),
-    info_style("  4. "), highlight_style("Vérifier les adresses de transaction"), info_style(":\n"),
-    info_style("    - Toujours vérifier que l’adresse du destinataire est correcte avant d’envoyer des fonds.\n"),
-    info_style("  5. "), highlight_style("Mettre à jour régulièrement ses logiciels"), info_style(":\n"),
-    info_style("    - Les wallets et exchanges peuvent publier des mises à jour pour corriger des failles de sécurité.\n"),
-    info_style("  6. "), highlight_style("Éviter les réseaux Wi-Fi publics"), info_style(":\n"),
-    info_style("    - Les connexions non sécurisées sont vulnérables aux interceptions.\n\n"),
+    info_style("3. "), highlight_style("51% attacks"), info_style(":\n"),
+    info_style(" Une entité contrôle plus de 50% du réseau blockchain, ce qui lui permet de manipuler les transactions.\n"),
+    info_style(" Exemple : Certaines blockchains à faible capitalisation sont vulnérables.\n\n"),
+    
+    info_style("4. "), highlight_style("Malwares"), info_style(":\n"),
+    info_style(" Logiciels malveillants visant à voler les cryptos ou à miner sans autorisation (cryptojacking).\n\n"),
+    
+    info_secondary_style("• Bonnes pratiques pour sécuriser ses fonds :\n\n"),
+    
+    info_style("1. "), highlight_style("Utiliser des wallets matériels"), info_style(":\n"),
+    info_style("Stockage hors ligne pour éviter les risques de piratage.\n"),
+    info_style(" *Exemples : Ledger, Trezor.\n\n"),
+    
+    info_style("2. "), highlight_style("Activer la double authentification (2FA)"), info_style(":\n"),
+    info_style(" Pour renforcer la sécurité des comptes sur les exchanges.\n\n"),
+    
+    info_style("3. "), highlight_style("Ne jamais partager sa clé privée"), info_style(":\n"),
+    info_style(" Une clé privée compromise entraîne une perte totale des fonds.\n\n"),
+    
+    info_style("4. "), highlight_style("Vérifier les adresses de transaction"), info_style(":\n"),
+    info_style(" Toujours vérifier que l’adresse du destinataire est correcte avant d’envoyer des fonds.\n\n"),
+    
+    info_style("5. "), highlight_style("Mettre à jour régulièrement ses logiciels"), info_style(":\n"),
+    info_style(" Les wallets et exchanges peuvent publier des mises à jour pour corriger des failles de sécurité.\n\n"),
+    
+    info_style("6. "), highlight_style("Éviter les réseaux Wi-Fi publics"), info_style(":\n"),
+    info_style(" Les connexions non sécurisées sont vulnérables aux interceptions.\n\n"),
   
-    highlight_style("Concepts clés à retenir\n\n"),
+    info_secondary_style("Concepts clés à retenir\n\n"),
     
     info_style("  1. "), highlight_style("Régulation"), info_style(":\n"),
     info_style("    o MiCA en Europe apporte un cadre clair et harmonisé pour les cryptos.\n"),
     info_style("    o Aux États-Unis, la SEC joue un rôle central, mais le cadre reste fragmenté.\n"),
-    info_style("    o Les cryptos axées sur la confidentialité posent des défis pour la conformité.\n"),
+    info_style("    o Les cryptos axées sur la confidentialité posent des défis pour la conformité.\n\n"),
+    
     info_style("  2. "), highlight_style("Sécurité"), info_style(":\n"),
     info_style("    o Les fraudes et hacks (phishing, rug pulls) sont des risques majeurs.\n"),
-    info_style("    o Les bonnes pratiques comme l’utilisation de wallets matériels et la 2FA sont essentielles pour protéger ses fonds.\n\n")
+    info_style("    o Les bonnes pratiques comme l’utilisation de wallets matériels et la 2FA sont essentielles pour protéger ses fonds.\n")
   ),
 
   "7q" = paste0(
     section_title_style("\nChapitre 7 : Applications et innovations\n"),
-    highlight_style("Sous-section (q) : La finance décentralisée (DeFi)\n\n"),
+    highlight_style("Sous-section (Q) : La finance décentralisée (DeFi)\n\n"),
     
-    info_secondary_style("• Qu’est-ce que la DeFi ?\n"),
+    info_secondary_style("• Qu’est-ce que la DeFi ?\n\n"),
     
-    info_style("  "), highlight_style("Définition"), info_style(": La finance décentralisée (DeFi) désigne un ensemble de services financiers accessibles via des blockchains, sans intermédiaires comme les banques ou institutions financières.\n"),
+    highlight_style("Définition"), info_style(": La finance décentralisée (DeFi) désigne un ensemble de services financiers accessibles via des blockchains, sans intermédiaires comme les banques ou institutions financières.\n\n"),
     
-    info_style("  "), highlight_style("Principe"), info_style(":\n"),
+    highlight_style("Principe"), info_style(":\n"),
     info_style("    o Basée sur des smart contracts, qui automatisent les transactions et les contrats sans intervention humaine.\n"),
     info_style("    o Accessible à tous, il suffit d’un portefeuille crypto.\n\n"),
     
-    info_secondary_style("• Les smart contracts :\n"),
+    info_secondary_style("• Les smart contracts :\n\n"),
     
-    info_style("  "), highlight_style("Définition"), info_style(": Programmes autonomes qui s'exécutent automatiquement lorsque des conditions prédéfinies sont remplies.\n"),
+    highlight_style("Définition"), info_style(": Programmes autonomes qui s'exécutent automatiquement lorsque des conditions prédéfinies sont remplies.\n\n"),
     
-    info_style("  "), highlight_style("Exemple"), info_style(":\n"),
+    highlight_style("Exemple"), info_style(":\n"),
     info_style("    o Si une personne envoie 1 ETH à un smart contract, celui-ci peut automatiquement envoyer un NFT en retour.\n"),
-    info_style("  "), highlight_style("Avantages"), info_style(":\n"),
+    highlight_style("Avantages"), info_style(":\n"),
     info_style("    o Transparence, immutabilité, réduction des frais, et rapidité des transactions.\n\n"),
     
-    info_secondary_style("• Exemples de projets DeFi :\n"),
+    info_secondary_style("• Exemples de projets DeFi :\n\n"),
     
-    info_style("  1. "), highlight_style("Uniswap"), info_style(":\n"),
-    info_style("    o Un exchange décentralisé (DEX) qui permet aux utilisateurs d’échanger des cryptomonnaies directement entre eux sans intermédiaire.\n"),
-    info_style("    o Fonctionne sur le principe des pools de liquidité.\n"),
-    info_style("  2. "), highlight_style("Aave"), info_style(":\n"),
-    info_style("    o Une plateforme de prêt décentralisée où les utilisateurs peuvent prêter leurs cryptos pour gagner des intérêts ou emprunter en fournissant des garanties.\n"),
-    info_style("    o Fonctionne sans banque, grâce aux smart contracts.\n\n")
+    info_style("1. "), highlight_style("Uniswap"), info_style(":\n"),
+    info_style(" Un exchange décentralisé (DEX) qui permet aux utilisateurs d’échanger des cryptomonnaies directement entre eux sans intermédiaire.\n"),
+    info_style(" Fonctionne sur le principe des pools de liquidité.\n\n"),
+    
+    info_style("2. "), highlight_style("Aave"), info_style(":\n"),
+    info_style(" Une plateforme de prêt décentralisée où les utilisateurs peuvent prêter leurs cryptos pour gagner des intérêts ou emprunter en fournissant des garanties.\n"),
+    info_style(" Fonctionne sans banque, grâce aux smart contracts.\n")
   ),
   
   "7r" = paste0(
     section_title_style("\nChapitre 7 : Applications et innovations\n"),
     highlight_style("Sous-section (R) : Les cas d’usage réels des cryptos\n\n"),
     
-    info_secondary_style("• Paiements internationaux :\n"),
+    info_secondary_style("• Paiements internationaux :\n\n"),
     
-    info_style("  - Les cryptomonnaies permettent des transactions transfrontalières rapides et peu coûteuses.\n"),
-    info_style("  "), highlight_style("Exemples"), info_style(":\n"),
-    info_style("    o Un transfert de Bitcoin ou USDT peut être effectué en quelques minutes, avec des frais bien inférieurs à ceux des banques.\n"),
-    info_style("  "), highlight_style("Avantages"), info_style(":\n"),
-    info_style("    o Suppression des intermédiaires (banques, réseaux SWIFT).\n"),
-    info_style("    o Accessibilité même dans les régions sous-bancarisées.\n\n"),
+    info_style("Les cryptomonnaies permettent des transactions transfrontalières rapides et peu coûteuses.\n\n"),
     
-    info_secondary_style("• Contrats intelligents (smart contracts) :\n"),
+    highlight_style("Exemples"), info_style(":\n"),
+    info_style("  Un transfert de Bitcoin ou USDT peut être effectué en quelques minutes, avec des frais bien inférieurs à ceux des banques.\n"),
+    highlight_style("Avantages"), info_style(":\n"),
+    info_style("  o Suppression des intermédiaires (banques, réseaux SWIFT).\n"),
+    info_style("  o Accessibilité même dans les régions sous-bancarisées.\n\n"),
     
-    info_style("  - Automatisation des accords entre parties.\n"),
-    info_style("  "), highlight_style("Usages"), info_style(":\n"),
-    info_style("    o Immobilier : Les smart contracts peuvent automatiser le transfert de propriété après un paiement.\n"),
-    info_style("    o Assurance : Versement automatique en cas de déclenchement d’un événement assuré (ex : retard de vol).\n\n"),
+    info_secondary_style("• Contrats intelligents (smart contracts) :\n\n"),
     
-    info_secondary_style("• Transfert de propriété :\n"),
+    info_style("Automatisation des accords entre parties.\n\n"),
     
-    info_style("  - Les blockchains permettent d’enregistrer des titres de propriété (terrains, maisons, œuvres d’art) de manière immuable et transparente.\n"),
-    info_style("  "), highlight_style("Exemple"), info_style(": La plateforme Propy permet de vendre ou d’acheter des biens immobiliers en utilisant la blockchain.\n\n")
+    highlight_style("Usages"), info_style(":\n"),
+    info_style("  o Immobilier : Les smart contracts peuvent automatiser le transfert de propriété après un paiement.\n"),
+    info_style("  o Assurance : Versement automatique en cas de déclenchement d’un événement assuré (ex : retard de vol).\n\n"),
+    
+    info_secondary_style("• Transfert de propriété :\n\n"),
+    
+    info_style("Les blockchains permettent d’enregistrer des titres de propriété (terrains, maisons, œuvres d’art) de manière immuable et transparente.\n"),
+    highlight_style("Exemple"), info_style(": La plateforme Propy permet de vendre ou d’acheter des biens immobiliers en utilisant la blockchain.\n")
   ),
   
   "7s" = paste0(
     section_title_style("\nChapitre 7 : Applications et innovations\n"),
     highlight_style("Sous-section (S) : L’impact environnemental\n\n"),
     
-    info_secondary_style("• Consommation énergétique du Bitcoin :\n"),
+    info_secondary_style("• Consommation énergétique du Bitcoin :\n\n"),
     
-    info_style("  - Bitcoin utilise le mécanisme de consensus Proof-of-Work (PoW), qui demande une énorme puissance de calcul.\n"),
-    info_style("  "), highlight_style("Conséquences environnementales"), info_style(" :\n"),
-    info_style("    o Forte consommation d’énergie, souvent générée à partir de combustibles fossiles.\n"),
-    info_style("    o Exemple : En 2022, la consommation annuelle du réseau Bitcoin a été comparée à celle de pays comme l’Argentine.\n\n"),
+    info_style("Bitcoin utilise le mécanisme de consensus Proof-of-Work (PoW), qui demande une énorme puissance de calcul.\n\n"),
     
-    info_secondary_style("• Initiatives pour des blockchains plus écologiques :\n"),
+    highlight_style("Conséquences environnementales"), info_style(" :\n"),
+    info_style("  o Forte consommation d’énergie, souvent générée à partir de combustibles fossiles.\n"),
+    info_style("  o Exemple : En 2022, la consommation annuelle du réseau Bitcoin a été comparée à celle de pays comme l’Argentine.\n\n"),
     
-    info_style("  "), highlight_style("Ethereum 2.0 (Proof-of-Stake)"), info_style(" :\n"),
-    info_style("    o Transition du PoW au PoS, réduisant la consommation énergétique de 99 %.\n"),
-    info_style("    o Moins de calculs complexes, donc moins de dépenses énergétiques.\n"),
-    info_style("  "), highlight_style("Projets neutres en carbone"), info_style(" :\n"),
-    info_style("    o Certaines blockchains (ex : Algorand) s'engagent à compenser leur empreinte carbone via des initiatives écologiques.\n"),
-    info_style("  "), highlight_style("Ressources renouvelables pour le minage"), info_style(" :\n"),
-    info_style("    o Des fermes de minage commencent à utiliser l’énergie solaire, éolienne ou hydraulique pour réduire leur impact environnemental.\n\n"),
+    info_secondary_style("• Initiatives pour des blockchains plus écologiques :\n\n"),
     
-    highlight_style("Concepts clés à retenir\n\n"),
+    highlight_style("Ethereum 2.0 (Proof-of-Stake)"), info_style(" :\n"),
+    info_style("  o Transition du PoW au PoS, réduisant la consommation énergétique de 99 %.\n"),
+    info_style("  o Moins de calculs complexes, donc moins de dépenses énergétiques.\n\n"),
+    
+    highlight_style("Projets neutres en carbone"), info_style(" :\n"),
+    info_style("  o Certaines blockchains (ex : Algorand) s'engagent à compenser leur empreinte carbone via des initiatives écologiques.\n\n"),
+    
+    highlight_style("Ressources renouvelables pour le minage"), info_style(" :\n"),
+    info_style("  o Des fermes de minage commencent à utiliser l’énergie solaire, éolienne ou hydraulique pour réduire leur impact environnemental.\n\n"),
+    
+    info_secondary_style("Concepts clés à retenir\n\n"),
     
     info_style("  1. "), highlight_style("Consommation énergétique"), info_style(" :\n"),
-    info_style("    o Bitcoin reste énergivore en raison du PoW.\n"),
-    info_style("    o Des solutions comme Ethereum 2.0 et les blockchains neutres en carbone sont des alternatives durables.\n"),
+    info_style("  o Bitcoin reste énergivore en raison du PoW.\n"),
+    info_style("  o Des solutions comme Ethereum 2.0 et les blockchains neutres en carbone sont des alternatives durables.\n\n"),
+    
     info_style("  2. "), highlight_style("Initiatives écologiques"), info_style(" :\n"),
-    info_style("    o Transition vers des mécanismes moins énergivores comme le PoS.\n"),
-    info_style("    o Utilisation accrue des énergies renouvelables pour le minage.\n\n")
+    info_style("  o Transition vers des mécanismes moins énergivores comme le PoS.\n"),
+    info_style("  o Utilisation accrue des énergies renouvelables pour le minage.\n")
   ),
   
   "8t" = paste0(
     section_title_style("\nChapitre 8 : Perspectives et tendances futures\n"),
     highlight_style("Sous-section (T) : Le futur des cryptomonnaies\n\n"),
     
-    info_secondary_style("• Adoption par les institutions et pays :\n"),
+    info_secondary_style("• Adoption par les institutions et pays :\n\n"),
     
     info_style("  1. "), highlight_style("Adoption par les entreprises"), info_style(" :\n"),
-    info_style("    - Les cryptomonnaies sont de plus en plus adoptées par des entreprises comme moyen de paiement et comme réserve de valeur.\n"),
-    info_style("    Exemple : Tesla a annoncé qu’elle acceptait le Bitcoin comme mode de paiement pour ses voitures (bien que suspendu par la suite à cause des préoccupations environnementales).\n"),
-    info_style("    - PayPal permet désormais aux utilisateurs d'acheter, de vendre et de détenir des cryptos directement sur leur plateforme.\n"),
-    info_style("    - Les banques commencent aussi à proposer des services liés aux cryptomonnaies (ex : services de garde de crypto).\n"),
+    info_style("Les cryptomonnaies sont de plus en plus adoptées par des entreprises comme moyen de paiement et comme réserve de valeur.\n"),
+    info_style(" - Tesla a annoncé qu’elle acceptait le Bitcoin comme mode de paiement pour ses voitures (bien que suspendu par la suite à cause des préoccupations environnementales).\n"),
+    info_style(" - PayPal permet désormais aux utilisateurs d'acheter, de vendre et de détenir des cryptos directement sur leur plateforme.\n"),
+    info_style(" - Les banques commencent aussi à proposer des services liés aux cryptomonnaies (ex : services de garde de crypto).\n\n"),
     
     info_style("  2. "), highlight_style("Adoption par les pays"), info_style(" :\n"),
-    info_style("    - Plusieurs pays ont pris des mesures pour intégrer les cryptos dans leur économie.\n"),
-    info_style("    - Le Salvador : Premier pays à adopter le Bitcoin comme monnaie légale en 2021.\n"),
-    info_style("    - Le Japon : A reconnu le Bitcoin comme moyen de paiement légitime.\n"),
-    info_style("    - La Chine : Bien qu’ayant interdit les ICO et les échanges de cryptomonnaies, la Chine travaille sur sa propre cryptomonnaie, le Yuan numérique.\n"),
-    info_style("    - L'Union Européenne : La mise en place de la MiCA (Markets in Crypto-Assets) vise à encadrer l’utilisation des cryptos et offrir une régulation harmonisée dans l’UE.\n\n"),
+    info_style("Plusieurs pays ont pris des mesures pour intégrer les cryptos dans leur économie.\n"),
+    info_style(" - Le Salvador : Premier pays à adopter le Bitcoin comme monnaie légale en 2021.\n"),
+    info_style(" - Le Japon : A reconnu le Bitcoin comme moyen de paiement légitime.\n"),
+    info_style(" - La Chine : Bien qu’ayant interdit les ICO et les échanges de cryptomonnaies, la Chine travaille sur sa propre cryptomonnaie, le Yuan numérique.\n"),
+    info_style(" - L'Union Européenne : La mise en place de la MiCA (Markets in Crypto-Assets) vise à encadrer l’utilisation des cryptos et offrir une régulation harmonisée dans l’UE.\n\n"),
     
-    info_secondary_style("• Innovations : Web3, Metaverse, Blockchain interopérable :\n"),
+    info_secondary_style("• Innovations : Web3, Metaverse, Blockchain interopérable :\n\n"),
     
-    info_style("  1. "), highlight_style("Web3"), info_style(" :\n"),
-    info_style("    "), highlight_style("Définition"), info_style(" : Le Web3 est un concept visant à décentraliser l'internet en utilisant des technologies comme la blockchain, permettant aux utilisateurs de posséder et de contrôler leurs données.\n"),
-    info_style("    "), highlight_style("Avantages"), info_style(" :\n"),
-    info_style("      o Contrôle individuel des données.\n"),
-    info_style("      o Applications décentralisées (dApps) où les utilisateurs n'ont pas besoin d’intermédiaires (banques, réseaux sociaux).\n"),
-    info_style("    "), highlight_style("Projets"), info_style(" :\n"),
-    info_style("      o "), highlight_style("Polkadot"), info_style(" : Permet l’interopérabilité entre différentes blockchains.\n"),
-    info_style("      o "), highlight_style("Ethereum 2.0"), info_style(" : Transition vers un modèle de consensus Proof-of-Stake (PoS) pour une plus grande scalabilité.\n\n"),
+    info_style("  1. "), success_style("Web3"), info_style(" :\n\n"),
     
-    info_style("  2. "), highlight_style("Metaverse"), info_style(" :\n"),
-    info_style("    "), highlight_style("Définition"), info_style(" : Un espace virtuel en 3D où les utilisateurs peuvent interagir entre eux et avec des objets numériques. Ce monde virtuel peut inclure des jeux, des interactions sociales, des commerces et des actifs numériques (NFTs).\n"),
-    info_style("    "), highlight_style("Cryptos dans le Metaverse"), info_style(" :\n"),
-    info_style("      o Les cryptomonnaies comme "), highlight_style("Decentraland (MANA)"), info_style(" ou "), highlight_style("Sandbox (SAND)"), info_style(" sont utilisées dans des mondes virtuels pour acheter des terrains, des objets, ou même des expériences interactives.\n"),
-    info_style("    "), highlight_style("Potentialités"), info_style(" :\n"),
-    info_style("      o Le Metaverse pourrait révolutionner les secteurs du gaming, de l’immobilier virtuel, et des événements en ligne.\n\n"),
+    highlight_style(". Définition"), info_style(" : Le Web3 est un concept visant à décentraliser l'internet en utilisant des technologies comme la blockchain, permettant aux utilisateurs de posséder et de contrôler leurs données.\n\n"),
     
-    info_style("  3. "), highlight_style("Blockchain interopérable"), info_style(" :\n"),
+    highlight_style(". Avantages"), info_style(" :\n"),
+    info_style("  o Contrôle individuel des données.\n"),
+    info_style("  o Applications décentralisées (dApps) où les utilisateurs n'ont pas besoin d’intermédiaires (banques, réseaux sociaux).\n"),
+    highlight_style(". Projets"), info_style(" :\n"),
+    info_style("  o "), highlight_style("Polkadot"), info_style(" : Permet l’interopérabilité entre différentes blockchains.\n"),
+    info_style("  o "), highlight_style("Ethereum 2.0"), info_style(" : Transition vers un modèle de consensus Proof-of-Stake (PoS) pour une plus grande scalabilité.\n\n"),
     
-    info_style("    "), highlight_style("Définition"), info_style(" : L'interopérabilité entre blockchains permet à différentes blockchains de communiquer et d’échanger des informations et des valeurs sans intermédiaire.\n"),
-    info_style("    "), question_style("Pourquoi c'est important ?"), info_style("\n"),
-    info_style("      o Permet de surmonter les limitations actuelles où chaque blockchain fonctionne isolément (ex : Bitcoin, Ethereum, Solana).\n"),
-    info_style("    "), highlight_style("Exemples de projets"), info_style(" :\n"),
-    info_style("      o "), highlight_style("Polkadot"), info_style(" : Crée une plateforme multi-chaînes où différentes blockchains peuvent échanger des données et des tokens.\n"),
-    info_style("      o "), highlight_style("Cosmos"), info_style(" : Permet l'interconnexion de différentes blockchains via son protocole IBC (Inter-Blockchain Communication).\n\n"),
+    info_style("  2. "), success_style("Metaverse"), info_style(" :\n\n"),
     
-    highlight_style("Concepts clés à retenir\n\n"),
+    highlight_style(". Définition"), info_style(" : Un espace virtuel en 3D où les utilisateurs peuvent interagir entre eux et avec des objets numériques. Ce monde virtuel peut inclure des jeux, des interactions sociales, des commerces et des actifs numériques (NFTs).\n\n"),
     
-    info_style("  1. "), highlight_style("Adoption par les institutions"), info_style(" :\n"),
+    highlight_style(". Cryptos dans le Metaverse"), info_style(" :\n"),
+    info_style("  o Les cryptomonnaies comme "), highlight_style("Decentraland (MANA)"), info_style(" ou "), highlight_style("Sandbox (SAND)"), info_style(" sont utilisées dans des mondes virtuels pour acheter des terrains, des objets, ou même des expériences interactives.\n"),
+    highlight_style(". Potentialités"), info_style(" :\n"),
+    info_style("   o Le Metaverse pourrait révolutionner les secteurs du gaming, de l’immobilier virtuel, et des événements en ligne.\n\n"),
+    
+    info_style("  3. "), success_style("Blockchain interopérable"), info_style(" :\n\n"),
+    
+    highlight_style(". Définition"), info_style(" : L'interopérabilité entre blockchains permet à différentes blockchains de communiquer et d’échanger des informations et des valeurs sans intermédiaire.\n\n"),
+    
+    info_style("    "), question_style("Pourquoi c'est important ?"), info_style("\n\n"),
+    
+    info_style("   Permet de surmonter les limitations actuelles où chaque blockchain fonctionne isolément (ex : Bitcoin, Ethereum, Solana).\n"),
+    highlight_style("  Exemples de projets"), info_style(" :\n"),
+    highlight_style(". - Polkadot"), info_style(" : Crée une plateforme multi-chaînes où différentes blockchains peuvent échanger des données et des tokens.\n"),
+    highlight_style(". - Cosmos"), info_style(" : Permet l'interconnexion de différentes blockchains via son protocole IBC (Inter-Blockchain Communication).\n\n"),
+    
+    info_secondary_style("Concepts clés à retenir\n\n"),
+    
+    info_style("1. "), highlight_style("Adoption par les institutions"), info_style(" :\n"),
     info_style("    o Les cryptomonnaies sont progressivement adoptées par les pays et les entreprises.\n"),
     info_style("    o Le Salvador a ouvert la voie en adoptant le Bitcoin comme monnaie légale.\n"),
-    info_style("  2. "), highlight_style("Web3 et Metaverse"), info_style(" :\n"),
+    info_style("2. "), highlight_style("Web3 et Metaverse"), info_style(" :\n"),
     info_style("    o Le Web3 décentralise Internet et permet un contrôle total des données par les utilisateurs.\n"),
     info_style("    o Le Metaverse offre un environnement virtuel où les cryptos jouent un rôle clé dans l’économie numérique.\n"),
-    info_style("  3. "), highlight_style("Blockchain interopérable"), info_style(" :\n"),
-    info_style("    o L’interopérabilité entre blockchains est essentielle pour permettre une communication fluide et sans frontières entre différents écosystèmes de cryptos.\n\n")
+    info_style("3. "), highlight_style("Blockchain interopérable"), info_style(" :\n"),
+    info_style("    o L’interopérabilité entre blockchains est essentielle pour permettre une communication fluide et sans frontières entre différents écosystèmes de cryptos.\n")
   ),
   
   "9u" = paste0(
     section_title_style("\nChapitre 9 : Les risques inhérents à l'investissement en cryptomonnaies\n"),
     highlight_style("Sous-section (U) : Les risques liés au marché\n\n"),
     
-    info_secondary_style("1. Volatilité extrême\n"),
+    info_secondary_style("1. Volatilité extrême\n\n"),
     
     highlight_style("Définition"), info_style(" :\n"),
     info_style("Les cryptomonnaies, comme Bitcoin, Ethereum, et d'autres altcoins, sont connues pour leur forte volatilité. Les prix peuvent fluctuer de manière significative en quelques heures ou jours, en réponse à des nouvelles, des événements du marché, ou même des sentiments des investisseurs.\n\n"),
@@ -985,7 +1022,7 @@ details <- list(
     info_style(" o Adopter une stratégie d'investissement à long terme si vous êtes prêt à supporter des fluctuations à court terme.\n"),
     info_style(" o Fixer des objectifs clairs et des niveaux de tolérance au risque.\n\n"),
     
-    info_secondary_style("2. Risques liés à la liquidité et à la manipulation de marché\n"),
+    info_secondary_style("2. Risques liés à la liquidité et à la manipulation de marché\n\n"),
     
     highlight_style("Définition"), info_style(" :\n"),
     info_style("Les cryptomonnaies ont souvent une liquidité plus faible que les marchés traditionnels, ce qui peut entraîner des difficultés à vendre ou à acheter rapidement à un prix acceptable. De plus, les marchés crypto peuvent être manipulés par des acteurs puissants.\n\n"),
@@ -994,16 +1031,17 @@ details <- list(
     info_style("  - Whales (grands détenteurs de cryptos) peuvent manipuler les prix en effectuant des transactions massives.\n"),
     info_style("  - Les pump and dump (augmentations artificielles du prix suivies de chutes brusques) sont courants dans les altcoins à faible capitalisation.\n\n"),
     
-    question_style("• Comment gérer ce risque ?\n"),
+    question_style("• Comment gérer ce risque ?\n\n"),
+    
     info_style(" o Choisir des cryptos avec une capitalisation boursière plus élevée pour assurer une meilleure liquidité.\n"),
-    info_style(" o Utiliser des stratégies de trading prudentes et fixer des limites pour éviter d’être victime de manipulations de marché.\n\n")
+    info_style(" o Utiliser des stratégies de trading prudentes et fixer des limites pour éviter d’être victime de manipulations de marché.\n")
   ),
   
   "9v" = paste0(
     section_title_style("\nChapitre 9 : Les risques inhérents à l'investissement en cryptomonnaies\n"),
     highlight_style("Sous-section (V): Les risques réglementaires et technologiques\n\n"),
     
-    info_secondary_style("1. Risques réglementaires\n"),
+    info_secondary_style("1. Risques réglementaires\n\n"),
     
     highlight_style("Définition"), info_style(" :\n"),
     info_style("Les cryptomonnaies évoluent dans un environnement juridique incertain. Les gouvernements du monde entier mettent en place des régulations ou des interdictions concernant les cryptos, ce qui peut affecter leur valeur et leur utilisation.\n\n"),
@@ -1012,11 +1050,12 @@ details <- list(
     info_style("- Chine : La Chine a imposé plusieurs interdictions sur les cryptomonnaies, ce qui a entraîné des chutes importantes du marché.\n"),
     info_style("- États-Unis : Bien que la SEC n'ait pas encore défini clairement les cryptos comme des valeurs mobilières, les régulations pourraient affecter leur statut juridique et leur valorisation à l'avenir.\n\n"),
     
-    question_style("• Comment gérer ce risque ?\n"),
+    question_style("• Comment gérer ce risque ?\n\n"),
+    
     info_style("  o Suivre de près les développements législatifs dans votre pays et au niveau mondial.\n"),
     info_style("  o Choisir de diversifier vos investissements entre des actifs numériques et des actifs traditionnels pour réduire l'impact de régulations imprévues.\n\n"),
     
-    info_secondary_style("2. Risques technologiques\n"),
+    info_secondary_style("2. Risques technologiques\n\n"),
     
     highlight_style("Définition"), info_style(" :\n"),
     info_style("Les cryptomonnaies sont basées sur des technologies complexes, et des bugs ou des vulnérabilités dans le code peuvent entraîner des pertes.\n\n"),
@@ -1024,16 +1063,17 @@ details <- list(
     highlight_style("Exemples"), info_style(" :\n"),
     info_style("- En 2016, le DAO (Decentralized Autonomous Organization) sur Ethereum a été piraté à cause d'une vulnérabilité dans son code, entraînant la perte de 50 millions de dollars en Ether.\n\n"),
     
-    question_style("• Comment gérer ce risque ?\n"),
+    question_style("• Comment gérer ce risque ?\n\n"),
+    
     info_style(" o Investir dans des projets solides, ayant des audits réguliers de sécurité effectués par des experts externes.\n"),
-    info_style(" o Assurez-vous que les plateformes que vous utilisez suivent les meilleures pratiques de sécurité.\n\n")
+    info_style(" o Assurez-vous que les plateformes que vous utilisez suivent les meilleures pratiques de sécurité.\n")
   ),
   
   "9w" = paste0(
     section_title_style("\nChapitre 9 : Les risques inhérents à l'investissement en cryptomonnaies\n"),
     highlight_style("Sous-section (W) : Les risques liés à la sécurité et aux arnaques\n\n"),
     
-    info_secondary_style("1. Sécurité et risques de piratage\n"),
+    info_secondary_style("1. Sécurité et risques de piratage\n\n"),
     
     highlight_style("Définition"), info_style(" :\n"),
     info_style("Les cryptomonnaies sont stockées dans des portefeuilles numériques. Cependant, ces portefeuilles peuvent être vulnérables aux attaques informatiques. Les échanges centralisés peuvent également être piratés, entraînant la perte de fonds des utilisateurs.\n\n"),
@@ -1042,12 +1082,13 @@ details <- list(
     info_style("- En 2014, le Mt. Gox exchange a été piraté, entraînant la perte de 850 000 BTC, qui à l’époque valaient près de 500 millions de dollars.\n"),
     info_style("- De nombreux incidents de piratage ont ciblé des plateformes comme Binance et Coinbase.\n\n"),
     
-    question_style("• Comment gérer ce risque ?\n"),
+    question_style("• Comment gérer ce risque ?\n\n"),
+    
     info_style(" o Utiliser des wallets matériels (Ledger, Trezor) pour stocker vos cryptos à long terme.\n"),
     info_style(" o Activer la double authentification (2FA) sur tous vos comptes d'échange et wallets.\n"),
     info_style(" o Ne jamais partager votre clé privée et garder vos informations sensibles hors ligne.\n\n"),
     
-    info_secondary_style("2. Risques liés aux arnaques et fraudes\n"),
+    info_secondary_style("2. Risques liés aux arnaques et fraudes\n\n"),
     
     highlight_style("Définition"), info_style(" :\n"),
     info_style("Le secteur des cryptomonnaies est encore relativement nouveau et attractif, ce qui en fait une cible idéale pour les arnaqueurs. Les projets douteux, les ICOs frauduleuses, et les escroqueries sont fréquents.\n\n"),
@@ -1056,35 +1097,32 @@ details <- list(
     info_style("- Les rug pulls (lorsqu’un projet crypto collecte des fonds puis disparaît) sont devenus une arnaque commune dans l’espace DeFi.\n"),
     info_style("- Des plateformes comme BitPetite et PlusToken ont été identifiées comme des systèmes de Ponzi, escroquant des millions de dollars.\n\n"),
     
-    question_style("• Comment gérer ce risque ?\n"),
+    question_style("• Comment gérer ce risque ?\n\n"),
+    
     info_style(" o Toujours faire une due diligence sur un projet avant d'investir (recherche sur l'équipe, la feuille de route, les partenaires).\n"),
     info_style(" o Éviter les projets promettant des rendements trop élevés ou trop rapides.\n"),
     info_style(" o Utiliser des plateformes reconnues et réglementées.\n\n"),
     
     info_secondary_style("1. Diversification\n"),
-    highlight_style("  • Diversification"), info_style(" :\n"),
-    info_style("    Ne mettez pas tous vos fonds dans une seule cryptomonnaie. Diversifiez entre différentes cryptos et types d’actifs (stocks, obligations).\n\n"),
+    info_style(" Ne mettez pas tous vos fonds dans une seule cryptomonnaie. Diversifiez entre différentes cryptos et types d’actifs (stocks, obligations).\n\n"),
     
     info_secondary_style("2. Approche à long terme\n"),
-    highlight_style("  • Approche à long terme"), info_style(" :\n"),
-    info_style("    Si vous êtes débutant, une stratégie à long terme (acheter et conserver) vous permettra de mieux gérer les fluctuations de prix à court terme.\n\n"),
+    info_style(" Si vous êtes débutant, une stratégie à long terme (acheter et conserver) vous permettra de mieux gérer les fluctuations de prix à court terme.\n\n"),
     
     info_secondary_style("3. Éducation continue\n"),
-    highlight_style("  • Éducation continue"), info_style(" :\n"),
-    info_style("    Suivez l'actualité des cryptomonnaies et des régulations, et continuez à apprendre en lisant des livres, des articles, en suivant des podcasts et des vidéos.\n\n"),
+    info_style(" Suivez l'actualité des cryptomonnaies et des régulations, et continuez à apprendre en lisant des livres, des articles, en suivant des podcasts et des vidéos.\n\n"),
     
     info_secondary_style("4. Suivre les conseils d’experts\n"),
-    highlight_style("  • Suivre les conseils d’experts"), info_style(" :\n"),
-    info_style("    Évitez les conseils trop enthousiastes venant de sources non fiables. Recherchez des analyses approfondies et des experts réputés.\n\n"),
+    info_style(" Évitez les conseils trop enthousiastes venant de sources non fiables. Recherchez des analyses approfondies et des experts réputés.\n\n"),
     
     section_title_style("\nConcepts clés à retenir\n\n"),
     
     info_secondary_style("1. Volatilité\n"),
-    highlight_style("o Volatilité"), info_style(" : Les cryptomonnaies sont extrêmement volatiles, et les fluctuations des prix peuvent entraîner des gains comme des pertes significatives.\n\n"),
+    info_style(" Les cryptomonnaies sont extrêmement volatiles, et les fluctuations des prix peuvent entraîner des gains comme des pertes significatives.\n"),
     info_secondary_style("2. Sécurité\n"),
-    highlight_style("o Sécurité"), info_style(" : Protégez vos fonds en utilisant des wallets sécurisés, en activant la 2FA et en évitant les arnaques.\n\n"),
+    info_style(" Protégez vos fonds en utilisant des wallets sécurisés, en activant la 2FA et en évitant les arnaques.\n"),
     info_secondary_style("3. Régulations et évolutions\n"),
-    highlight_style("o Régulations et évolutions"), info_style(" : Le cadre réglementaire évolue rapidement, ce qui peut avoir un impact majeur sur l'investissement en cryptomonnaies.\n\n")
+    info_style(" Le cadre réglementaire évolue rapidement, ce qui peut avoir un impact majeur sur l'investissement en cryptomonnaies.\n")
     
   ),
   
@@ -1138,6 +1176,3 @@ details <- list(
     info_style("Le monde des cryptomonnaies et de la blockchain est vaste et en constante évolution. Il existe de nombreuses ressources et opportunités pour approfondir vos connaissances. Que vous soyez passionné par l’aspect technique, économique ou sociétal, il y a toujours plus à découvrir. Restez curieux, explorez les nouvelles tendances, et continuez à apprendre pour rester à la pointe de cet univers fascinant.\n")
     )
   )
-
-
-
