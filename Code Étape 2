@@ -329,7 +329,7 @@ comparaison_auto_eval <- function(auto_eval_result, test_result) {
   cat(section_title_style("\n=== Niveau global de connaissances ===\n"))
   if (moyenne_generale < 4.5) {
     cat(info_secondary_style("\nVotre niveau de connaissance est FAIBLE.\n"))
-    cat(highlight_style("Ne vous inquiétez pas, notre plateforme est là pour vous accompagner peu importe votre niveau. Continuez à explorer et à apprendre, vous allez progresser !\n"))
+    cat(highlight_style("Il faut continuez à explorer et à apprendre, vous allez progresser !\n"))
   } else if (moyenne_generale <= 6.9) {
     cat(info_secondary_style("\nVotre niveau de connaissance est MOYEN.\n"))
     cat(highlight_style("C'est un bon départ ! Continuez sur cette lancée pour approfondir vos connaissances.\n"))
@@ -354,8 +354,7 @@ comparaison_auto_eval <- function(auto_eval_result, test_result) {
 ###################################
 
 mise_a_jour_profil <- function(profil_df, auto_eval_result, resultats_comparaison, output_file) {
-  cat(section_title_style("\n=== Mise à jour des données utilisateur et recherche de votre correspondance comportementale type ===\n"))
-  
+
   # Ajouter les nouvelles colonnes avec les résultats
   updated_profil_df <- profil_df
   updated_profil_df$auto_eval_finance <- auto_eval_result$niveau_financier
@@ -403,27 +402,27 @@ matrice_profils <- list(
 "),
   list(capacite = "Faible", connaissance = "Élevé", risque = "Faible", animal = "🐧 Manchot", description = "Résilient et méthodique, le Manchot compense ses limitations physiques par une incroyable capacité d’adaptation. Sa patience lui permet de résister aux épreuves et d’avancer malgré les vents contraires.",
        conseil="Conservez votre discipline et votre approche rigoureuse. Investissez dans des produits à long terme qui correspondent à votre endurance."),
-  list(capacite = "Moyenne", connaissance = "Faible", risque = "Élevé", animal = "🐒 Singe hurleur", description = "Curieux et plein d’énergie, le Singe hurleur s’aventure souvent sur des terrains inconnus sans véritable plan. Désorganisé et impulsif, il agit sous l’excitation du moment, parfois au détriment de la prudence. Son enthousiasme est contagieux, mais il doit apprendre à le canaliser.",
+  list(capacite = "Moyen", connaissance = "Faible", risque = "Élevé", animal = "🐒 Singe hurleur", description = "Curieux et plein d’énergie, le Singe hurleur s’aventure souvent sur des terrains inconnus sans véritable plan. Désorganisé et impulsif, il agit sous l’excitation du moment, parfois au détriment de la prudence. Son enthousiasme est contagieux, mais il doit apprendre à le canaliser.",
        conseil="Prenez le temps de structurer vos choix. Votre curiosité est un atout, mais couplez-la à une recherche approfondie pour éviter de prendre des risques inutiles."),
-  list(capacite = "Moyenne", connaissance = "Faible", risque = "Moyen", animal = " 🦡 blaireau", description = "Endurant et déterminé, le Blaireau avance avec ténacité malgré les obstacles. Il est connu pour sa résilience et son courage, mais il manque parfois de connaissances pour optimiser ses efforts. Sa capacité à s'adapter dans des environnements variés en fait un exemple de persévérance. Toutefois, il peut se montrer un peu borné face à des conseils extérieurs.",
+  list(capacite = "Moyen", connaissance = "Faible", risque = "Moyen", animal = " 🦡 blaireau", description = "Endurant et déterminé, le Blaireau avance avec ténacité malgré les obstacles. Il est connu pour sa résilience et son courage, mais il manque parfois de connaissances pour optimiser ses efforts. Sa capacité à s'adapter dans des environnements variés en fait un exemple de persévérance. Toutefois, il peut se montrer un peu borné face à des conseils extérieurs.",
        conseil="Votre ténacité est un atout précieux, mais apprenez à élargir vos connaissances avant d’agir. Diversifiez vos investissements et entourez-vous de conseils éclairés pour tirer pleinement parti de votre endurance."),
-  list(capacite = "Moyenne", connaissance = "Faible", risque = "Faible", animal = "🦥 Paresseux", description = "Le Paresseux est l’incarnation de la tranquillité. Lent et détaché, il préfère observer la vie passer plutôt que de se précipiter dans des décisions. Cette attitude le protège des risques, mais le rend aussi passif face à des opportunités intéressantes.",
+  list(capacite = "Moyen", connaissance = "Faible", risque = "Faible", animal = "🦥 Paresseux", description = "Le Paresseux est l’incarnation de la tranquillité. Lent et détaché, il préfère observer la vie passer plutôt que de se précipiter dans des décisions. Cette attitude le protège des risques, mais le rend aussi passif face à des opportunités intéressantes.",
        conseil= "Apprenez à sortir de votre confort et à agir. Une dose d’audace pourrait transformer votre approche en une stratégie gagnante."),
-  list(capacite = "Moyenne", connaissance = "Moyen", risque = "Élevé", animal = "🦅 Faucon pèlerin", description = "Stratège et visionnaire, le Faucon pèlerin repère rapidement ses opportunités et plonge avec précision. Cependant, son audace et sa rapidité peuvent le rendre imprudent s’il ne prend pas le temps d’évaluer tous les facteurs.",
+  list(capacite = "Moyen", connaissance = "Moyen", risque = "Élevé", animal = "🦅 Faucon pèlerin", description = "Stratège et visionnaire, le Faucon pèlerin repère rapidement ses opportunités et plonge avec précision. Cependant, son audace et sa rapidité peuvent le rendre imprudent s’il ne prend pas le temps d’évaluer tous les facteurs.",
        conseil="Continuez à viser haut, mais prenez quelques instants pour vérifier vos hypothèses avant de foncer. Une stratégie bien calibrée vous permettra de voler encore plus haut.
 
 "),
-  list(capacite = "Moyenne", connaissance = "Moyen", risque = "Moyen", animal = "🦫 Castor", description = "Travailleur acharné, le Castor aime bâtir méthodiquement. Équilibré et prévoyant, il consacre du temps à construire des fondations solides, mais il sait aussi s’adapter quand la situation l’exige.",
+  list(capacite = "Moyen", connaissance = "Moyen", risque = "Moyen", animal = "🦫 Castor", description = "Travailleur acharné, le Castor aime bâtir méthodiquement. Équilibré et prévoyant, il consacre du temps à construire des fondations solides, mais il sait aussi s’adapter quand la situation l’exige.",
        conseil="Poursuivez votre stratégie structurée. Les fondations solides que vous posez aujourd’hui deviendront un atout précieux pour des investissements à long terme."),
-  list(capacite = "Moyenne", connaissance = "Moyen", risque = "Faible", animal = "🐼 Panda", description = "Paisible et réfléchi, le Panda préfère la sécurité et le confort. Bien qu’il ait une personnalité charmante, il peut manquer d’initiative pour sortir de sa zone de confort et explorer de nouvelles opportunités.",
+  list(capacite = "Moyen", connaissance = "Moyen", risque = "Faible", animal = "🐼 Panda", description = "Paisible et réfléchi, le Panda préfère la sécurité et le confort. Bien qu’il ait une personnalité charmante, il peut manquer d’initiative pour sortir de sa zone de confort et explorer de nouvelles opportunités.",
        conseil="Exploitez votre calme pour investir dans des options stables, mais osez expérimenter des choix légèrement plus audacieux pour diversifier votre portefeuille.
 
 "),
-  list(capacite = "Moyenne", connaissance = "Élevé", risque = "Élevé", animal = "🐅 Tigre", description = "Puissant et agile, le Tigre combine force et rapidité pour maximiser ses résultats. Son instinct de chasseur lui permet de repérer les meilleures opportunités, mais son goût du risque peut parfois le mettre en danger.",
+  list(capacite = "Moyen", connaissance = "Élevé", risque = "Élevé", animal = "🐅 Tigre", description = "Puissant et agile, le Tigre combine force et rapidité pour maximiser ses résultats. Son instinct de chasseur lui permet de repérer les meilleures opportunités, mais son goût du risque peut parfois le mettre en danger.",
        conseil="Continuez à maximiser vos gains, mais gardez un œil sur vos limites. Diversifiez vos investissements pour sécuriser vos succès."),
-  list(capacite = "Moyenne", connaissance = "Élevé", risque = "Moyen", animal = "🦊 Lynx", description = "Silencieux et observateur, le Lynx est un expert en évaluation des opportunités. Il avance discrètement et n’agit qu’après avoir soigneusement étudié son environnement. Cette approche méthodique lui permet d’éviter les erreurs.",
+  list(capacite = "Moyen", connaissance = "Élevé", risque = "Moyen", animal = "🦊 Lynx", description = "Silencieux et observateur, le Lynx est un expert en évaluation des opportunités. Il avance discrètement et n’agit qu’après avoir soigneusement étudié son environnement. Cette approche méthodique lui permet d’éviter les erreurs.",
        conseil="Restez fidèle à votre approche analytique. Elle est un atout pour détecter les opportunités à moyen terme tout en limitant les risques."),
-  list(capacite = "Moyenne", connaissance = "Élevé", risque = "Faible", animal = "🐨 Koala", description = "Paisible et prudent, le Koala avance avec sérénité. Il choisit toujours des chemins sûrs et préfère éviter toute forme de stress. Bien qu’il soit parfois trop précautionneux, sa constance est un véritable atout.",
+  list(capacite = "Moyen", connaissance = "Élevé", risque = "Faible", animal = "🐨 Koala", description = "Paisible et prudent, le Koala avance avec sérénité. Il choisit toujours des chemins sûrs et préfère éviter toute forme de stress. Bien qu’il soit parfois trop précautionneux, sa constance est un véritable atout.",
        conseil="Continuez à miser sur des placements stables et sécurisés. Cependant, ouvrez-vous à quelques options modérément risquées pour augmenter légèrement votre rendement."),
   list(capacite = "Élevé", connaissance = "Faible", risque = "Élevé", animal = "🐆 Guépard", description = "Rapide et impressionnant, le Guépard est un sprinter hors pair. Il agit avec une énergie explosive, mais son impulsivité peut le rendre inconséquent. Il manque parfois de vision à long terme et peut s'épuiser rapidement s'il ne gère pas ses ressources.",
        conseil="Utilisez votre dynamisme pour saisir des opportunités ponctuelles, mais apprenez à équilibrer vos efforts. Pensez à investir dans des produits à court terme tout en élaborant une stratégie durable."),
@@ -449,6 +448,27 @@ matrice_profils <- list(
 ")
 )
 
+############
+
+assign("animaux_scores", data.frame(
+  Animal = c("🐦 Dodo", "🦔 Hérisson", "🐇 Lapin", "🐐 Chèvre des falaises", 
+             "🦦 Loutre", "🦆 Canard", "🐍 Serpent", "🦉 Hibou", 
+             "🐧 Manchot", "🐒 Singe hurleur", "🦡 Blaireau", "🦥 Paresseux", 
+             "🦅 Faucon pèlerin", "🦫 Castor", "🐼 Panda", "🐅 Tigre", 
+             "🦊 Lynx", "🐨 Koala", "🐆 Guépard", "🐫 Chameau", "🦌 Cerf", 
+             "🦩 Héron", "🐻 Ours brun", "🐢 Tortue géante", "🦅 Aigle impérial", 
+             "🐺 Loup gris", "🐘 Éléphant"),
+  Capacité = c(1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 6, 6, 6, 6, 6, 6, 6, 6, 6),
+  Connaissances = c(1, 1, 1, 3, 3, 3, 6, 6, 6, 1, 1, 1, 3, 3, 3, 6, 6, 6, 1, 1, 1, 3, 3, 3, 6, 6, 6),
+  Risque = c(3, 6, 1, 3, 6, 1, 3, 6, 1, 3, 6, 1, 3, 6, 1, 3, 6, 1, 3, 6, 1, 3, 6, 1, 3, 6, 1),
+  Score = c(5, 8, 3, 7, 10, 5, 10, 13, 8, 7, 10, 5, 9, 12, 7, 12, 15, 10, 10, 13, 8, 12, 15, 10, 15, 18, 13)
+), envir = .GlobalEnv)
+
+
+#############################################################################################
+######## Determination de l'annimal type
+####################################################################################
+
 determine_animal_type <- function(capacite, connaissance, risque, matrice_profils) {
   profil_animal <- matrice_profils[sapply(matrice_profils, function(x) {
     x$capacite == capacite &&
@@ -473,7 +493,10 @@ determine_animal_type <- function(capacite, connaissance, risque, matrice_profil
   ))
 }
 
+######################################
 # Découverte de l'animal type
+#####################################
+
 animal_type_reveal <- function(user_data, matrice_profils) {
   cat(section_title_style("\n=== Découverte de votre animal type ===\n"))
   
@@ -526,19 +549,186 @@ animal_type_reveal <- function(user_data, matrice_profils) {
     }
     
     # Message final
-    cat(info_style("\nMerci d'avoir utilisé notre application pour découvrir votre profil animal. Nous espérons que ces résultats vous guideront dans vos parcours d'apprentissage et vos décisions d'investissement. Maintenant que vous connaissez votre type d'investisseur, nous pouvons vous offrir un accès personnalisé à nos outils d'investissement pour maximiser votre potentiel ! 🌟\n"))
+    cat(info_style("\nMaintenant que vous connaissez votre type d'investisseur, nous pouvons vous offrir un accès personnalisé à nos outils d'investissement pour maximiser votre potentiel grace à votre score annimal ! 🌟\n"))
   } else {
     # Gestion du cas où profil_animal est NULL
     cat(error_style("\nErreur : Le profil animal est introuvable. Veuillez vérifier les paramètres ou les données d'entrée. ❌\n"))
   }
-  
-  
   
   return(list(
     animal_type = profil_animal$animal,
     animal_description = profil_animal$description
   ))
 }
+
+##############################################################
+##### Determination de l'annimal score
+##############################################################
+
+determine_animal_score <- function(capacite, connaissance, risque) {
+  # Conversion des inputs en scores
+  capacite_points <- ifelse(capacite == "Élevé", 6, ifelse(capacite == "Moyen", 3, 1))
+  connaissance_points <- ifelse(connaissance == "Élevé", 6, ifelse(connaissance == "Moyen", 3, 1))
+  risque_points <- ifelse(risque == "Moyen", 6, ifelse(risque == "Élevé", 3, 1))
+  
+  # Calcul du score total
+  animal_score <- capacite_points + connaissance_points + risque_points
+  
+  # Retourner le score calculé
+  return(animal_score)
+}
+
+
+#######################################
+# Découverte de l'Animal Score
+#######################################
+
+animal_score_reveal <- function(user_data) {
+  cat(section_title_style("\n=== Découverte de votre Animal Score ===\n"))
+  
+  # Question à l'utilisateur (placée en premier)
+  repeat {
+    cat(question_style("Souhaitez-vous découvrir votre Animal Score et les outils auxquels vous aurez accès ? (oui/non) : "))
+    decouvrir_score <- tolower(readline())
+    if (decouvrir_score %in% c("oui", "non")) break
+    cat(warning_style("\nVeuillez répondre uniquement par 'oui' ou 'non'.\n"))
+  }
+  
+  if (decouvrir_score == "non") {
+    cat(info_style("\nPas de problème, revenez quand vous serez prêt à découvrir votre score.\n"))
+    return(NULL)
+  }
+  
+  # Calculer l'Animal Score
+  animal_score <- determine_animal_score(
+    capacite = user_data$capacite_investissement,
+    connaissance = user_data$niveau_connaissance,
+    risque = user_data$appetit_risque_categorie
+  )
+  
+  # Explication approfondie de l'Animal Score (après la question)
+  cat(highlight_style(
+    "L'Animal Score est un indicateur clé, directement associé à votre Animal Type.\n"
+  ))
+  cat(info_style(
+    "Il permet de quantifier votre niveau. Le score minimum possible est **3** et le score maximum possible est **18**.\n"
+  ))
+  
+  cat("\n")
+  
+  # Présentation des outils CryptoWise Lite et Pro
+  cat(question_style("🔍 Quels outils sont disponibles avec CryptoWise ?\n"))
+  
+  # Présentation des outils CryptoWise Lite et Pro
+  cat(info_secondary_style("1. CryptoWise Lite :\n"))
+  cat(info_style("   Cette version de notre application comprend uniquement la fonctionnalité suivante :\n"))
+  cat(highlight_style("   • CryptoAcademy : "), "Apprenez tout sur le monde des cryptomonnaies et renforcez vos connaissances de manière pédagogique.\n\n")
+  
+  cat(info_secondary_style("2. CryptoWise Pro :\n"))
+  cat(info_style("   Cette version avancée inclut **CryptoAcademy** ainsi que plusieurs autres outils puissants pour optimiser vos décisions d'investissement :\n"))
+  cat(highlight_style("   • TrendHunter : "), "Identifiez les cryptomonnaies tendance.\n")
+  cat(highlight_style("   • RegAlert : "), "Suivez les évolutions réglementaires.\n")
+  cat(highlight_style("   • BitcoinPulse : "), "Analysez le Bitcoin en profondeur.\n")
+  cat(highlight_style("   • AltcoinTracker : "), "Observez les phases de domination entre altcoins et Bitcoin.\n")
+  cat(highlight_style("   • MarketScope : "), "Évaluez les performances globales du marché.\n")
+  cat(highlight_style("   • CryptoFocus : "), "Obtenez des analyses détaillées d'une cryptomonnaie spécifique.\n\n")
+  
+  # Importance du choix
+  cat(info_style(
+    "Votre Animal Score joue un rôle crucial dans la détermination des outils auxquels vous aurez accès :\n\n"
+  ))
+  
+  # Avec un score élevé
+  cat(info_style(
+    highlight_style("• Avec un score élevé : "), 
+    "Vous obtenez un accès direct à ", 
+    highlight_style("CryptoWise Pro"), 
+    ", qui inclut des outils avancés tels que ", 
+    highlight_style("TrendHunter"), ", ", 
+    highlight_style("RegAlert"), ", ", 
+    highlight_style("BitcoinPulse"), ", et bien plus encore.\n"
+  ))
+  
+  # Avec un score moyen
+  cat(info_style(
+    highlight_style("• Avec un score moyen : "), 
+    "Vous bénéficiez d'un accès  ", 
+    highlight_style("conditionnel à CryptoWise Pro"), 
+    ". Vous devrez réussir un test de connaissances pour débloquer l'ensemble des fonctionnalités avancées.\n"
+  ))
+  
+  # Avec un score faible
+  cat(info_style(
+    highlight_style("• Avec un score faible : "), 
+    "Vous n'obtenez qu'un accès à ", 
+    highlight_style("CryptoWise Lite"), 
+    ", qui comprend uniquement la fonctionnalité pédagogique.\n\n"
+  ))
+  
+  # Afficher le score et le message personnalisé (après tout le reste)
+  cat(success_style("\n✨ Votre Animal Score est : "), highlight_style(animal_score), "\n\n")
+  
+  if (animal_score < 7) {
+    cat(warning_style(
+      "Votre Animal Score indique que vous n'avez pas le profil adéquat pour investir sur le marché des cryptos et que vous avez encore besoin de développer vos compétences avant de pouvoir envisager d'investir pleinement.\n"
+    ))
+    cat("\n") # Espace entre les phrases
+    cat(info_style(
+      "Vous aurez donc accès uniquement à ", 
+      info_secondary_style("CryptoWise Lite"), 
+      ", qui comprend la fonctionnalité pédagogique ", 
+      highlight_style("CryptoAcademy"), 
+      " pour vous aider à apprendre et à renforcer vos connaissances.\n"
+    ))
+  } else if (animal_score >= 7 && animal_score <= 12) {
+    cat(info_style(
+      "Votre Animal Score montre que vous êtes sur la bonne voie pour devenir un investisseur confirmé, cependant un renforcement de votre niveau de connaissance du marché s'impose.\n"
+    ))
+    cat("\n") # Espace entre les phrases
+    cat(info_style(
+      "Vous aurez pour le moment donc accès uniquement à ", 
+      info_secondary_style("CryptoWise Lite"), 
+      ", qui comprend la fonctionnalité pédagogique ", 
+      highlight_style("CryptoAcademy"), 
+      ". Cependant, avec un test de connaissances réussi, vous pourrez débloquer la version ", 
+      info_secondary_style("CryptoWise Pro"), 
+      ", incluant les autres outils avancés de notre version Pro.\n"
+    ))
+  } else if (animal_score > 12) {
+    cat(success_style(
+      "Félicitations ! Votre Animal Score prouve que vous êtes prêt à investir sereinement.\n"
+    ))
+    cat("\n") # Espace entre les phrases
+    cat(info_style(
+      "Vous avez un accès direct à ", 
+      info_secondary_style("CryptoWise Pro"), 
+      ", qui inclut ", 
+      highlight_style("CryptoAcademy"), 
+      " et tous nos autres outils avancés. Amusez-vous bien !\n"
+    ))
+  }
+  
+  # Phrase de remerciement
+  cat("\n")
+  cat(success_style(
+    "Merci beaucoup d'avoir utilisé notre outil d'analyse de votre profil.\n"
+  ))
+  cat(info_style(
+    "Vous avez maintenant débloqué les fonctionnalités suivantes :\n"
+  ))
+  if (animal_score < 7) {
+    cat(info_secondary_style("- CryptoWise Lite"), "\n")
+  } else if (animal_score >= 7 && animal_score <= 12) {
+    cat(info_secondary_style("- CryptoWise Lite"), "\n")
+    cat(info_secondary_style("- CryptoWise Pro"), " : accessible après validation du test de connaissances.\n")
+  } else if (animal_score > 12) {
+    cat(info_secondary_style("- CryptoWise Pro"), "\n")
+  }
+  
+}
+
+
+#######################################
 
 start_app <- function() {
   cat(section_title_style("\n=== Bienvenue sur SmartProfile - CryptoWise Copilote ===\n"))
@@ -594,28 +784,50 @@ start_app <- function() {
     matrice_profils = matrice_profils
   )
   
-  # Si l'utilisateur accepte, retourner les résultats
+  # Si l'utilisateur accepte, retourner les résultats de l'animal type
   if (!is.null(animal_result)) {
     assign("animal_result", animal_result, envir = .GlobalEnv)
   }
+  
+  # Étape 5 : Découverte de l'animal score
+  animal_score_reveal(user_data = updated_profil_df)
+  
+  # Étape 6 : Mise à jour du DataFrame avec les nouvelles colonnes
+  updated_profil_df <- updated_profil_df %>%
+    mutate(
+      animal_score = determine_animal_score(
+        capacite = capacite_investissement,
+        connaissance = niveau_connaissance,
+        risque = appetit_risque_categorie
+      ),
+      version_debloquee = case_when(
+        animal_score < 7 ~ "CryptoWise Lite",
+        animal_score >= 7 & animal_score <= 12 ~ "CryptoWise ConditionPro",
+        animal_score > 12 ~ "CryptoWise Pro"
+      )
+    )
+  
+  # Mise à jour du DataFrame récapitulatif
+  profil_recap <- updated_profil_df %>%
+    mutate(
+      type_animal = animal_result$animal_type,
+      description = animal_result$animal_description,
+      conseil = determine_animal_type(
+        capacite = updated_profil_df$capacite_investissement,
+        connaissance = updated_profil_df$niveau_connaissance,
+        risque = updated_profil_df$appetit_risque_categorie,
+        matrice_profils = matrice_profils
+      )$conseil
+    )
+  
+  # Assigner le DataFrame profil_recap dans l'environnement global
+  assign("profil_recap", profil_recap, envir = .GlobalEnv)
+  
+  # Enregistrement du DataFrame profil_recap
+  chemin_profil_recap <- "/Users/mehdifehri/Desktop/Technique de programmation/Data work/profil_recap.xlsx"
+  write_xlsx(profil_recap, chemin_profil_recap)
+  
 }
-
-# Création du DataFrame profil_recap
-profil_recap <- updated_profil_df %>%
-  mutate(
-    type_animal = animal_result$animal_type,
-    description = animal_result$animal_description,
-    conseil = determine_animal_type(
-      capacite = updated_profil_df$capacite_investissement,
-      connaissance = updated_profil_df$niveau_connaissance,
-      risque = updated_profil_df$appetit_risque_categorie,
-      matrice_profils = matrice_profils
-    )$conseil
-  )
-
-# Enregistrement du DataFrame profil_recap
-chemin_profil_recap <- "/Users/mehdifehri/Desktop/Technique de programmation/Data work/profil_recap.xlsx"
-write_xlsx(profil_recap, chemin_profil_recap)
-
 # Appel de la fonction principale pour lancer l'application
 start_app()
+
