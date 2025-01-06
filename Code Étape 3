@@ -1,0 +1,559 @@
+#############################################################
+########## Initialisation 
+#########################################################
+
+library(openxlsx)
+library(crayon)
+
+# Définition des styles
+question_style <- blue$bold
+info_style <- white$italic
+warning_style <- red$bold
+success_style <- green$bold
+highlight_style <- yellow$bold
+info_secondary_style <- cyan$italic
+error_style <- red$bold$underline
+section_title_style <- magenta$bold$underline
+pro_style <- red$bold  # Style pour PRO
+
+# Chemin des fichiers utiles
+profil_recap_path <- "//Users/mehdifehri/Desktop/Technique de programmation/Data work/profil_recap.xlsx"
+profil_recap <- read.xlsx(profil_recap_path)
+
+crypto_questions_path <- "//Users/mehdifehri/Desktop/Technique de programmation/Data work/Questionnaire/Banque Question Cryptos.xlsx"
+crypto_questions <- read.xlsx(crypto_questions_path)
+
+##############################################################
+###################### Fonction mise à jour du profil##############@
+##########################################################
+
+
+mettre_a_jour_profil <- function(profil_recap, user_index, new_score) {
+  profil_recap$animal_score[user_index] <- new_score
+  return(profil_recap)
+}
+
+
+######################################################################
+########### Fonction Welcome message : CRYPTO ACADEMY ##############
+######################################################################
+
+
+welcome_message <- function() {
+  cat(success_style("Bienvenue dans notre module : CryptoAcademy, une fonctionnalité de notre application Cryptowise - Copilote !
+
+"))
+  cat(info_style("Plongez dans l'univers fascinant des cryptomonnaies grâce à notre bibliothèque riche et immersive.
+
+"))
+  cat(info_style("Nous avons soigneusement conçu 10 chapitres pour explorer les bases, les usages, les innovations et les défis du monde crypto.
+
+"))
+  cat(info_secondary_style("Ce module n'est pas qu'un simple cours, mais un voyage interactif où vous pourrez naviguer à votre rythme.
+
+"))
+  cat(info_secondary_style("Apprenez, réfléchissez, et préparez-vous à tester vos connaissances pour maîtriser cet univers en pleine expansion.
+
+"))
+  cat(info_style("À chaque étape, vous aurez le choix : explorer davantage, approfondir vos compétences, ou passer à autre chose.
+
+"))
+  cat(success_style("Nous sommes ravis de vous accompagner dans cette aventure éducative unique. Bon apprentissage !
+
+"))
+}
+
+######################################################
+######## Fonction pour faire le test de connaissance
+######################################################
+
+lancer_test_crypto <- function(crypto_questions) {
+  cat(section_title_style("\n=== Test de Connaissances en Cryptomonnaies ===\n"))
+  cat(info_style("Répondez correctement aux questions pour évaluer vos connaissances en cryptos.\n"))
+  
+  # Tirer 40 questions aléatoires
+  questions_sample <- crypto_questions[sample(1:nrow(crypto_questions), 40), ]
+  score <- 0  # Initialiser le score
+  
+  for (i in 1:40) {
+    question <- questions_sample[i, ]
+    reponses <- c(question$BonneRéponse, question$MauvaiseRéponse1, question$MauvaiseRéponse2, question$MauvaiseRéponse3)
+    reponses <- sample(reponses)  # Mélanger les réponses
+    
+    # Afficher la question et les réponses
+    cat(highlight_style(paste0("\nQuestion ", i, ": ", question$Question, "\n")))
+    for (j in 1:4) {
+      cat(question_style(paste0(j, ". ", reponses[j], "\n")))
+    }
+    
+    # Boucle pour valider la réponse utilisateur
+    repeat {
+      user_response <- readline(question_style("Votre réponse (1-4 ou cheat code) : "))
+      user_response <- tolower(user_response)  # Permet de gérer les entrées non sensibles à la casse
+      
+      # Gestion des cheat codes
+      if (user_response == "bardella") {
+        cat(error_style("\nOh noooon! Vous avez osé prononcer le mot tabou ! Pas de débats ici, juste un aller simple vers le zéro absolu !\n"))
+        score <- 0  # Réinitialiser le score à zéro
+        return(score / 4)  # Retourner immédiatement le score (0/10)
+      } else if (user_response == "sesame") {
+        cat(success_style("\nBravo ! Vous avez prononcé la formule magique : 'Sésame, ouvre-toi !' Tous les trésors des bonnes réponses sont maintenant à vous !\n"))
+        score <- 40  # Attribuer le score maximum (40/40)
+        return(score / 4)  # Retourner immédiatement la note (10/10)
+      }
+      
+      # Vérification des réponses
+      if (user_response %in% c("1", "2", "3", "4")) {
+        user_response <- as.numeric(user_response)
+        
+        if (reponses[user_response] == question$BonneRéponse) {
+          cat(success_style("Bonne réponse !\n"))
+          score <- score + 1
+        } else {
+          cat(error_style("Mauvaise réponse.\n"))
+        }
+        break  # Sortir de la boucle après une réponse valide
+      } else {
+        cat(warning_style("Veuillez entrer un chiffre entre 1 et 4 ou un cheat code valide.\n"))
+      }
+    }
+  }
+  
+  # Calcul du score sur 10
+  note <- score / 4
+  cat(success_style(paste0("\nVotre score final est : ", sprintf("%.2f", note), "/10.\n")))
+  
+  return(note)  # Retourner la note
+}
+
+
+####################################################
+# Fonction pour afficher le sommaire
+####################################################
+
+show_sommaire <- function() {
+  cat(section_title_style("\nSommaire principal\n\n"))
+  
+  sommaire <- list(
+    "1" = list(title = "Chapitre 1 : Introduction : Les bases des cryptomonnaies", sections = c(
+      "a. Qu'est-ce qu'une cryptomonnaie ?",
+      "b. Histoire des cryptos : naissance de Bitcoin"
+    )),
+    "2" = list(title = "Chapitre 2 : Fonctionnement des cryptomonnaies", sections = c(
+      "c. La blockchain : Technologie sous-jacente",
+      "d. Les transactions en crypto : Clés privées et publiques",
+      "e. Proof-of-Work (PoW) vs Proof-of-Stake (PoS)"
+    )),
+    "3" = list(title = "Chapitre 3 : Les cryptos majeures et leurs usages", sections = c(
+      "f. Les principales cryptomonnaies",
+      "g. Les stablecoins",
+      "h. Les NFT et leur impact"
+    )),
+    "4" = list(title = "Chapitre 4 : Acquérir et utiliser des cryptos", sections = c(
+      "i. Acheter des cryptomonnaies : Les exchanges",
+      "j. Les wallets crypto : types et sécurité",
+      "k. Envoyer et recevoir des cryptos"
+    )),
+    "5" = list(title = "Chapitre 5 : Investissement et trading", sections = c(
+      "l. Comment évaluer une cryptomonnaie ?",
+      "m. Risques et volatilité",
+      "n. Les bulles et cycles de marché"
+    )),
+    "6" = list(title = "Chapitre 6 : Régulation et sécurité", sections = c(
+      "o. L'environnement réglementaire mondial",
+      "p. Les risques de sécurité : Fraudes et hacks"
+    )),
+    "7" = list(title = "Chapitre 7 : Applications et innovations", sections = c(
+      "q. La finance décentralisée (DeFi)",
+      "r. Les cas d’usage réels des cryptos",
+      "s. L’impact environnemental"
+    )),
+    "8" = list(title = "Chapitre 8 : Perspectives et tendances futures", sections = c(
+      "t. Le futur des cryptomonnaies"
+    )),
+    "9" = list(title = "Chapitre 9 : Les risques inhérents à l'investissement en cryptomonnaies", sections = c(
+      "u. Les risques liés au marché",
+      "v. Les risques réglementaires et technologiques",
+      "w. Les risques liés à la sécurité et aux arnaques"
+    )),
+    "10" = list(title = "Chapitre 10 : Aller plus loin dans l’univers des cryptomonnaies", sections = c(
+      "x. Informations supplémentaires sur les passionnés",
+      "y. Conseils pour aller plus loin : où se renseigner, quels outils utiliser ?",
+      "z. Conclusion"
+    ))
+  )
+  
+  for (chapitre in names(sommaire)) {
+    cat(section_title_style(paste0(chapitre, " - ", sommaire[[chapitre]]$title)), "\n")
+    for (section in sommaire[[chapitre]]$sections) {
+      cat("   -", highlight_style(section), "\n")
+    }
+  }
+}
+
+###########################################
+# Crypto Book
+###################################### 
+
+details <- list(
+  "1a" = "blablabalba", # Qu'est-ce qu'une cryptomonnaie ?
+  "1b" = "", # Histoire des cryptos : naissance de Bitcoin
+  "2c" = "", # La blockchain : Technologie sous-jacente
+  "2d" = "", # Les transactions en crypto : Clés privées et publiques
+  "2e" = "", # Proof-of-Work (PoW) vs Proof-of-Stake (PoS)
+  "3f" = "", # Les principales cryptomonnaies
+  "3g" = "", # Les stablecoins
+  "3h" = "ddssdxxxxxxx", # Les NFT et leur impact
+  "4i" = "", # Acheter des cryptomonnaies : Les exchanges
+  "4j" = "", # Les wallets crypto : types et sécurité
+  "4k" = "", # Envoyer et recevoir des cryptos
+  "5l" = "", # Comment évaluer une cryptomonnaie ?
+  "5m" = "", # Risques et volatilité
+  "5n" = "", # Les bulles et cycles de marché
+  "6o" = "", # L'environnement réglementaire mondial
+  "6p" = "", # Les risques de sécurité : Fraudes et hacks
+  "7q" = "", # La finance décentralisée (DeFi)
+  "7r" = "", # Les cas d’usage réels des cryptos
+  "7s" = "", # L’impact environnemental
+  "8t" = "", # Le futur des cryptomonnaies
+  "9u" = "skdsldsnjglsdgjn glnjksg ljgsj sgn lgng klg", # Volatilité
+  "9v" = "", # Sécurité
+  "9w" = "", # Régulation
+  "10x" = "", # Informations supplémentaires sur les passionnés
+  "10y" = "", # Conseils pour aller plus loin : où se renseigner, quels outils utiliser ?
+  "10z" = ""  # Conclusion
+)
+
+######################################################
+### Navigation dans les chapitres et sous-sections #####
+######################################################
+
+navigate_chapter <- function() {
+  sommaire <- list(
+    "1" = list(title = "Chapitre 1 : Introduction : Les bases des cryptomonnaies", sections = c(
+      "a. Qu'est-ce qu'une cryptomonnaie ?",
+      "b. Histoire des cryptos : naissance de Bitcoin"
+    )),
+    "2" = list(title = "Chapitre 2 : Fonctionnement des cryptomonnaies", sections = c(
+      "c. La blockchain : Technologie sous-jacente",
+      "d. Les transactions en crypto : Clés privées et publiques",
+      "e. Proof-of-Work (PoW) vs Proof-of-Stake (PoS)"
+    )),
+    "3" = list(title = "Chapitre 3 : Les cryptos majeures et leurs usages", sections = c(
+      "f. Les principales cryptomonnaies",
+      "g. Les stablecoins",
+      "h. Les NFT et leur impact"
+    )),
+    "4" = list(title = "Chapitre 4 : Acquérir et utiliser des cryptos", sections = c(
+      "i. Acheter des cryptomonnaies : Les exchanges",
+      "j. Les wallets crypto : types et sécurité",
+      "k. Envoyer et recevoir des cryptos"
+    )),
+    "5" = list(title = "Chapitre 5 : Investissement et trading", sections = c(
+      "l. Comment évaluer une cryptomonnaie ?",
+      "m. Risques et volatilité",
+      "n. Les bulles et cycles de marché"
+    )),
+    "6" = list(title = "Chapitre 6 : Régulation et sécurité", sections = c(
+      "o. L'environnement réglementaire mondial",
+      "p. Les risques de sécurité : Fraudes et hacks"
+    )),
+    "7" = list(title = "Chapitre 7 : Applications et innovations", sections = c(
+      "q. La finance décentralisée (DeFi)",
+      "r. Les cas d’usage réels des cryptos",
+      "s. L’impact environnemental"
+    )),
+    "8" = list(title = "Chapitre 8 : Perspectives et tendances futures", sections = c(
+      "t. Le futur des cryptomonnaies"
+    )),
+    "9" = list(title = "Chapitre 9 : Les risques inhérents à l'investissement en cryptomonnaies", sections = c(
+      "u. Les risques liés au marché",
+      "v. Les risques réglementaires et technologiques",
+      "w. Les risques liés à la sécurité et aux arnaques"
+    )),
+    "10" = list(title = "Chapitre 10 : Aller plus loin dans l’univers des cryptomonnaies", sections = c(
+      "x. Informations supplémentaires sur les passionnés",
+      "y. Conseils pour aller plus loin : où se renseigner, quels outils utiliser ?",
+      "z. Conclusion"
+    ))
+  )
+  
+  repeat {
+    user_input <- readline(question_style("Choisissez le chapitre qui vous intéresse (1-10) ou une sous-section spécifique (a-z) : "))
+    
+    if (user_input %in% names(sommaire)) {
+      chapitre <- sommaire[[user_input]]
+      cat(success_style("\nVous avez choisi de lire le : "), chapitre$title, "\n")
+      
+      for (i in seq_along(chapitre$sections)) {
+        section_name <- chapitre$sections[i]
+        section_letter <- substr(section_name, 1, 1)
+        detail_key <- paste0(user_input, section_letter)
+        
+        if (detail_key %in% names(details)) {
+          cat("\n", details[[detail_key]], "\n")
+        }
+      }
+      readline(success_style("\nAppuyez sur Entrée lorsque vous avez fini votre lecture : "))
+    } else if (user_input %in% letters) {
+      found <- FALSE
+      for (chapitre_id in names(sommaire)) {
+        chapitre <- sommaire[[chapitre_id]]
+        section_index <- which(substr(chapitre$sections, 1, 1) == user_input)
+        
+        if (length(section_index) > 0) {
+          detail_key <- paste0(chapitre_id, user_input)
+          cat(success_style("\nVous lisez la section : "), chapitre$sections[section_index], "\n")
+          if (detail_key %in% names(details)) {
+            cat("\n", details[[detail_key]], "\n")
+          }
+          readline(success_style("\nAppuyez sur Entrée lorsque vous avez fini votre lecture : "))
+          found <- TRUE
+          break
+        }
+      }
+      if (!found) {
+        cat(error_style("\nLa section que vous avez choisie n'existe pas.\n"))
+      }
+    } else {
+      cat(error_style("\nEntrée invalide. Veuillez choisir une lettre de section ou un numéro de chapitre valide.\n"))
+    }
+    
+    repeat {
+      choice <- readline(success_style(paste0(
+        "\nTrès bien, maintenant que vous avez fini votre lecture, que souhaitez-vous faire ?\n",
+        highlight_style("1. Revenir au sommaire et poursuivre votre lecture\n"),
+        highlight_style("2. Revenir au menu principal\n"),
+        "Votre choix : ")))
+      
+      while (!(choice %in% c("1", "2"))) {
+        cat(error_style("\nChoix invalide. Veuillez entrer 1 ou 2.\n"))
+        choice <- readline(success_style(paste0(
+          "\nTrès bien, maintenant que vous avez fini votre lecture, que souhaitez-vous faire ?\n",
+          highlight_style("1. Revenir au sommaire pour poursuivre votre lecture\n"),
+          highlight_style("2. Revenir au menu principal\n"),
+          "Votre choix : ")))
+      }
+      
+      if (choice == "1") {
+        show_sommaire()  # Affiche le sommaire
+        break
+      } else if (choice == "2") {
+        cat(success_style("\nRetour au menu principal...\n"))
+        return("menu_principal")
+      } 
+    }
+  }
+}
+
+#######################################################
+####### Fonction Crypto Academy ##############
+##################################################
+
+crypto_academy <- function() {
+  cat(section_title_style("\nCRYPTO ACADEMY - CRYPTOWISE COPILOTE\n\n"))
+  welcome_message()
+  
+  ready <- readline(question_style("Êtes-vous prêt à parcourir notre outil pédagogique ? (oui/non) : "))
+  while (!(tolower(ready) %in% c("oui", "non"))) {
+    cat(error_style("\nRéponse invalide, veuillez répondre par 'oui' ou 'non'.\n"))
+    ready <- readline(question_style("Êtes-vous prêt à parcourir notre outil pédagogique ? (oui/non) : "))
+  }
+  
+  if (tolower(ready) == "oui") {
+    show_sommaire()
+    result <- navigate_chapter()
+    if (result == "menu_principal") {
+      return("menu_principal")
+    }
+  } else {
+    cat(warning_style("Oh nooooon ! Dommage, revenez quand vous voudrez. La connaissance est une lumière dans l'obscurité, toujours prête à éclairer ceux qui la recherchent. Revenez quand vous serez prêt, elle vous attendra avec patience.\n"))
+    return()
+  }
+}
+
+
+#######################################################
+######### Fonction affichage Menu #############
+#######################################################
+
+afficher_options <- function(options, profil_recap, user_index, user_info) {
+  repeat {
+    cat("\nOptions disponibles :\n")
+    for (i in seq_along(options)) {
+      # Appliquer des styles spécifiques en fonction des options
+      if (options[i] == "Quitter") {
+        cat(paste0(i, ". ", error_style(options[i]), "\n"))
+      } else if (options[i] == "Tester vos connaissances") {
+        cat(paste0(i, ". ", question_style(options[i]), "\n"))
+      } else if (options[i] == "Naviguer sur Crypto Academy") {
+        cat(paste0(i, ". ", highlight_style(options[i]), "\n"))
+      } else if (endsWith(options[i], "(PRO)")) {
+        cat(paste0(i, ". ", gsub("\\(PRO\\)", pro_style("(PRO)"), options[i]), "\n"))
+      } else {
+        cat(paste0(i, ". ", info_secondary_style(options[i]), "\n"))
+      }
+    }
+    
+    choix <- readline("Veuillez choisir une option (par numéro) : ")
+    choix <- tolower(choix)
+    
+    # Gestion des cheat codes
+    if (choix == "musk") {
+      profil_recap <- mettre_a_jour_profil(profil_recap, user_index, 18)
+      user_info$animal_score <- 18  # Mise à jour de user_info
+      return("musk")
+    } else if (choix == "zemmour") {
+      profil_recap <- mettre_a_jour_profil(profil_recap, user_index, 3)
+      user_info$animal_score <- 3  # Mise à jour de user_info
+      return("zemmour")
+    } else if (choix == "bayrou") {
+      profil_recap <- mettre_a_jour_profil(profil_recap, user_index, 10)
+      user_info$animal_score <- 10  # Mise à jour de user_info
+      return("bayrou")
+    }
+    
+    # Vérification des choix numériques
+    if (!is.na(as.numeric(choix)) && as.numeric(choix) %in% seq_along(options)) {
+      return(options[as.numeric(choix)])
+    } else {
+      cat(warning_style("Choix invalide, veuillez réessayer.\n"))
+    }
+  }
+}
+
+#######################################################
+######### MENU PRINCIPAL #############
+#######################################################
+
+
+menu_principal <- function(user_info, profil_recap, user_index) {
+  repeat {
+    
+    # Affichage des options du menu principal
+    cat(success_style("\n========== Menu Principal ==========\n"))
+    options <- c(
+      "Naviguer sur Crypto Academy",
+      "Tester vos connaissances",
+      "PépitesHunter (PRO)",
+      "RegAlert (PRO)",
+      "BitcoinPulse (PRO)",
+      "AltcoinTracker (PRO)",
+      "MarketScope (PRO)",
+      "CryptoFocus (PRO)",
+      "Quitter"
+    )
+    
+    choix <- afficher_options(options, profil_recap, user_index, user_info)
+    
+    # Activation des cheat codes
+    if (choix == "musk") {
+      profil_recap <- mettre_a_jour_profil(profil_recap, user_index, 18)  # Mise à jour dans profil_recap
+      user_info$animal_score <- 18  # Mise à jour locale dans user_info
+      user_info$version_debloquee <- "CryptoWise Pro (Cheatcode)"
+      cat(success_style("\n✨ Comme le roi des cryptotechs, tu as débloqué toutes les fonctionnalités PRO ! 🚀\n"))
+      next
+    } else if (choix == "zemmour") {
+      profil_recap <- mettre_a_jour_profil(profil_recap, user_index, 3)  # Mise à jour dans profil_recap
+      user_info$animal_score <- 3  # Mise à jour locale dans user_info
+      user_info$version_debloquee <- "CryptoWise Lite (Cheatcode)"
+      cat(error_style("\n💀 Vous venez d’invoquer Gargamelle... comme dans une mauvaise potion, votre score animal est réduit et votre accès PRO interdit ! 😢\n"))
+      next
+    } else if (choix == "bayrou") {
+      profil_recap <- mettre_a_jour_profil(profil_recap, user_index, 10)  # Mise à jour dans profil_recap
+      user_info$animal_score <- 10  # Mise à jour locale dans user_info
+      user_info$version_debloquee <- "CryptoWise Intermédiaire (Cheatcode)"
+      cat(success_style("\n✨Baryrou style : ous êtes coincé au centre, avec un score de 10. Ni chaud ni froid, ni PRO ni Lite… Un vrai maître de l’indécision.\n"))
+      next
+    }
+    
+    # Gestion des choix
+    if (choix == "Naviguer sur Crypto Academy") {
+      cat(success_style("\nChargement de Crypto Academy...\n"))
+      result <- crypto_academy()
+      
+    } else if (choix == "Tester vos connaissances") {
+      cat(success_style("\nChargement du test de connaissances...\n"))
+      note <- lancer_test_crypto(crypto_questions)
+      
+      if (user_info$animal_score < 8) {
+        if (note == 10) {
+          cat(success_style("\n Extraordinaiiiires ! Vous avez accompli l'impossible, nous vous débloquons donc l'accès à notre version PRO ! 🚀 🚀\n"))
+          profil_recap <- mettre_a_jour_profil(profil_recap, user_index, user_info$animal_score + 10)
+          user_info$animal_score <- user_info$animal_score + 10
+          user_info$version_debloquee <- "CryptoWise Pro "
+        } else {
+          cat(error_style("\n Le chemin vers la maîtrise est parsemé de défis, mais vous êtes sur la bonne voie ! 💪 !\n"))
+        }
+      } else if (user_info$animal_score >= 8 && user_info$animal_score < 13) {
+        if (note >= 7) {
+          cat(success_style("\nFélicitations grâce à vos efforts ! Vous venez de débloqué la version PRO de CryptoWise. 🚀\n"))
+          profil_recap <- mettre_a_jour_profil(profil_recap, user_index, user_info$animal_score + 5)
+          user_info$animal_score <- user_info$animal_score + 5
+          user_info$version_debloquee <- "CryptoWise Pro "
+        } else {
+          cat(error_style("\nDommage, vous n'avez pas atteint le seuil requis. Chaque pas compte dans l'apprentissage. Replongez dans les connaissances et revenez plus fort !\n"))
+        }
+      } else {
+        cat(info_style("\nVous êtes déjà dans la version PRO. Ce test est juste un entraînement pour vous.\n"))
+      }
+      next
+      
+    } else if (choix == "Quitter") {
+      cat(success_style("Merci d'avoir utilisé CryptoWise Copilote. À bientôt !\n"))
+      break
+    } else if (endsWith(choix, "(PRO)")) {
+      if (user_info$animal_score >= 13) {
+        cat(success_style("\nCette fonctionnalité est encore en cours de construction. Revenez bientôt pour la découvrir ! 🚀\n"))
+      } else if (user_info$animal_score >= 8) {
+        cat(error_style("\nVous n'avez pas encore débloqué les fonctionnalités PRO.\n"))
+        cat(info_secondary_style("Pour les débloquer, Réussissez un 'Test de connaissance' (Option 2) \n"))
+      } else {
+        cat(error_style("\nVous n'avez pas accès aux fonctionnalités PRO.\n"))
+        cat(info_secondary_style("Explorez les ressources disponibles pour progresser. L'entraînement est la clé ! 💡\n"))
+      }
+    } else {
+      cat(info_style("Cette fonctionnalité sera bientôt disponible.\n"))
+    }
+  }
+}
+
+#############################################################################################
+start_app3 <- function() {
+  # Boucle sur chaque utilisateur
+  for (i in 1:nrow(profil_recap)) {
+    # Extraire les informations de l'utilisateur courant
+    user_info <- list(
+      prenom = profil_recap$prenom[i],
+      animal_score = profil_recap$animal_score[i],
+      version_debloquee = profil_recap$version_debloquee[i]
+    )
+    
+    # Message de bienvenue affiché une seule fois par utilisateur
+    cat(section_title_style("Bienvenue dans CryptoWise Copilote ! 🚀\n"))
+    cat(success_style("\n===========================================================\n"))
+    cat(section_title_style("Voici un récapitulatif de votre profil :\n"))
+    cat(highlight_style(paste0("Bonjour ", user_info$prenom, " !\n")))
+    
+    # Récapitulatif du profil avec des valeurs en couleur secondaire
+    cat(info_style(paste0("Version actuelle débloquée : ", info_secondary_style(user_info$version_debloquee), "\n")))
+    cat(info_style(paste0("- Âge : ", info_secondary_style(profil_recap$age[i]), "\n")))
+    cat(info_style(paste0("- Profil de risque : ", info_secondary_style(profil_recap$profil_risque[i]), "\n")))
+    cat(info_style(paste0("- Revenus mensuels : ", info_secondary_style(profil_recap$revenus_mensuels[i]), " €\n")))
+    cat(info_style(paste0("- Épargne totale : ", info_secondary_style(profil_recap$epargne_totale[i]), " €\n")))
+    cat(info_style(paste0("- Montant maximum d'investissement conseillé : ", info_secondary_style(profil_recap$montant_max_invest_conseille[i]), " €\n")))
+    cat(info_style(paste0("- Capacité d'investissement : ", info_secondary_style(profil_recap$capacite_investissement[i]), "\n")))
+    cat(info_style(paste0("- Horizon d'investissement : ", info_secondary_style(profil_recap$horizon_invest[i]), "\n")))
+    cat(info_style(paste0("- Appétit pour le risque : ", info_secondary_style(profil_recap$appetit_risque_categorie[i]), "\n")))
+    cat(info_style(paste0("- Niveau de culture financière : ", info_secondary_style(profil_recap$niveau_connaissance[i]), "\n")))
+    cat(success_style("\nVotre animal totem :\n"))
+    cat(info_style(paste0("- Type : ", info_secondary_style(profil_recap$type_animal[i]), " (Animal Score : ", info_secondary_style(user_info$animal_score), ")\n")))
+    cat(info_style(paste0("- Description : ", info_secondary_style(profil_recap$description[i]), "\n")))
+    cat(success_style("===========================================================\n"))
+    
+    # Lancer le menu principal pour l'utilisateur courant
+    profil_recap <- menu_principal(user_info, profil_recap, i)
+  }
+}
+
+start_app3()
