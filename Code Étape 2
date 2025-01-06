@@ -354,7 +354,7 @@ comparaison_auto_eval <- function(auto_eval_result, test_result) {
 ###################################
 
 mise_a_jour_profil <- function(profil_df, auto_eval_result, resultats_comparaison, output_file) {
-
+  
   # Ajouter les nouvelles colonnes avec les résultats
   updated_profil_df <- profil_df
   updated_profil_df$auto_eval_finance <- auto_eval_result$niveau_financier
@@ -611,7 +611,7 @@ animal_score_reveal <- function(user_data) {
     "L'Animal Score est un indicateur clé, directement associé à votre Animal Type.\n"
   ))
   cat(info_style(
-    "Il permet de quantifier votre niveau. Le score minimum possible est **3** et le score maximum possible est **18**.\n"
+    "Il permet de quantifier votre niveau. Le score minimum possible est (3) et le score maximum possible est (18).\n"
   ))
   
   cat("\n")
@@ -643,18 +643,16 @@ animal_score_reveal <- function(user_data) {
     highlight_style("• Avec un score élevé : "), 
     "Vous obtenez un accès direct à ", 
     highlight_style("CryptoWise Pro"), 
-    ", qui inclut des outils avancés tels que ", 
-    highlight_style("TrendHunter"), ", ", 
-    highlight_style("RegAlert"), ", ", 
-    highlight_style("BitcoinPulse"), ", et bien plus encore.\n"
+    ", qui inclut tous nos outils avancés\n"
+    
   ))
   
   # Avec un score moyen
   cat(info_style(
     highlight_style("• Avec un score moyen : "), 
     "Vous bénéficiez d'un accès  ", 
-    highlight_style("conditionnel à CryptoWise Pro"), 
-    ". Vous devrez réussir un test de connaissances pour débloquer l'ensemble des fonctionnalités avancées.\n"
+    highlight_style("conditionnel à CryptoWise Pro."), 
+    warning_style("(Vous devrez réussir un test de connaissances pour débloquer l'ensemble des fonctionnalités avancées.)\n")
   ))
   
   # Avec un score faible
@@ -802,7 +800,7 @@ start_app <- function() {
       ),
       version_debloquee = case_when(
         animal_score < 7 ~ "CryptoWise Lite",
-        animal_score >= 7 & animal_score <= 12 ~ "CryptoWise ConditionPro",
+        animal_score >= 7 & animal_score <= 12 ~ "CryptoWise Intermédiaire",
         animal_score > 12 ~ "CryptoWise Pro"
       )
     )
