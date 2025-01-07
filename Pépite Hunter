@@ -1,0 +1,471 @@
+############### Pépites Hunter ###################
+
+
+# Chargement des bibliothèques nécessaires
+library(crayon)  # Pour les styles de couleur
+library(dplyr)   # Pour la manipulation des données
+library(ggplot2) # Pour les visualisations (si nécessaire)
+library(httr)    # Pour les appels API
+library(jsonlite) # Pour travailler avec les données JSON
+library(curl)
+
+# Définition des styles
+question_style <- blue$bold
+info_style <- white$italic
+warning_style <- red$bold
+success_style <- green$bold
+highlight_style <- yellow$bold
+info_secondary_style <- cyan$italic
+error_style <- red$bold$underline
+section_title_style <- magenta$bold$underline
+pro_style <- red$bold  # Style pour PRO
+
+
+################################################################################
+#########                  LUNAR CRUSH (API Payante)
+################################################################################
+
+lunar_crush <- function() {
+  # Message d'introduction
+  cat(section_title_style("\nBienvenue sur LunarCrush - Analyse Crypto avancée !\n"))
+  cat(success_style("\n===========================================================\n"))
+  cat(highlight_style("LunarCrush est une plateforme innovante qui fournit des analyses approfondies sur les cryptomonnaies. Voici ce qu'elle offre :\n"))
+  
+  cat("- ", info_style("Analyse des tendances sociales : Découvrez les cryptomonnaies les plus mentionnées sur les réseaux sociaux, identifiez les tendances émergentes et évaluez l'intérêt communautaire.\n"))
+  cat("- ", info_style("Analyse des tendances de recherche : Obtenez un aperçu des recherches les plus populaires pour les cryptos sur diverses plateformes.\n"))
+  cat("- ", info_style("AltRank : Classement unique qui combine l'activité sociale et les indicateurs de marché pour évaluer les opportunités cachées.\n"))
+  cat("- ", info_style("Galaxy Score : Un score exclusif basé sur une combinaison de données sociales, de marché et techniques pour mesurer la santé et la qualité d'une crypto.\n"))
+  
+  cat(success_style("\n===========================================================\n"))
+  
+  # Message indiquant que l'outil est en pause
+  cat(warning_style("\nActuellement, notre outil est en cours de développement car l'API LunarCrush nécessite un abonnement payant.\n"))
+  cat(warning_style("\nLa construction de cet outil est donc temporairement en pause.\n"))
+  
+  # Menu principal pour LunarCrush
+  repeat {
+    cat(section_title_style("\n=== Menu LunarCrush ===\n"))
+    options <- c(
+      "Revenir au menu PépitesHunter",
+      "Analyse des tendances sociales",
+      "Analyse des tendances de recherche",
+      "AltRank",
+      "Galaxy Score"
+    )
+    
+    for (i in seq_along(options)) {
+      cat(paste0(i, ". ", options[i], "\n"))
+    }
+    
+    choix <- readline(question_style("Veuillez choisir une option (par numéro) : "))
+    
+    if (choix == "1") {
+      cat(info_style("\nRetour au menu PépitesHunter...\n"))
+      break
+    } else if (choix %in% c("2", "3", "4", "5")) {
+      option <- options[as.numeric(choix)]
+      cat(success_style(paste0("\nVous avez choisi : ", option, "\n")))
+      
+      # Explication spécifique à chaque option
+      if (option == "Analyse des tendances sociales") {
+        cat(info_style("\nL'analyse des tendances sociales vous permet de repérer les cryptomonnaies les plus mentionnées sur les réseaux sociaux. Ces informations peuvent aider à identifier des opportunités avant qu'elles ne deviennent mainstream.\n"))
+      } else if (option == "Analyse des tendances de recherche") {
+        cat(info_style("\nCette option analyse les termes de recherche pour les cryptos, ce qui peut indiquer un intérêt croissant ou une tendance en développement.\n"))
+      } else if (option == "AltRank") {
+        cat(info_style("\nAltRank combine l'activité sociale et les indicateurs de marché pour classer les cryptos, en mettant en lumière celles qui ont un potentiel caché.\n"))
+      } else if (option == "Galaxy Score") {
+        cat(info_style("\nGalaxy Score est un indicateur unique qui évalue la santé globale et la qualité d'une crypto en fonction de données sociales, de marché et techniques.\n"))
+      }
+      
+      # Message indiquant que la fonctionnalité est indisponible
+      cat(warning_style("\nCette fonctionnalité est en cours de construction.\n"))
+      cat(warning_style("\nMalheureusement, l'API LunarCrush est payante et nécessite un abonnement.\n"))
+    } else {
+      cat(warning_style("\nChoix invalide. Veuillez réessayer.\n"))
+    }
+  }
+}
+
+# Appel à la fonction principale
+lunar_crush()
+
+
+################################################################################
+#########                  Santiment (API Payante)
+################################################################################
+
+santiment <- function() {
+  # Message d'introduction
+  cat(section_title_style("\nBienvenue sur Santiment - Analyse Crypto avancée !\n"))
+  cat(success_style("\n===========================================================\n"))
+  cat(highlight_style("Santiment est une plateforme spécialisée dans l'analyse des cryptomonnaies, axée sur quatre types de données principales :\n"))
+  
+  cat("- ", info_style("Données on-chain : Cela inclut les transactions en temps réel, les flux d'échanges, et les données blockchain pertinentes. Ces analyses permettent d'identifier les mouvements de \"whales\" (grands détenteurs de crypto) ou des changements inhabituels dans les activités on-chain.\n"))
+  cat("- ", info_style("Signaux sociaux : Analyse des discussions sur les réseaux sociaux pour détecter les tendances émergentes et les sentiments autour des cryptomonnaies.\n"))
+  cat("- ", info_style("Analyse de sentiment de marché : Utilise des métriques pour comprendre si le sentiment global des investisseurs est optimiste, pessimiste ou neutre.\n"))
+  cat("- ", info_style("Données de développement : Données sur l'activité des développeurs des projets blockchain, incluant les commits GitHub ou l'évolution des projets techniques.\n"))
+  
+  cat(success_style("\n===========================================================\n"))
+  
+  # Message indiquant que l'outil est en pause
+  cat(warning_style("\nActuellement, cet outil est en cours de développement car l'API Santiment nécessite un abonnement payant.\n"))
+  cat(warning_style("\nLa construction de cet outil est donc temporairement en pause.\n"))
+  
+  # Menu principal pour Santiment
+  repeat {
+    cat(section_title_style("\n=== Menu Santiment ===\n"))
+    options <- c(
+      "Revenir au menu PépitesHunter",
+      "Analyse des données on-chain",
+      "Analyse des signaux sociaux",
+      "Analyse du sentiment de marché",
+      "Suivi des données de développement"
+    )
+    
+    for (i in seq_along(options)) {
+      cat(paste0(i, ". ", options[i], "\n"))
+    }
+    
+    choix <- readline(question_style("Veuillez choisir une option (par numéro) : "))
+    
+    if (choix == "1") {
+      cat(info_style("\nRetour au menu PépitesHunter...\n"))
+      break
+    } else if (choix %in% c("2", "3", "4", "5")) {
+      option <- options[as.numeric(choix)]
+      cat(success_style(paste0("\nVous avez choisi : ", option, "\n")))
+      cat(warning_style("\nCette fonctionnalité est en cours de construction.\n"))
+      cat(warning_style("\nMalheureusement, l'API Santiment est payante et nécessite un abonnement.\n"))
+    } else {
+      cat(warning_style("\nChoix invalide. Veuillez réessayer.\n"))
+    }
+  }
+}
+
+# Appel à la fonction principale
+santiment()
+
+################################################################################
+############## COIN GECKO
+#################################################################################
+
+#############################
+# Dataframe global pour stocker les données
+coingecko_data <- NULL
+
+# Fonction pour télécharger les données depuis CoinGecko
+download_coingecko_data <- function() {
+  url <- "https://api.coingecko.com/api/v3/coins/markets"
+  params <- list(
+    vs_currency = "usd",
+    order = "market_cap_desc",
+    per_page = 250,
+    page = 1,
+    sparkline = FALSE
+  )
+  
+  response <- GET(url, query = params)
+  
+  if (status_code(response) == 200) {
+    data <- fromJSON(content(response, "text", encoding = "UTF-8"))
+    assign("coingecko_data", data, envir = .GlobalEnv)
+    cat(success_style("\nDonnées téléchargées avec succès depuis CoinGecko !\n"))
+  } else {
+    cat(error_style("\nErreur lors de la récupération des données depuis CoinGecko. Vérifiez votre connexion ou les paramètres API.\n"))
+    assign("coingecko_data", NULL, envir = .GlobalEnv)
+  }
+}
+
+####################################################
+# Fonction corrigée pour afficher un tableau avec colonnes fixes et couleurs
+display_table_fixed_colored <- function(data, title) {
+  # Largeurs fixes pour chaque colonne
+  col_widths <- c(40, 15, 10)  # Largeurs pour chaque colonne
+  
+  # Fonction pour tronquer ou remplir les colonnes
+  format_column <- function(column, width) {
+    sapply(column, function(x) {
+      x <- substr(x, 1, width)  # Tronque les chaînes trop longues
+      sprintf(paste0("%-", width, "s"), x)  # Ajoute des espaces si nécessaire
+    })
+  }
+  
+  # Formater les en-têtes
+  header <- sprintf(
+    "%-*s | %-*s | %-*s",
+    col_widths[1], "Nom",
+    col_widths[2], "Symbole",
+    col_widths[3], "Variation"
+  )
+  
+  # Formater les données
+  formatted_data <- data.frame(
+    Nom = format_column(data$name, col_widths[1]),
+    Symbole = format_column(data$symbol, col_widths[2]),
+    Variation = format_column(data$price_change_percentage_24h, col_widths[3])
+  )
+  
+  # Appliquer des couleurs aux données
+  formatted_data$Nom <- cli::col_cyan(formatted_data$Nom)
+  formatted_data$Symbole <- cli::col_yellow(formatted_data$Symbole)
+  formatted_data$Variation <- ifelse(
+    as.numeric(gsub("%", "", data$price_change_percentage_24h)) >= 0,
+    cli::col_green(formatted_data$Variation),  # Vert pour positif
+    cli::col_red(formatted_data$Variation)    # Rouge pour négatif
+  )
+  
+  # Afficher le titre
+  cat(cli::col_magenta(title), "\n")
+  
+  # Afficher les en-têtes
+  cat(header, "\n")
+  
+  # Ligne de séparation
+  cat(paste0(rep("-", sum(col_widths) + 6), collapse = ""), "\n")
+  
+  # Afficher chaque ligne de données
+  for (i in 1:nrow(formatted_data)) {
+    cat(sprintf(
+      "%-*s | %-*s | %-*s\n",
+      col_widths[1], formatted_data$Nom[i],
+      col_widths[2], formatted_data$Symbole[i],
+      col_widths[3], formatted_data$Variation[i]
+    ))
+  }
+}
+
+
+##########################################################
+# Fonction pour analyser les variations de prix
+process_price_signals <- function(data) {
+  cat(section_title_style("\n=== Signal Prix ===\n"))
+  
+  cat(info_style("\nDans cette section, vous trouverez les "))
+  cat(highlight_style("détails des variations de prix des cryptomonnaies sur les dernières 24 heures"))
+  cat(info_style(", triées selon différents critères pour une analyse précise et rapide.\n\n"))
+  
+  cat(success_style("=== Organisation des données : ===\n"))
+  cat(info_style("- Les cryptomonnaies ayant connu "))
+  cat(success_style("les plus fortes progressions"))
+  cat(info_style(" sur 24 heures sont listées par ordre décroissant.\n"))
+  cat(info_style("- Les cryptomonnaies ayant enregistré "))
+  cat(warning_style("les plus fortes baisses"))
+  cat(info_style(" sont triées par ordre croissant.\n"))
+  cat(info_style("- Nous mettons également en avant un classement des "))
+  cat(highlight_style("10 meilleures performances"))
+  cat(info_style(" et des "))
+  cat(highlight_style("10 pires performances"))
+  cat(info_style(", pour identifier rapidement les signaux les plus marquants.\n\n"))
+  
+  cat(success_style("=== Source des données : ===\n"))
+  cat(info_style("Les données affichées ici proviennent de "))
+  cat(highlight_style("l'API CoinGecko"))
+  cat(info_style(", une référence mondiale en matière d’informations sur les cryptomonnaies. Elles sont collectées et mises à jour régulièrement pour garantir leur fiabilité.\n\n"))
+  
+  cat(success_style("=== Présentation des résultats : ===\n"))
+  cat(info_style("Les données sont organisées sous forme de tableaux contenant les informations suivantes :\n"))
+  cat(info_style("- "))
+  cat(highlight_style("Nom de la cryptomonnaie"))
+  cat(info_style(" : Identification de l’actif.\n"))
+  cat(info_style("- "))
+  cat(highlight_style("Symbole"))
+  cat(info_style(" : Abréviation officielle (par exemple, BTC pour Bitcoin).\n"))
+  cat(info_style("- "))
+  cat(highlight_style("Variation de prix sur 24h"))
+  cat(info_style(" : Exprimée en pourcentage, arrondie à deux décimales pour plus de clarté.\n\n"))
+  
+  cat(success_style("=== Structure des résultats affichés : ===\n"))
+  cat(info_style("1. "))
+  cat(highlight_style("Top 50 Progressions"))
+  cat(info_style(" : Liste des cryptomonnaies ayant enregistré les plus fortes hausses de prix.\n"))
+  cat(info_style("2. "))
+  cat(highlight_style("Top 50 Baisse"))
+  cat(info_style(" : Liste des cryptomonnaies ayant subi les plus fortes baisses.\n"))
+  cat(info_style("3. "))
+  cat(highlight_style("Signaux Haussiers (Top 10)"))
+  cat(info_style(" : Les 10 actifs les plus performants.\n"))
+  cat(info_style("4. "))
+  cat(highlight_style("Signaux Baissiers (Top 10)"))
+  cat(info_style(" : Les 10 actifs ayant connu les plus grandes baisses.\n\n"))
+  
+  cat(warning_style("Note : "))
+  cat(info_style("Ces données fournissent une vue d’ensemble claire des mouvements récents sur les 24 dernières heures.\n\n"))
+  
+  ############
+  
+  if (is.null(data) || nrow(data) == 0) {
+    cat(error_style("\nErreur : Les données ne sont pas disponibles. Veuillez vérifier l'appel API.\n"))
+    return()
+  }
+  
+  ################## 
+  # Nettoyage et préparation des données
+  cleaned_data <- data %>%
+    select(name, symbol, price_change_percentage_24h) %>%
+    mutate(
+      price_change_percentage_24h = paste0(round(as.numeric(price_change_percentage_24h), 2), "%")
+    )
+  
+  # Top 50 Progressions
+  display_table_fixed_colored(
+    cleaned_data %>% arrange(desc(as.numeric(gsub("%", "", price_change_percentage_24h)))) %>% head(50),
+    "Tableau des variations en % des dernières 24 heures : Top 50 Progressions "
+  )
+  cat(cli::col_green("\nCe tableau présente les cryptomonnaies ayant enregistré les meilleures progressions sur les dernières 24 heures.\n\n"))
+  
+  # Top 50 Baisses
+  display_table_fixed_colored(
+    cleaned_data %>% arrange(as.numeric(gsub("%", "", price_change_percentage_24h))) %>% head(50),
+    "Tableau des variations en % des dernières 24 heures : Top 50 Baisses"
+  )
+  cat(cli::col_red("\nCe tableau présente les cryptomonnaies ayant subi les plus fortes baisses sur les dernières 24 heures.\n\n"))
+  
+  # Signaux Haussiers (Top 10)
+  display_table_fixed_colored(
+    cleaned_data %>% arrange(desc(as.numeric(gsub("%", "", price_change_percentage_24h)))) %>% head(10),
+    "Tableau des Signaux Haussiers (Top 10)"
+  )
+  cat(cli::col_green("\nLes 10 cryptomonnaies les plus performantes à surveiller.\n\n"))
+  
+  # Signaux Baissiers (Top 10)
+  display_table_fixed_colored(
+    cleaned_data %>% arrange(as.numeric(gsub("%", "", price_change_percentage_24h))) %>% head(10),
+    "Tableau des Signaux Baissiers (Top 10)"
+  )
+  cat(cli::col_red("\nLes 10 cryptomonnaies ayant subi les plus fortes baisses.\n"))
+  
+}
+
+################################################################################
+# Fonction principale pour gérer le menu
+coingecko <- function() {
+  cat(section_title_style("\n Détection des pépites via CoinGecko - outils d'analyse !\n"))
+  cat(success_style("\n===========================================================\n"))
+  cat(highlight_style("\nExplorez les signaux prix, volumes, niches et tendances des cryptomonnaies!\n"))
+  cat(success_style("===========================================================\n"))
+  
+  # Télécharger les données une fois au début
+  download_coingecko_data()
+  
+  # Vérifier si les données ont été correctement téléchargées
+  if (is.null(coingecko_data) || nrow(coingecko_data) == 0) {
+    cat(error_style("\nImpossible de continuer : les données n'ont pas été téléchargées correctement.\n"))
+    return()
+  }
+  
+  repeat {
+    cat(section_title_style("\n=== Menu CoinGecko ===\n"))
+    options <- c(
+      "Revenir au menu PépitesHunter",
+      "Signal Prix",
+      "Volume et Trading (non implémenté)",
+      "Classement par Capitalisation Boursière (non implémenté)"
+    )
+    
+    for (i in seq_along(options)) {
+      cat(paste0(i, ". ", options[i], "\n"))
+    }
+    
+    choix <- readline(question_style("Veuillez choisir une option (par numéro) : "))
+    
+    if (choix == "1") {
+      cat(info_style("\nRetour au menu PépitesHunter...\n"))
+      break
+    } else if (choix == "2") {
+      process_price_signals(coingecko_data)
+    } else if (choix %in% c("3", "4")) {
+      cat(warning_style("\nCette fonctionnalité n'est pas encore implémentée.\n"))
+    } else {
+      cat(warning_style("\nChoix invalide. Veuillez réessayer.\n"))
+    }
+  }
+}
+
+# Appel à la fonction principale
+coingecko()
+
+################################################################################
+###########@################### MENU PEPITE ###############
+################################################################################
+
+# Définition de PépitesHunter
+pepite_hunter <- function() {
+  cat(section_title_style("\nPépitesHunter - Cryptowise Copilote :\n"))
+  cat(success_style("\n===========================================================\n"))
+  cat(highlight_style("Bienvenue sur votre outil unique pour détecter les signaux de probable run sur des cryptomonnaies prometteuses.\n"))
+  cat(highlight_style("\nAvec PépitesHunter, vous pouvez :\n"))
+  cat("- Analyser les cryptos les plus recherchées sur différentes plateformes.\n")
+  cat("- Observer leur progression sur plusieurs périodes temporelles.\n")
+  cat("- Identifier les mouvements potentiels avant qu'ils ne deviennent des tendances majeures.\n")
+  cat(success_style("===========================================================\n"))
+  
+  cat(section_title_style("\nPlateformes disponibles :\n"))
+  
+  # Liste des plateformes avec leurs descriptions
+  platforms <- list(
+    "\nLunar Crush" = "Analyse les tendances sociales et fournit des insights sur les interactions en ligne autour des cryptomonnaies.",
+    "\nCoinGecko" = "Fournit des données complètes sur les prix, volumes, et autres métriques du marché crypto.",
+    "\nGoogle Trend" = "Explore les recherches Google pour identifier les cryptos suscitant un intérêt croissant.",
+    "\nCoin Market Cap" = "Propose un classement exhaustif des cryptomonnaies avec des indicateurs de marché clés.",
+    "\nMessari" = "Plateforme d'analyse pour les données de marché et les recherches approfondies sur les cryptos.",
+    "\nSantiment" = "Se concentre sur les données on-chain, les signaux sociaux et le sentiment du marché."
+  )
+  
+  # Affichage des plateformes avec styles
+  for (platform in names(platforms)) {
+    cat(info_secondary_style(platform), ":", info_style(platforms[[platform]]), "\n")
+    cat("\n")  # Espacement pour meilleure lisibilité
+  }
+  
+  # Menu des outils PépitesHunter
+  repeat {
+    cat(section_title_style("\n=== Menu des outils PépitesHunter ===\n"))
+    options <- c(
+      "Lunar Crush (Restreinte)",
+      "CoinGecko",
+      "Google Trend",
+      "Coin Market Cap",
+      "Messari",
+      "Santiment",
+      "Revenir au menu principal"
+    )
+    
+    for (i in seq_along(options)) {
+      cat(paste0(i, ". ", options[i], "\n"))
+    }
+    
+    choix <- readline(question_style("Veuillez choisir une plateforme (par numéro) : "))
+    
+    if (choix %in% c("1", "2", "3", "4", "5", "6")) {
+      platform <- options[as.numeric(choix)]
+      cat(success_style(paste0("\nVous avez choisi : ", platform, "\n")))
+      
+      # Message personnalisé pour chaque plateforme
+      if (platform == "Lunar Crush") {
+        cat(highlight_style("\nPlongez dans les signaux sociaux et les tendances en ligne grâce à Lunar Crush ! 🚀\n"))
+      } else if (platform == "CoinGecko") {
+        cat(highlight_style("\nDécouvrez les données complètes sur les cryptos avec CoinGecko.\n"))
+      } else if (platform == "Google Trend") {
+        cat(highlight_style("\nAnalysez les recherches Google pour repérer les cryptos qui attirent l'attention.\n"))
+      } else if (platform == "Coin Market Cap") {
+        cat(highlight_style("\nExplorez le classement et les indicateurs clés avec Coin Market Cap.\n"))
+      } else if (platform == "Messari") {
+        cat(highlight_style("\nApprofondissez vos analyses grâce aux données riches de Messari.\n"))
+      } else if (platform == "Santiment") {
+        cat(highlight_style("\nExaminez les signaux sociaux et les données on-chain via Santiment.\n"))
+      }
+      
+      # Placeholder pour implémentation spécifique
+      cat(info_style("\nCette fonctionnalité sera bientôt disponible.\n"))
+      
+    } else if (choix == "7") {
+      cat(info_style("\nRetour au menu principal...\n"))
+      break
+    } else {
+      cat(warning_style("\nChoix invalide. Veuillez réessayer.\n"))
+    }
+  }
+}
+
+# Appel à la fonction PépitesHunter
+pepite_hunter()
