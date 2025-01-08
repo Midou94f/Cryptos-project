@@ -21,6 +21,58 @@ format_large_number <- function(x) {
   format(x, big.mark = " ", scientific = FALSE)
 }
 
+# Fonction pour le formatage des tableaux
+display_table_fixed_colored <- function(data) {
+  # Largeurs fixes pour chaque type de colonne
+  col_widths <- c(
+    name = 30,
+    symbol = 10,
+    id = 25,
+    market_cap = 20,
+    twitter_followers = 20,
+    sentiment_votes_up = 20,
+    sentiment_votes_down = 20
+  )
+  
+  # Fonction pour formater une colonne
+  format_column <- function(values, width) {
+    sapply(values, function(x) {
+      x <- substr(as.character(x), 1, width)
+      sprintf(paste0("%-", width, "s"), x)
+    })
+  }
+  
+  # Formater l'en-tête
+  header_parts <- mapply(function(name, width) {
+    sprintf(paste0("%-", width, "s"), toupper(name))
+  }, names(data), col_widths[names(data)])
+  
+  header <- paste(header_parts, collapse = " | ")
+  
+  # Afficher l'en-tête
+  cat(cli::col_yellow(header), "\n")
+  cat(paste(rep("-", sum(col_widths[names(data)]) + (3 * (ncol(data) - 1))), collapse = ""), "\n")
+  
+  # Formater et afficher chaque ligne avec des couleurs
+  for(i in 1:nrow(data)) {
+    row_values <- mapply(function(value, col_name, width) {
+      formatted <- format_column(value, width)
+      switch(col_name,
+             "name" = cli::col_cyan(formatted),
+             "symbol" = cli::col_green(formatted),
+             "id" = cli::col_magenta(formatted),
+             "market_cap" = cli::col_yellow(formatted),
+             "twitter_followers" = cli::col_blue(formatted),
+             "sentiment_votes_up" = cli::col_green(formatted),
+             "sentiment_votes_down" = cli::col_red(formatted),
+             formatted)
+    }, as.list(data[i,]), names(data), col_widths[names(data)])
+    
+    cat(paste(row_values, collapse = " | "), "\n")
+  }
+  cat("\n")
+}
+
 # Fonction pour télécharger les 250 premières cryptos
 get_top_cryptos <- function() {
   url <- "https://api.coingecko.com/api/v3/coins/markets"
@@ -116,18 +168,17 @@ visualiser_crypto_specifique <- function() {
           symbol = social_data$symbol,
           twitter_followers = format_large_number(social_data$community_data$twitter_followers),
           sentiment_votes_up = paste0(round(social_data$sentiment_votes_up_percentage, 2), "%"),
-          sentiment_votes_down = paste0(round(social_data$sentiment_votes_down_percentage, 2), "%")
+          sentiment_votes_down = paste0(round(social_data$sentiment_votes_down_percentage, 2), "%"),
+          stringsAsFactors = FALSE
         )
         
-        print(result_df)
-        cat("\n")
+        display_table_fixed_colored(result_df)
         
         # Analyse du sentiment
         mood_global <- social_data$sentiment_votes_up_percentage
         cat(section_title_style("Analyse du Sentiment :\n\n"))
         cat("Mood Global : ", highlight_style(paste0(round(mood_global, 2), "%\n\n")))
         
-        # Message d'analyse du sentiment
         sentiment_message <- if (mood_global > 70) {
           success_style("Le sentiment est hyper positif - Bull Market en vue ! 🚀")
         } else if (mood_global > 50) {
@@ -153,8 +204,7 @@ visualiser_crypto_specifique <- function() {
         mutate(market_cap = paste0(format_large_number(round(market_cap / 1e9, 2)), " Mds $"))
       
       cat(section_title_style("\nListe des 250 plus grandes cryptos :\n\n"))
-      print(display_df)
-      cat("\n")
+      display_table_fixed_colored(display_df)
       readline(info_style("Veuillez noter l'ID qui vous intéresse et appuyer sur Entrée pour continuer...\n"))
       visualiser_crypto_specifique()
     }
@@ -243,7 +293,8 @@ afficher_social_metrics <- function(ids) {
         symbol = social_data$symbol,
         twitter_followers = format_large_number(social_data$community_data$twitter_followers),
         sentiment_votes_up = paste0(round(social_data$sentiment_votes_up_percentage, 2), "%"),
-        sentiment_votes_down = paste0(round(social_data$sentiment_votes_down_percentage, 2), "%")
+        sentiment_votes_down = paste0(round(social_data$sentiment_votes_down_percentage, 2), "%"),
+        stringsAsFactors = FALSE
       )
     }
     
@@ -257,8 +308,7 @@ afficher_social_metrics <- function(ids) {
   
   cat("\nRésultats :\n\n")
   social_data_table <- do.call(rbind, social_data_list)
-  print(social_data_table)
-  cat("\n")
+  display_table_fixed_colored(social_data_table)
   
   # Calcul et affichage du sentiment global
   mood_global <- mean(sentiment_votes_raw)
