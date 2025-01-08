@@ -1,0 +1,730 @@
+# Importation des bibliothèques nécessaires
+library(crayon)
+library(dplyr)
+library(jsonlite)     # Pour lire les données JSON
+library(httr)         # Pour les appels API
+library(kableExtra)
+
+# Définition des styles existants
+question_style <- blue$bold
+info_style <- white$italic
+warning_style <- red$bold
+success_style <- green$bold
+highlight_style <- yellow$bold
+info_secondary_style <- cyan$italic
+error_style <- red$bold$underline
+section_title_style <- magenta$bold$underline
+
+
+#############################
+# Dataframe global pour stocker les données
+coingecko_data <- NULL
+
+# Fonction pour télécharger les données depuis CoinGecko
+download_coingecko_data <- function() {
+  url <- "https://api.coingecko.com/api/v3/coins/markets"
+  params <- list(
+    vs_currency = "usd",
+    order = "market_cap_desc",
+    per_page = 250,
+    page = 1,
+    sparkline = FALSE
+  )
+  
+  response <- GET(url, query = params)
+  
+  if (status_code(response) == 200) {
+    data <- fromJSON(content(response, "text", encoding = "UTF-8"))
+    assign("coingecko_data", data, envir = .GlobalEnv)
+    cat(success_style("\nDonnées téléchargées avec succès depuis CoinGecko !\n"))
+  } else {
+    cat(error_style("\nErreur lors de la récupération des données depuis CoinGecko. Vérifiez votre connexion ou les paramètres API.\n"))
+    assign("coingecko_data", NULL, envir = .GlobalEnv)
+  }
+}
+
+####################################################
+# Fonction corrigée pour afficher un tableau avec colonnes fixes et couleurs
+display_table_fixed_colored <- function(data, title) {
+  # Largeurs fixes pour chaque colonne
+  col_widths <- c(40, 15, 10)  # Largeurs pour chaque colonne
+  
+  # Fonction pour tronquer ou remplir les colonnes
+  format_column <- function(column, width) {
+    sapply(column, function(x) {
+      x <- substr(x, 1, width)  # Tronque les chaînes trop longues
+      sprintf(paste0("%-", width, "s"), x)  # Ajoute des espaces si nécessaire
+    })
+  }
+  
+  # Formater les en-têtes
+  header <- sprintf(
+    "%-*s | %-*s | %-*s",
+    col_widths[1], "Nom",
+    col_widths[2], "Symbole",
+    col_widths[3], "Variation"
+  )
+  
+  # Formater les données
+  formatted_data <- data.frame(
+    Nom = format_column(data$name, col_widths[1]),
+    Symbole = format_column(data$symbol, col_widths[2]),
+    Variation = format_column(data$price_change_percentage_24h, col_widths[3])
+  )
+  
+  # Appliquer des couleurs aux données
+  formatted_data$Nom <- cli::col_cyan(formatted_data$Nom)
+  formatted_data$Symbole <- cli::col_yellow(formatted_data$Symbole)
+  formatted_data$Variation <- ifelse(
+    as.numeric(gsub("%", "", data$price_change_percentage_24h)) >= 0,
+    cli::col_green(formatted_data$Variation),  # Vert pour positif
+    cli::col_red(formatted_data$Variation)    # Rouge pour négatif
+  )
+  
+  # Afficher le titre
+  cat(cli::col_magenta(title), "\n")
+  
+  # Afficher les en-têtes
+  cat(header, "\n")
+  
+  # Ligne de séparation
+  cat(paste0(rep("-", sum(col_widths) + 6), collapse = ""), "\n")
+  
+  # Afficher chaque ligne de données
+  for (i in 1:nrow(formatted_data)) {
+    cat(sprintf(
+      "%-*s | %-*s | %-*s\n",
+      col_widths[1], formatted_data$Nom[i],
+      col_widths[2], formatted_data$Symbole[i],
+      col_widths[3], formatted_data$Variation[i]
+    ))
+  }
+}
+
+
+##########################################################
+# Fonction pour analyser les variations de prix
+process_price_signals <- function(data) {
+  cat(section_title_style("\n=== Signal Prix ===\n"))
+  
+  cat(info_style("\nDans cette section, vous trouverez les "))
+  cat(highlight_style("détails des variations de prix des cryptomonnaies sur les dernières 24 heures"))
+  cat(info_style(", triées selon différents critères pour une analyse précise et rapide.\n\n"))
+  
+  cat(success_style("=== Organisation des données : ===\n"))
+  cat(info_style("- Les cryptomonnaies ayant connu "))
+  cat(success_style("les plus fortes progressions"))
+  cat(info_style(" sur 24 heures sont listées par ordre décroissant.\n"))
+  cat(info_style("- Les cryptomonnaies ayant enregistré "))
+  cat(warning_style("les plus fortes baisses"))
+  cat(info_style(" sont triées par ordre croissant.\n"))
+  cat(info_style("- Nous mettons également en avant un classement des "))
+  cat(highlight_style("10 meilleures performances"))
+  cat(info_style(" et des "))
+  cat(highlight_style("10 pires performances"))
+  cat(info_style(", pour identifier rapidement les signaux les plus marquants.\n\n"))
+  
+  cat(success_style("=== Source des données : ===\n"))
+  cat(info_style("Les données affichées ici proviennent de "))
+  cat(highlight_style("l'API CoinGecko"))
+  cat(info_style(", une référence mondiale en matière d’informations sur les cryptomonnaies. Elles sont collectées et mises à jour régulièrement pour garantir leur fiabilité.\n\n"))
+  
+  cat(success_style("=== Présentation des résultats : ===\n"))
+  cat(info_style("Les données sont organisées sous forme de tableaux contenant les informations suivantes :\n"))
+  cat(info_style("- "))
+  cat(highlight_style("Nom de la cryptomonnaie"))
+  cat(info_style(" : Identification de l’actif.\n"))
+  cat(info_style("- "))
+  cat(highlight_style("Symbole"))
+  cat(info_style(" : Abréviation officielle (par exemple, BTC pour Bitcoin).\n"))
+  cat(info_style("- "))
+  cat(highlight_style("Variation de prix sur 24h"))
+  cat(info_style(" : Exprimée en pourcentage, arrondie à deux décimales pour plus de clarté.\n\n"))
+  
+  cat(success_style("=== Structure des résultats affichés : ===\n"))
+  cat(info_style("1. "))
+  cat(highlight_style("Top 50 Progressions"))
+  cat(info_style(" : Liste des cryptomonnaies ayant enregistré les plus fortes hausses de prix.\n"))
+  cat(info_style("2. "))
+  cat(highlight_style("Top 50 Baisse"))
+  cat(info_style(" : Liste des cryptomonnaies ayant subi les plus fortes baisses.\n"))
+  cat(info_style("3. "))
+  cat(highlight_style("Signaux Haussiers (Top 10)"))
+  cat(info_style(" : Les 10 actifs les plus performants.\n"))
+  cat(info_style("4. "))
+  cat(highlight_style("Signaux Baissiers (Top 10)"))
+  cat(info_style(" : Les 10 actifs ayant connu les plus grandes baisses.\n\n"))
+  
+  cat(warning_style("Note : "))
+  cat(info_style("Ces données fournissent une vue d’ensemble claire des mouvements récents sur les 24 dernières heures.\n\n"))
+  
+  ############
+  
+  if (is.null(data) || nrow(data) == 0) {
+    cat(error_style("\nErreur : Les données ne sont pas disponibles. Veuillez vérifier l'appel API.\n"))
+    return()
+  }
+  
+  ################## 
+  # Nettoyage et préparation des données
+  cleaned_data <- data %>%
+    select(name, symbol, price_change_percentage_24h) %>%
+    mutate(
+      price_change_percentage_24h = paste0(round(as.numeric(price_change_percentage_24h), 2), "%")
+    )
+  
+  # Top 50 Progressions
+  display_table_fixed_colored(
+    cleaned_data %>% arrange(desc(as.numeric(gsub("%", "", price_change_percentage_24h)))) %>% head(50),
+    "Tableau des variations en % des dernières 24 heures : Top 50 Progressions "
+  )
+  cat(cli::col_green("\nCe tableau présente les cryptomonnaies ayant enregistré les meilleures progressions sur les dernières 24 heures.\n\n"))
+  
+  # Top 50 Baisses
+  display_table_fixed_colored(
+    cleaned_data %>% arrange(as.numeric(gsub("%", "", price_change_percentage_24h))) %>% head(50),
+    "Tableau des variations en % des dernières 24 heures : Top 50 Baisses"
+  )
+  cat(cli::col_red("\nCe tableau présente les cryptomonnaies ayant subi les plus fortes baisses sur les dernières 24 heures.\n\n"))
+  
+  # Signaux Haussiers (Top 10)
+  display_table_fixed_colored(
+    cleaned_data %>% arrange(desc(as.numeric(gsub("%", "", price_change_percentage_24h)))) %>% head(10),
+    "Tableau des Signaux Haussiers (Top 10)"
+  )
+  cat(cli::col_green("\nLes 10 cryptomonnaies les plus performantes à surveiller.\n\n"))
+  
+  # Signaux Baissiers (Top 10)
+  display_table_fixed_colored(
+    cleaned_data %>% arrange(as.numeric(gsub("%", "", price_change_percentage_24h))) %>% head(10),
+    "Tableau des Signaux Baissiers (Top 10)"
+  )
+  cat(cli::col_red("\nLes 10 cryptomonnaies ayant subi les plus fortes baisses.\n"))
+  
+}
+
+
+###############################################################################
+##### 3 VOLUME ET TRADING
+###############################################################################
+
+# Fonction pour formater les grands nombres avec des espaces
+format_number <- function(number) {
+  # Conversion en milliards
+  number_in_billions <- number / 1000000000
+  # Formatage avec 2 décimales
+  formatted <- sprintf("%.2f", number_in_billions)
+  # Ajout des espaces pour les milliers
+  parts <- strsplit(formatted, "\\.")[[1]]
+  whole_part <- parts[1]
+  decimal_part <- parts[2]
+  whole_part <- format(as.numeric(whole_part), big.mark = " ", scientific = FALSE)
+  return(paste0(whole_part, ".", decimal_part))
+}
+
+# Fonction modifiée pour afficher un tableau avec les nouvelles colonnes
+display_volume_table <- function(data, title) {
+  # Largeurs fixes pour chaque colonne
+  col_widths <- c(40, 15, 15, 15, 10)  # Largeurs ajustées pour les nouvelles colonnes
+  
+  # Fonction pour tronquer ou remplir les colonnes
+  format_column <- function(column, width) {
+    sapply(column, function(x) {
+      x <- substr(x, 1, width)  # Tronque les chaînes trop longues
+      sprintf(paste0("%-", width, "s"), x)  # Ajoute des espaces si nécessaire
+    })
+  }
+  
+  # Formater les en-têtes
+  header <- sprintf(
+    "%-*s | %-*s | %-*s | %-*s | %-*s",
+    col_widths[1], "Nom",
+    col_widths[2], "Symbole",
+    col_widths[3], "Volume (B$)",
+    col_widths[4], "MarketCap (B$)",
+    col_widths[5], "Liquidité %"
+  )
+  
+  # Formater les données
+  formatted_data <- data.frame(
+    Nom = format_column(data$name, col_widths[1]),
+    Symbole = format_column(data$symbol, col_widths[2]),
+    Volume = format_column(data$volume_formatted, col_widths[3]),
+    MarketCap = format_column(data$market_cap_formatted, col_widths[4]),
+    Liquidite = format_column(data$liquidity_percentage, col_widths[5])
+  )
+  
+  # Appliquer des couleurs aux données
+  formatted_data$Nom <- cli::col_cyan(formatted_data$Nom)
+  formatted_data$Symbole <- cli::col_yellow(formatted_data$Symbole)
+  formatted_data$Volume <- cli::col_green(formatted_data$Volume)
+  formatted_data$MarketCap <- cli::col_blue(formatted_data$MarketCap)
+  formatted_data$Liquidite <- cli::col_magenta(formatted_data$Liquidite)
+  
+  # Afficher le titre
+  cat(cli::col_magenta(title), "\n")
+  
+  # Afficher les en-têtes
+  cat(header, "\n")
+  
+  # Ligne de séparation
+  cat(paste0(rep("-", sum(col_widths) + 10), collapse = ""), "\n")
+  
+  # Afficher chaque ligne de données
+  for (i in 1:nrow(formatted_data)) {
+    cat(sprintf(
+      "%-*s | %-*s | %-*s | %-*s | %-*s\n",
+      col_widths[1], formatted_data$Nom[i],
+      col_widths[2], formatted_data$Symbole[i],
+      col_widths[3], formatted_data$Volume[i],
+      col_widths[4], formatted_data$MarketCap[i],
+      col_widths[5], formatted_data$Liquidite[i]
+    ))
+  }
+}
+
+# Fonction principale pour analyser les volumes et la liquidité
+process_volume_trading <- function(data) {
+  cat(section_title_style("\n=== Analyse des Volumes et de la Liquidité ===\n"))
+  
+  cat(section_title_style("\nDans cette section, vous trouverez les analyses des volumes de trading et de la liquidité"))
+  cat(" des cryptomonnaies, basées sur les données de l'API CoinGecko.\n\n")
+  
+  cat("Nous vous présenterons :\n")
+  cat(info_style(" La relation entre les volumes échangés et la capitalisation boursière sur 24h\n"))
+  cat(info_style(" Les niveau de volumes de trading\n"))  
+  cat(info_style(" Les indicateurs clés de liquidité\n\n"))
+  
+  cat(highlight_style("La compréhension de ces éléments est essentielle"))
+  cat(info_secondary_style(" pour interpréter l'activité du marché, évaluer la facilité à acheter ou vendre un actif "))
+  cat("et détecter de potentielles anomalies.\n\n")
+  
+  cat(success_style("Plongeons maintenant dans l'analyse de ces données de volumes et de liquidité."))
+  
+  if (is.null(data) || nrow(data) == 0) {
+    cat(error_style("\nErreur : Les données ne sont pas disponibles. Veuillez vérifier l'appel API.\n"))
+    return()
+  }
+  
+  # Préparation et nettoyage des données
+  cleaned_data <- data %>%
+    select(name, symbol, total_volume, market_cap) %>%
+    mutate(
+      # Conversion en milliards avec formatage amélioré
+      volume_formatted = sapply(total_volume, format_number),
+      market_cap_formatted = sapply(market_cap, format_number),
+      # Calcul du ratio de liquidité (volume/market_cap en pourcentage)
+      liquidity_ratio = (total_volume / market_cap) * 100,
+      liquidity_percentage = sprintf("%.2f%%", liquidity_ratio)
+    )
+  
+  # Top 100 par volume
+  cat(section_title_style("\n=== Top 100 Cryptomonnaies par Volume de Trading ===\n\n"))
+  cat(highlight_style("Analyse des volumes de trading sur 24 heures (exprimés en milliards USD) des 100 cryptomonnaies les plus actives selon les données temps réel de CoinGecko. La capitalisation boursière est également exprimée en milliards USD pour une évaluation comparative précise. Le volume d'échanges est un indicateur clé de la profondeur du marché et de l'intérêt des traders.\n\n"))
+  display_volume_table(
+    cleaned_data %>% 
+      arrange(desc(total_volume)) %>% 
+      head(100),
+    "Classement par Volume de Trading (Top 100)"
+  )
+  
+  # Top 50 par liquidité (les plus élevés)
+  cat(section_title_style("\n=== Top 50 Cryptomonnaies par Taux de Liquidité ===\n\n"))
+  cat(highlight_style("Classement des 50 actifs présentant les meilleurs ratios de liquidité (Volume 24h / Market Cap). Ce ratio, exprimé en pourcentage, est un indicateur crucial de la capacité d'un actif à être échangé sans impact significatif sur son prix. Les volumes et capitalisations sont exprimés en milliards USD, données validées par CoinGecko.\n\n"))
+  display_volume_table(
+    cleaned_data %>% 
+      arrange(desc(liquidity_ratio)) %>% 
+      head(50),
+    "Classement par Taux de Liquidité le Plus Élevé (Top 50)"
+  )
+  
+  # Top 50 par liquidité (les plus faibles)
+  cat(section_title_style("\n=== Top 50 Cryptomonnaies avec le Taux de Liquidité le Plus Faible ===\n\n"))
+  cat(highlight_style("Identification des 50 actifs présentant les ratios de liquidité (Volume 24h / Market Cap) les plus faibles parmi les principales cryptomonnaies. Un faible ratio peut indiquer une concentration importante des détenteurs ou une faible activité de trading. Volumes et capitalisations exprimés en milliards USD. Données fournies en temps réel par l'API CoinGecko.\n\n"))
+  display_volume_table(
+    cleaned_data %>% 
+      arrange(liquidity_ratio) %>% 
+      head(50),
+    "Classement par Taux de Liquidité le Plus Faible (Top 50)"
+  )
+}
+
+###############################################################################
+####. Statistiques sociales
+###############################################################################
+
+# Fonction pour formater les grands nombres
+format_large_number <- function(x) {
+  format(x, big.mark = " ", scientific = FALSE)
+}
+
+# Fonction pour le formatage des tableaux
+display_table_fixed_colored2 <- function(data) {
+  # Largeurs fixes pour chaque type de colonne
+  col_widths <- c(
+    name = 30,
+    symbol = 10,
+    id = 25,
+    market_cap = 20,
+    twitter_followers = 20,
+    sentiment_votes_up = 20,
+    sentiment_votes_down = 20
+  )
+  
+  # Fonction pour formater une colonne
+  format_column <- function(values, width) {
+    sapply(values, function(x) {
+      x <- substr(as.character(x), 1, width)
+      sprintf(paste0("%-", width, "s"), x)
+    })
+  }
+  
+  # Formater l'en-tête
+  header_parts <- mapply(function(name, width) {
+    sprintf(paste0("%-", width, "s"), toupper(name))
+  }, names(data), col_widths[names(data)])
+  
+  header <- paste(header_parts, collapse = " | ")
+  
+  # Afficher l'en-tête
+  cat(cli::col_yellow(header), "\n")
+  cat(paste(rep("-", sum(col_widths[names(data)]) + (3 * (ncol(data) - 1))), collapse = ""), "\n")
+  
+  # Formater et afficher chaque ligne avec des couleurs
+  for(i in 1:nrow(data)) {
+    row_values <- mapply(function(value, col_name, width) {
+      formatted <- format_column(value, width)
+      switch(col_name,
+             "name" = cli::col_cyan(formatted),
+             "symbol" = cli::col_green(formatted),
+             "id" = cli::col_magenta(formatted),
+             "market_cap" = cli::col_yellow(formatted),
+             "twitter_followers" = cli::col_blue(formatted),
+             "sentiment_votes_up" = cli::col_green(formatted),
+             "sentiment_votes_down" = cli::col_red(formatted),
+             formatted)
+    }, as.list(data[i,]), names(data), col_widths[names(data)])
+    
+    cat(paste(row_values, collapse = " | "), "\n")
+  }
+  cat("\n")
+}
+
+# Fonction pour télécharger les 250 premières cryptos
+get_top_cryptos <- function() {
+  url <- "https://api.coingecko.com/api/v3/coins/markets"
+  params <- list(
+    vs_currency = "usd",
+    order = "market_cap_desc",
+    per_page = 250,
+    page = 1,
+    sparkline = FALSE
+  )
+  
+  response <- GET(url, query = params)
+  
+  if (status_code(response) == 200) {
+    data <- fromJSON(content(response, "text", encoding = "UTF-8"))
+    cat(success_style("\nDonnées des 250 premières cryptos téléchargées avec succès !\n\n"))
+    return(data)
+  } else {
+    cat(error_style("\nErreur lors de la récupération des données.\n"))
+    return(NULL)
+  }
+}
+
+# Fonction pour télécharger les données sociales
+get_social_data <- function(id) {
+  url <- paste0("https://api.coingecko.com/api/v3/coins/", id)
+  response <- GET(url)
+  
+  if (status_code(response) == 200) {
+    data <- fromJSON(content(response, "text", encoding = "UTF-8"))
+    return(data)
+  } else if (status_code(response) == 429) {
+    cat(warning_style("\nLimite atteinte pour ", id, ". Pause de 61 secondes...\n"))
+    Sys.sleep(61)
+    return(NULL)
+  } else {
+    cat(error_style(paste0("\nErreur lors de la récupération des données pour ", id, "\n")))
+    return(NULL)
+  }
+}
+
+# Menu principal
+social_main_menu <- function() {
+  repeat {
+    cat(section_title_style("\n Options - Social Metrics des Cryptos\n\n"))
+    cat(question_style("0) Revenir au menu précédent\n"))
+    cat("1) Visualiser les socials metrics sociales d'une crypto spécifique\n")
+    cat("2) Visualiser les socials metrics du marché crypto en général\n")
+    
+    # Lecture et validation de l'entrée utilisateur
+    repeat {
+      choix <- suppressWarnings(as.integer(readline(question_style("\nVeuillez entrer votre choix (0, 1 ou 2) : "))))
+      
+      # Vérification si choix est NA ou hors limites
+      if (!is.na(choix) && choix >= 0 && choix <= 2) {
+        break
+      }
+      cat(warning_style("\nChoix invalide. Veuillez entrer 0, 1 ou 2 uniquement.\n"))
+    }
+    
+    if (choix == 0) {
+      cat(info_style("\nRetour au menu précédent...\n"))
+      break
+    } else if (choix == 1) {
+      visualiser_crypto_specifique()
+    } else if (choix == 2) {
+      visualiser_cryptos_generales()
+    }
+  }
+}
+
+# Visualisation d'une crypto spécifique
+visualiser_crypto_specifique <- function() {
+  cat(section_title_style("\nVisualisation des socials metrics d'une crypto spécifique\n"))
+  
+  repeat {
+    connait_id <- tolower(readline(question_style("Connaissez-vous l'ID de la crypto ? (oui/non) : ")))
+    if (connait_id %in% c("oui", "non")) break
+    cat(warning_style("\nVeuillez répondre uniquement par 'oui' ou 'non'.\n"))
+  }
+  
+  if (connait_id == "oui") {
+    repeat {
+      id <- readline(question_style("Veuillez entrer l'ID de la crypto : "))
+      social_data <- get_social_data(id)
+      
+      if (!is.null(social_data)) {
+        cat(success_style("\nDonnées pour ", id, " téléchargées avec succès !\n\n"))
+        
+        # Création d'un tableau formaté
+        result_df <- data.frame(
+          name = social_data$name,
+          symbol = social_data$symbol,
+          twitter_followers = format_large_number(social_data$community_data$twitter_followers),
+          sentiment_votes_up = paste0(round(social_data$sentiment_votes_up_percentage, 2), "%"),
+          sentiment_votes_down = paste0(round(social_data$sentiment_votes_down_percentage, 2), "%"),
+          stringsAsFactors = FALSE
+        )
+        
+        display_table_fixed_colored2(result_df)
+        
+        # Analyse du sentiment
+        mood_global <- social_data$sentiment_votes_up_percentage
+        cat(section_title_style("Analyse du Sentiment :\n\n"))
+        cat("Mood Global : ", highlight_style(paste0(round(mood_global, 2), "%\n\n")))
+        
+        sentiment_message <- if (mood_global > 70) {
+          success_style("Le sentiment est hyper positif - Bull Market en vue ! 🚀")
+        } else if (mood_global > 50) {
+          success_style("Le sentiment est globalement positif 📈")
+        } else if (mood_global > 30) {
+          warning_style("Le sentiment est globalement négatif 📉")
+        } else {
+          error_style("Le sentiment est hyper négatif - Bear Market en vue ! 🐻")
+        }
+        
+        cat(sentiment_message, "\n\n")
+        break
+      } else {
+        cat(warning_style("\nID invalide ou problème lors de la récupération. Veuillez réessayer.\n"))
+      }
+    }
+  } else {
+    top_cryptos <- get_top_cryptos()
+    if (!is.null(top_cryptos)) {
+      display_df <- top_cryptos %>% 
+        select(name, id, market_cap) %>%
+        head(250) %>%
+        mutate(market_cap = paste0(format_large_number(round(market_cap / 1e9, 2)), " Mds $"))
+      
+      cat(section_title_style("\nListe des 250 plus grandes cryptos :\n\n"))
+      display_table_fixed_colored2(display_df)
+      readline(info_style("Veuillez noter l'ID qui vous intéresse et appuyer sur Entrée pour continuer...\n"))
+      visualiser_crypto_specifique()
+    }
+  }
+}
+
+# Visualisation des cryptos en général
+visualiser_cryptos_generales <- function() {
+  repeat {
+    cat(section_title_style("\nVisualisation des sociales metrics des cryptos\n\n"))
+    cat(question_style("0) Retour au menu principal\n"))
+    cat("1) Visualiser les 4 plus grandes cryptos (", warning_style("Temps d'attente: < 60 secondes"), ")\n")
+    cat("2) Visualiser les 8 plus grandes cryptos (", warning_style("temps d'attente estimé : 2 minutes"), ")\n")
+    cat("3) Visualiser les 12 plus grandes cryptos (", warning_style("temps d'attente estimé : 3 minutes"), ")\n")
+    cat("4) Visualiser les 16 plus grandes cryptos (", warning_style("temps d'attente estimé : 4 minutes"), ")\n")
+    cat("5) Choisir un nombre personnalisé de cryptos (", warning_style("Maximum 50"), ")\n")
+    
+    # Lecture et validation de l'entrée utilisateur
+    repeat {
+      choix <- suppressWarnings(as.integer(readline(question_style("\nVeuillez entrer votre choix (0-5) : "))))
+      
+      # Vérification si choix est NA ou hors limites
+      if (!is.na(choix) && choix >= 0 && choix <= 5) {
+        break
+      }
+      cat(warning_style("\nChoix invalide. Veuillez entrer un nombre entre 0 et 5.\n"))
+    }
+    
+    if (choix == 0) {
+      cat(info_style("\nRetour au menu principal...\n"))
+      break
+    } else if (choix == 5) {
+      # Gestion du nombre personnalisé
+      repeat {
+        nombre_perso <- suppressWarnings(as.integer(readline(question_style("\nEntrez le nombre de cryptos à visualiser (maximum 50) : "))))
+        
+        if (!is.na(nombre_perso) && nombre_perso > 0 && nombre_perso <= 50) {
+          temps_estime <- ceiling(nombre_perso / 4) * 1.5
+          cat(warning_style(paste0("\nTemps d'attente estimé : ", temps_estime, " minutes\n")))
+          
+          repeat {
+            choix_confirme <- tolower(readline(question_style("Voulez-vous continuer ? (oui/non) : ")))
+            if (choix_confirme %in% c("oui", "non")) break
+            cat(warning_style("\nVeuillez répondre uniquement par 'oui' ou 'non'.\n"))
+          }
+          
+          if (choix_confirme == "oui") {
+            top_cryptos <- get_top_cryptos()
+            if (!is.null(top_cryptos)) {
+              top_ids <- head(top_cryptos$id, nombre_perso)
+              afficher_social_metrics(top_ids)
+            }
+          }
+          break
+        } else {
+          cat(warning_style("\nNombre invalide. Veuillez entrer un nombre entre 1 et 50.\n"))
+        }
+      }
+    } else if (choix >= 1 && choix <= 4) {
+      nombre_cryptos <- choix * 4
+      top_cryptos <- get_top_cryptos()
+      if (!is.null(top_cryptos)) {
+        top_ids <- head(top_cryptos$id, nombre_cryptos)
+        afficher_social_metrics(top_ids)
+      }
+    }
+  }
+}
+
+# Affichage des metrics sociales
+afficher_social_metrics <- function(ids) {
+  social_data_list <- list()
+  sentiment_votes_raw <- numeric()  # Pour stocker les valeurs brutes des sentiments
+  
+  for (i in seq_along(ids)) {
+    id <- ids[i]
+    cat(info_style(paste0("\nTéléchargement des données pour : ", id, "...\n")))
+    
+    social_data <- get_social_data(id)
+    
+    if (!is.null(social_data)) {
+      sentiment_votes_raw <- c(sentiment_votes_raw, social_data$sentiment_votes_up_percentage)
+      
+      social_data_list[[i]] <- data.frame(
+        name = social_data$name,
+        symbol = social_data$symbol,
+        twitter_followers = format_large_number(social_data$community_data$twitter_followers),
+        sentiment_votes_up = paste0(round(social_data$sentiment_votes_up_percentage, 2), "%"),
+        sentiment_votes_down = paste0(round(social_data$sentiment_votes_down_percentage, 2), "%"),
+        stringsAsFactors = FALSE
+      )
+    }
+    
+    if (i %% 4 == 0 && i < length(ids)) {
+      cat(warning_style("\nPause de 61 secondes pour respecter les limites de l'API...\n"))
+      Sys.sleep(61)
+    } else {
+      Sys.sleep(2)
+    }
+  }
+  
+  cat("\nRésultats :\n\n")
+  social_data_table <- do.call(rbind, social_data_list)
+  display_table_fixed_colored2(social_data_table)
+  
+  # Calcul et affichage du sentiment global
+  mood_global <- mean(sentiment_votes_raw)
+  cat(section_title_style("Analyse du Sentiment Global :\n\n"))
+  cat("Mood Global : ", highlight_style(paste0(round(mood_global, 2), "%\n\n")))
+  
+  # Analyse du sentiment
+  sentiment_message <- if (mood_global > 70) {
+    success_style("Le sentiment est hyper positif - Bull Market en vue ! 🚀")
+  } else if (mood_global > 50) {
+    success_style("Le sentiment est globalement positif 📈")
+  } else if (mood_global > 30) {
+    warning_style("Le sentiment est globalement négatif 📉")
+  } else {
+    error_style("Le sentiment est hyper négatif - Bear Market en vue ! 🐻")
+  }
+  
+  cat(sentiment_message, "\n\n")
+}
+
+# Exécution du menu principal
+
+
+
+################################################################################
+# Fonction principale pour gérer le menu
+################################################################################
+
+coingecko <- function() {
+  cat(section_title_style("\n Détection des pépites via CoinGecko - outils d'analyse !\n"))
+  cat(success_style("\n===========================================================\n"))
+  cat(highlight_style("\nExplorez les signaux prix, volumes, niches et tendances des cryptomonnaies!\n"))
+  cat(success_style("===========================================================\n"))
+  
+  # Télécharger les données une fois au début
+  download_coingecko_data()
+  
+  # Vérifier si les données ont été correctement téléchargées
+  if (is.null(coingecko_data) || nrow(coingecko_data) == 0) {
+    cat(error_style("\nImpossible de continuer : les données n'ont pas été téléchargées correctement.\n"))
+    return()
+  }
+  
+  repeat {
+    cat(section_title_style("\n=== Menu CoinGecko ===\n"))
+    options <- c(
+      "Revenir au menu PépitesHunter",
+      "Signal Prix",
+      "Volume et Trading",
+      "Statistiques Sociales",
+      "Analyse des Tendances et Recherches Populaires",
+      "Données sur les Exchanges",
+      "Tokens Récemment Ajoutés"
+    )
+    
+    for (i in seq_along(options)) {
+      cat(paste0(i, ". ", options[i], "\n"))
+    }
+    
+    choix <- readline(question_style("Veuillez choisir une option (par numéro) : "))
+    
+    # Dans la fonction coingecko(), modifie la partie du choix de menu :
+    if (choix == "1") {
+      cat(info_style("\nRetour au menu PépitesHunter...\n"))
+      break
+    } else if (choix == "2") {
+      process_price_signals(coingecko_data)
+    } else if (choix == "3") {
+      process_volume_trading(coingecko_data)
+    } else if (choix == "4") {
+      social_main_menu()
+    } else if (choix %in% c("5", "6", "7")) {
+      cat(warning_style("\nCette fonctionnalité est en cours de développement. Elle sera bientôt disponible !\n"))
+    } else {
+      cat(warning_style("\nChoix invalide. Veuillez réessayer.\n"))
+    }
+  }
+}
+
+# Appel à la fonction principale
+coingecko()
+
