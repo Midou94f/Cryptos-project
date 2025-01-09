@@ -11,6 +11,7 @@ library(curl)
 library(kableExtra)
 library(cli)
 library(scales)  # Pour le formatage des nombres
+library(gtrendsR)
 
 # Définition des styles
 question_style <- blue$bold
@@ -1478,6 +1479,251 @@ trend_menu <- function() {
 # Exécution du menu principal des tendances
 
 
+###############################################################################@
+########   GOOGLE TREND
+################################################################################
+
+# Fonction pour l'analyse Google Trends
+google_trend_analysis <- function() {
+  repeat {
+    cat(section_title_style("\n=== Analyse Google Trends des Cryptomonnaies ===\n"))
+    
+    # Texte d'introduction détaillé
+    cat(success_style("\nBienvenue sur l'analyseur de tendances Google pour les cryptomonnaies !\n\n"))
+    
+    cat(info_style("Cette analyse utilise l'API officielle de Google Trends pour vous fournir\n"))
+    cat(info_style("des informations précises sur l'intérêt mondial pour les cryptomonnaies.\n\n"))
+    
+    cat(highlight_style("Fonctionnement de l'outil :\n"))
+    cat("• Collecte en temps réel des données de recherche Google\n")
+    cat("• Analyse des 30 principales cryptomonnaies par capitalisation\n")
+    cat("• Mesure de l'intérêt relatif et des pics de popularité\n")
+    cat("• Classement basé sur les tendances de recherche mondiales\n\n")
+    
+    cat(info_secondary_style("Les résultats vous permettront de :\n"))
+    cat("• Identifier les cryptos qui suscitent le plus d'intérêt\n")
+    cat("• Repérer les tendances émergentes\n")
+    cat("• Comprendre l'évolution de la popularité des projets\n")
+    cat("• Comparer l'intérêt relatif entre différentes périodes\n\n")
+    
+    cat(warning_style("Note importante : "), info_style("Les données reflètent uniquement l'intérêt des recherches\n"))
+    cat(info_style("Google et ne constituent pas des conseils d'investissement.\n\n"))
+    
+    # Choix du type d'analyse
+    cat(section_title_style("Type d'analyse disponible :\n"))
+    cat("1) Analyse globale (Top 30)\n")
+    cat("2) Analyse d'une crypto spécifique\n")
+    cat(question_style("0) Retour au menu principal\n"))
+    
+    analyse_choix <- readline(question_style("\nChoisissez votre type d'analyse (0-2) : "))
+    
+    if (analyse_choix == "0") {
+      cat(info_style("\nRetour au menu principal...\n"))
+      break
+    }
+    
+    # Proposer les horizons temporels
+    cat(section_title_style("\nHorizons temporels disponibles :\n"))
+    cat(highlight_style("\nAnalyse court terme :\n"))
+    cat("1) Dernière heure\n")
+    cat("2) 4 dernières heures\n")
+    cat("3) Dernières 24 heures\n")
+    
+    cat(highlight_style("\nAnalyse moyen terme :\n"))
+    cat("4) Dernière semaine\n")
+    cat("5) Dernier mois\n")
+    cat("6) Derniers 3 mois\n")
+    
+    cat(highlight_style("\nAnalyse long terme :\n"))
+    cat("7) Dernière année\n")
+    cat("8) 5 dernières années\n")
+    cat(question_style("0) Retour\n"))
+    
+    choix <- readline(question_style("\nChoisissez votre horizon temporel (0-8) : "))
+    
+    if (choix == "0") {
+      next
+    }
+    
+    # Définir la période en fonction du choix
+    periode <- switch(choix,
+                      "1" = "now 1-H",
+                      "2" = "now 4-H",
+                      "3" = "now 1-d",
+                      "4" = "now 7-d",
+                      "5" = "today 1-m",
+                      "6" = "today 3-m",
+                      "7" = "today 12-m",
+                      "8" = "today 5-y",
+                      {
+                        cat(warning_style("\nChoix invalide. Utilisation de la période par défaut (1 mois).\n"))
+                        "today 1-m"
+                      })
+    
+    if (analyse_choix == "2") {
+      # Analyse d'une crypto spécifique
+      cat(section_title_style("\nAnalyse d'une crypto spécifique\n"))
+      cat(info_style("Entrez l'ID de la crypto (exemple : 'bitcoin', 'ethereum', etc.)\n"))
+      crypto_id <- readline(question_style("ID de la crypto : "))
+      
+      # Vérifier si l'ID existe dans les données
+      if (!(crypto_id %in% coingecko_data$id)) {
+        cat(error_style("\nID non trouvé dans la base de données.\n"))
+        next
+      }
+      
+      cryptos <- c(crypto_id)
+      cat(info_style(sprintf("\nAnalyse de %s en cours...\n", crypto_id)))
+    } else {
+      # Analyse globale
+      cryptos <- head(coingecko_data$id, 30)
+    }
+    
+    nb_groupes <- ceiling(length(cryptos) / 5)
+    temps_estime <- nb_groupes * 15  # 15 secondes par groupe en moyenne
+    
+    cat(section_title_style("\nAnalyse en cours...\n"))
+    cat(info_style(sprintf("- Nombre de cryptos analysées : %d\n", length(cryptos))))
+    cat(info_style(sprintf("- Temps estimé : environ %d secondes\n", temps_estime)))
+    
+    # Initialiser les résultats
+    results_list <- list()
+    compteur <- 0
+    
+    # Barre de progression
+    cat(success_style("Progression de l'analyse :\n"))
+    for(i in seq(1, length(cryptos), 5)) {
+      compteur <- compteur + 1
+      pourcentage <- round(compteur/nb_groupes * 100)
+      barre <- paste(rep("=", pourcentage/2), collapse="")
+      spaces <- paste(rep(" ", 50-nchar(barre)), collapse="")
+      cat(sprintf("\r[%s%s] %d%%", barre, spaces, pourcentage))
+      
+      end_idx <- min(i+4, length(cryptos))
+      batch_cryptos <- cryptos[i:end_idx]
+      
+      trends <- tryCatch({
+        gtrends(
+          keyword = paste0(batch_cryptos, " crypto"),
+          time = periode,
+          onlyInterest = TRUE
+        )
+      }, error = function(e) {
+        cat(warning_style(sprintf("\nGroupe %d : Erreur de requête. Passage au suivant.\n", compteur)))
+        NULL
+      })
+      
+      if (!is.null(trends) && !is.null(trends$interest_over_time)) {
+        temp_results <- trends$interest_over_time %>%
+          group_by(keyword) %>%
+          summarise(
+            mean_interest = mean(hits, na.rm = TRUE),
+            max_interest = max(hits, na.rm = TRUE)
+          )
+        results_list[[length(results_list) + 1]] <- temp_results
+      }
+      
+      Sys.sleep(0.5)
+    }
+    
+    cat("\n")  # Nouvelle ligne après la barre de progression
+    
+    # Traitement et affichage des résultats
+    if (length(results_list) > 0) {
+      all_results <- do.call(rbind, results_list)
+      
+      final_results <- all_results %>%
+        filter(!is.na(mean_interest)) %>%
+        mutate(
+          keyword = gsub(" crypto", "", keyword),
+          mean_interest = round(mean_interest, 2),
+          max_interest = round(max_interest, 2)
+        ) %>%
+        arrange(desc(mean_interest))
+      
+      if (nrow(final_results) > 0) {
+        display_df <- data.frame(
+          Rang = 1:nrow(final_results),
+          Crypto = final_results$keyword,
+          Interet = final_results$mean_interest,
+          Pic = final_results$max_interest,
+          stringsAsFactors = FALSE
+        )
+        
+        titre <- if(analyse_choix == "2") {
+          sprintf("\nRésultats pour %s\n", toupper(crypto_id))
+        } else {
+          "\nTop 30 des Cryptos les Plus Recherchées\n"
+        }
+        
+        cat(section_title_style(titre))
+        cat(info_secondary_style("(Classement basé sur l'intérêt moyen des recherches Google)\n\n"))
+        
+        # En-têtes du tableau
+        cat(cli::col_yellow(paste(
+          sprintf("%-6s", "RANG"),
+          sprintf("%-20s", "CRYPTO"),
+          sprintf("%-15s", "INTÉRÊT MOY"),
+          sprintf("%-15s", "PIC"),
+          "\n"
+        )))
+        
+        # Ligne de séparation
+        cat(paste(rep("-", 60), collapse = ""), "\n")
+        
+        # Contenu du tableau avec couleurs
+        print_df <- if(analyse_choix == "2") display_df else head(display_df, 30)
+        for(i in 1:nrow(print_df)) {
+          rang_color <- if(i <= 3) cli::col_green else if(i <= 10) cli::col_blue else cli::col_white
+          interet_color <- if(print_df$Interet[i] >= 50) cli::col_green else if(print_df$Interet[i] >= 20) cli::col_yellow else cli::col_red
+          pic_color <- if(print_df$Pic[i] >= 80) cli::col_green else if(print_df$Pic[i] >= 40) cli::col_yellow else cli::col_red
+          
+          cat(paste0(
+            rang_color(sprintf("%-6d", print_df$Rang[i])),
+            cli::col_cyan(sprintf("%-20s", print_df$Crypto[i])),
+            interet_color(sprintf("%-15s", paste0(print_df$Interet[i], "%"))),
+            pic_color(sprintf("%-15s", paste0(print_df$Pic[i], "%"))),
+            "\n"
+          ))
+        }
+        
+        # Légende des couleurs avec meilleure présentation
+        cat("\n", section_title_style("=== LÉGENDE ==="), "\n\n")
+        
+        # Légende pour le rang
+        cat(info_secondary_style("Position dans le classement :"), "\n")
+        cat(sprintf("   %s %s\n", cli::col_green("●"), "Top 3"))
+        cat(sprintf("   %s %s\n", cli::col_blue("●"), "Top 4-10"))
+        cat(sprintf("   %s %s\n", cli::col_white("●"), "Autres positions"))
+        
+        # Légende pour l'intérêt moyen
+        cat(info_secondary_style("\nNiveau d'intérêt moyen :"), "\n")
+        cat(sprintf("   %s %s\n", cli::col_green("●"), "Élevé     (≥ 50%)"))
+        cat(sprintf("   %s %s\n", cli::col_yellow("●"), "Moyen     (≥ 20%)"))
+        cat(sprintf("   %s %s\n", cli::col_red("●"), "Faible    (< 20%)"))
+        
+        # Légende pour les pics d'intérêt
+        cat(info_secondary_style("\nPic d'intérêt :"), "\n")
+        cat(sprintf("   %s %s\n", cli::col_green("●"), "Fort      (≥ 80%)"))
+        cat(sprintf("   %s %s\n", cli::col_yellow("●"), "Moyen     (≥ 40%)"))
+        cat(sprintf("   %s %s\n", cli::col_red("●"), "Faible    (< 40%)"))
+        
+        cat("\n", highlight_style("NOTE : "), info_style("Les pourcentages représentent le niveau d'intérêt relatif par rapport au pic maximum (100%).\n\n"))
+      } else {
+        cat(warning_style("\nAucun résultat valide n'a pu être obtenu.\n"))
+      }
+    } else {
+      cat(error_style("\nAucune donnée n'a pu être récupérée. Veuillez réessayer plus tard.\n"))
+    }
+    
+    cat(question_style("\nAppuyez sur Entrée pour effectuer une nouvelle analyse ou tapez '0' pour quitter : "))
+    reponse <- readline()
+    if (reponse == "0") {
+      cat(info_style("\nRetour au menu principal...\n"))
+      break
+    }
+  }
+}
 
 
 ################################################################################
@@ -1681,7 +1927,7 @@ pepite_hunter <- function() {
     } else if (choix == "4") {
       trend_menu()
     } else if (choix == "5") {
-      cat(warning_style("\nGoogle Trend est en cours de développement.\n"))
+      google_trend_analysis()
     } else if (choix == "6") {
       lunar_crush()
     } else if (choix == "7") {
