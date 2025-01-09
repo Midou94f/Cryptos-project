@@ -680,6 +680,806 @@ afficher_social_metrics <- function(ids) {
 
 # Exécution du menu principal
 
+###############################################################################@
+######## TREND ANALYSIS
+################################################################################
+
+# Fonction améliorée pour formater les grands nombres
+format_large_number <- function(x) {
+  sapply(x, function(value) {
+    if (is.na(value)) {
+      "N/A"
+    } else {
+      format(value, big.mark = " ", scientific = FALSE)
+    }
+  })
+}
+
+display_table_fixed_colored_generique <- function(data, title = NULL) {
+  data <- as.data.frame(lapply(data, function(x) {
+    ifelse(is.na(x), "N/A", x)
+  }))
+  
+  col_widths <- c(
+    rank = 5,
+    name = 40,
+    symbol = 10,
+    score = 10,
+    market_cap_rank = 15,
+    price_change = 15,
+    market_cap = 20
+  )
+  
+  format_column <- function(values, width) {
+    sapply(values, function(x) {
+      x <- substr(as.character(x), 1, width)
+      sprintf(paste0("%-", width, "s"), x)
+    })
+  }
+  
+  if (!is.null(title)) {
+    cat(section_title_style(paste0("\n", title, "\n\n")))
+  }
+  
+  header_parts <- mapply(function(name, width) {
+    if (is.na(width)) {
+      toupper(name)
+    } else {
+      sprintf(paste0("%-", width, "s"), toupper(name))
+    }
+  }, names(data), col_widths[names(data)])
+  
+  header <- paste(header_parts, collapse = " | ")
+  cat(cli::col_yellow(header), "\n")
+  cat(paste(rep("-", nchar(header)), collapse = ""), "\n")
+  
+  for (i in 1:nrow(data)) {
+    row_values <- mapply(function(value, col_name, width) {
+      formatted <- format_column(value, width)
+      switch(col_name,
+             "name" = cli::col_cyan(formatted),
+             "symbol" = cli::col_green(formatted),
+             "score" = cli::col_yellow(formatted),
+             "market_cap_rank" = cli::col_magenta(formatted),
+             "price_change" = {
+               if (value == "N/A") {
+                 formatted
+               } else {
+                 value <- as.numeric(gsub("%", "", value))
+                 if (value >= 0) cli::col_green(formatted) else cli::col_red(formatted)
+               }
+             },
+             formatted)
+    }, as.list(data[i,]), names(data), col_widths[names(data)])
+    
+    cat(paste(row_values, collapse = " | "), "\n")
+  }
+  cat("\n")
+}
+
+##################
+display_table_fixed_colored_option4 <- function(data, title = NULL) {
+  data <- as.data.frame(lapply(data, function(x) as.character(x)))
+  data[is.na(data)] <- "N/A"
+  
+  col_widths <- c(
+    name = 40,
+    market_cap = 20,
+    change_24h = 15
+  )
+  
+  format_column <- function(values, width) {
+    sapply(values, function(x) {
+      x <- substr(as.character(x), 1, width)
+      sprintf(paste0("%-", width, "s"), x)
+    })
+  }
+  
+  if (!is.null(title)) {
+    cat(section_title_style(paste0("\n", title, "\n\n")))
+  }
+  
+  header_parts <- mapply(function(name, width) {
+    sprintf(paste0("%-", width, "s"), toupper(name))
+  }, names(data), col_widths[names(data)])
+  
+  header <- paste(header_parts, collapse = " | ")
+  cat(cli::col_yellow(header), "\n")
+  cat(paste(rep("-", nchar(header)), collapse = ""), "\n")
+  
+  for (i in 1:nrow(data)) {
+    row_values <- mapply(function(value, col_name, width) {
+      formatted <- format_column(value, width)
+      switch(col_name,
+             "name" = cli::col_cyan(formatted),
+             "market_cap" = cli::col_green(formatted),
+             "change_24h" = {
+               value <- as.numeric(gsub("%", "", value))
+               if (is.na(value)) cli::col_yellow(formatted)
+               else if (value >= 0) cli::col_green(formatted) else cli::col_red(formatted)
+             },
+             formatted)
+    }, as.list(data[i,]), names(data), col_widths[names(data)])
+    
+    cat(paste(row_values, collapse = " | "), "\n")
+  }
+  cat("\n")
+}
+
+# Fonction pour récupérer les tendances
+get_trends <- function() {
+  tryCatch({
+    response <- GET("https://api.coingecko.com/api/v3/search/trending")
+    
+    if (status_code(response) == 200) {
+      data <- fromJSON(rawToChar(response$content))
+      return(data)
+    } else {
+      cat(error_style("\nErreur lors de la récupération des tendances. Code:", status_code(response), "\n"))
+      return(NULL)
+    }
+  }, error = function(e) {
+    cat(error_style("\nErreur de connexion à l'API:", e$message, "\n"))
+    return(NULL)
+  })
+}
+
+# Fonction pour obtenir les informations d'une crypto spécifique
+get_coin_info <- function(id) {
+  tryCatch({
+    response <- GET(paste0("https://api.coingecko.com/api/v3/coins/", id))
+    
+    if (status_code(response) == 200) {
+      data <- fromJSON(rawToChar(response$content))
+      return(data)
+    } else {
+      cat(error_style("\nErreur lors de la récupération des informations. Code:", status_code(response), "\n"))
+      return(NULL)
+    }
+  }, error = function(e) {
+    cat(error_style("\nErreur de connexion à l'API:", e$message, "\n"))
+    return(NULL)
+  })
+}
+
+# Fonction pour obtenir les catégories
+get_categories <- function() {
+  tryCatch({
+    response <- GET("https://api.coingecko.com/api/v3/coins/categories")
+    
+    if (status_code(response) == 200) {
+      data <- fromJSON(rawToChar(response$content))
+      return(data)
+    } else {
+      cat(error_style("\nErreur lors de la récupération des catégories. Code:", status_code(response), "\n"))
+      return(NULL)
+    }
+  }, error = function(e) {
+    cat(error_style("\nErreur de connexion à l'API:", e$message, "\n"))
+    return(NULL)
+  })
+}
+
+#######################################
+# Fonction pour l'analyse des tendances (Option 1)
+analyze_trends <- function() {
+  cat(section_title_style("\n=== Analyse des Tendances de Recherche ===\n\n"))
+  
+  # Texte explicatif
+  cat(info_style("Cette section vous présente les cryptomonnaies et NFTs actuellement en tendance sur CoinGecko.\n\n"))
+  cat(info_style("Les données affichées sont basées sur :\n"))
+  cat(info_style("- Le volume de recherches effectuées par les utilisateurs sur CoinGecko.\n"))
+  cat(info_style("- Les interactions des utilisateurs sur des plateformes sociales comme Twitter et Reddit.\n\n"))
+  cat(info_style("Ces tendances sont calculées sur une période récente (souvent quelques jours à une semaine)\n"))
+  cat(info_style("et sont mises à jour régulièrement pour refléter les changements d'intérêt des utilisateurs.\n\n"))
+  cat(success_style("Vous trouverez ci-dessous les actifs les plus populaires, classés par recherche et intérêt :\n\n"))
+  
+  trends_data <- get_trends()
+  if (!is.null(trends_data)) {
+    # Cryptos en tendance
+    crypto_trends <- data.frame(
+      name = trends_data$coins$item$name,
+      symbol = toupper(trends_data$coins$item$symbol)
+    )
+    
+    cat(success_style("\nTop Cryptos les plus recherchées :\n"))
+    display_table_fixed_colored_generique(head(crypto_trends, 100))
+    
+    # NFTs en tendance
+    nft_trends <- data.frame(
+      name = trends_data$nfts$name,
+      symbol = toupper(trends_data$nfts$symbol)
+    )
+    
+    cat(success_style("\nTop NFTs les plus recherchés :\n"))
+    display_table_fixed_colored_generique(head(nft_trends, 50))
+  }
+  
+  readline(question_style("\nAppuyez sur Entrée pour revenir au menu..."))
+}
+
+#####################################
+# Fonction pour le score de tendance (Option 2)
+trend_score_analysis <- function() {
+  cat(section_title_style("\n=== Score de Tendance ===\n\n"))
+  
+  # Explication du score de tendance
+  cat(highlight_style("Le score de tendance reflète l'intérêt des utilisateurs envers une cryptomonnaie.\n\n"))
+  cat(info_style("Ce score est basé sur :\n"))
+  cat(info_style("- Le volume de recherches et d'interactions sur CoinGecko.\n"))
+  cat(info_style("- Les mentions et interactions sur des plateformes sociales comme Twitter et Reddit.\n\n"))
+  cat(info_style("La période d'analyse couvre environ 30 jours. Les données sont mises à jour\n"))
+  cat(info_style("régulièrement pour refléter les tendances actuelles.\n\n"))
+  cat(info_style("Contrairement aux variations de prix ou à la capitalisation, ce score mesure\n"))
+  cat(info_style("l'intérêt global et non financier envers une cryptomonnaie donnée.\n\n"))
+  
+  # Lecture du score
+  cat(success_style("Lecture du score :\n"))
+  cat(info_style("- Un score élevé (par exemple, 15-20) indique une forte popularité récente.\n"))
+  cat(info_style("- Un score de 0 signifie un intérêt très faible ou inexistant.\n"))
+  cat(info_style("- La plage des scores observés varie généralement entre 0 et environ 15-20,\n"))
+  cat(info_style("  mais elle n'a pas de limite fixe supérieure.\n\n"))
+  
+  cat(success_style("Les cryptos les plus populaires du moment sont affichées ci-dessous :\n\n"))
+  
+  trends_data <- get_trends()
+  if (!is.null(trends_data)) {
+    # Construction des données pour le tableau
+    trend_scores <- data.frame(
+      name = trends_data$coins$item$name,
+      symbol = toupper(trends_data$coins$item$symbol),
+      market_cap_rank = trends_data$coins$item$market_cap_rank,
+      score = trends_data$coins$item$score
+    )
+    
+    # Tri des cryptos par score décroissant
+    trend_scores <- trend_scores %>%
+      arrange(desc(score))
+    
+    # Augmentation de la limite d'affichage (affiche tout ce qui est disponible)
+    cat(success_style("Classement par popularité :\n"))
+    display_table_fixed_colored_generique(head(trend_scores, 100))
+  } else {
+    cat(error_style("\nImpossible de récupérer les tendances actuellement. Veuillez réessayer plus tard.\n"))
+  }
+  
+  readline(question_style("\nAppuyez sur Entrée pour revenir au menu..."))
+}
+
+
+####################################################
+# Fonction pour afficher les cryptos disponibles
+show_available_coins <- function() {
+  cat(section_title_style("\nListe des Cryptos Disponibles\n"))
+  
+  # Faire la requête pour obtenir la liste des cryptos
+  tryCatch({
+    response <- GET("https://api.coingecko.com/api/v3/coins/list")
+    
+    if (status_code(response) == 200) {
+      coins <- fromJSON(rawToChar(response$content))
+      
+      # Création du dataframe pour l'affichage
+      coins_df <- data.frame(
+        name = coins$name,
+        symbol = toupper(coins$symbol),
+        id = coins$id
+      )
+      
+      # Affichage paginé (20 par page)
+      total_pages <- ceiling(nrow(coins_df) / 20)
+      page <- 1
+      
+      repeat {
+        # Afficher la page courante
+        start_idx <- ((page - 1) * 20) + 1
+        end_idx <- min(page * 20, nrow(coins_df))
+        current_page <- coins_df[start_idx:end_idx, ]
+        
+        cat(section_title_style(sprintf("\nPage %d/%d\n\n", page, total_pages)))
+        display_table_fixed_colored_generique(current_page)
+        
+        # Options de navigation
+        cat(question_style("\nOptions :\n"))
+        cat("1) Page suivante\n")
+        cat("2) Page précédente\n")
+        cat("3) Aller à une page spécifique\n")
+        cat("4) Rechercher par nom\n")
+        cat("0) Retour au menu précédent\n")
+        
+        choix <- suppressWarnings(as.integer(readline(question_style("\nVotre choix : "))))
+        
+        if (is.na(choix)) next
+        
+        if (choix == 0) break
+        
+        switch(choix,
+               "1" = {
+                 if (page < total_pages) page <- page + 1
+                 else cat(warning_style("\nVous êtes déjà à la dernière page.\n"))
+               },
+               "2" = {
+                 if (page > 1) page <- page - 1
+                 else cat(warning_style("\nVous êtes déjà à la première page.\n"))
+               },
+               "3" = {
+                 new_page <- suppressWarnings(as.integer(readline(question_style(
+                   sprintf("\nEntrez le numéro de page (1-%d) : ", total_pages)))))
+                 if (!is.na(new_page) && new_page >= 1 && new_page <= total_pages) {
+                   page <- new_page
+                 } else {
+                   cat(warning_style("\nNuméro de page invalide.\n"))
+                 }
+               },
+               "4" = {
+                 search_term <- tolower(readline(question_style("\nEntrez le terme à rechercher : ")))
+                 found_coins <- coins_df[grep(search_term, tolower(coins_df$name)), ]
+                 
+                 if (nrow(found_coins) > 0) {
+                   cat(success_style("\nRésultats de la recherche :\n"))
+                   display_table_fixed_colored_generique(head(found_coins, 20))
+                   readline(question_style("\nAppuyez sur Entrée pour continuer..."))
+                 } else {
+                   cat(warning_style("\nAucune crypto trouvée avec ce terme.\n"))
+                 }
+               })
+      }
+      
+    } else {
+      cat(error_style("\nErreur lors de la récupération de la liste. Code:", status_code(response), "\n"))
+    }
+  }, error = function(e) {
+    cat(error_style("\nErreur de connexion à l'API:", e$message, "\n"))
+  })
+}
+
+# Fonction pour afficher les informations détaillées d'une crypto
+display_coin_info <- function(coin_data) {
+  cat(section_title_style(paste("\nInformations détaillées pour", coin_data$name, "\n")))
+  
+  # Informations de base
+  cat(success_style("\n=== Informations de Base ===\n"))
+  cat(info_style("Nom: "), coin_data$name, "\n")
+  cat(info_style("Symbole: "), toupper(coin_data$symbol), "\n")
+  cat(info_style("Rang Market Cap: "), coin_data$market_cap_rank, "\n")
+  
+  # Prix et variations
+  cat(success_style("\n=== Prix et Variations ===\n"))
+  if (!is.null(coin_data$market_data)) {
+    cat(info_style("Prix actuel (USD): $"), format(coin_data$market_data$current_price$usd, scientific = FALSE), "\n")
+    cat(info_style("Variation 24h: "), 
+        ifelse(coin_data$market_data$price_change_percentage_24h >= 0,
+               success_style(paste0("+", round(coin_data$market_data$price_change_percentage_24h, 2), "%")),
+               warning_style(paste0(round(coin_data$market_data$price_change_percentage_24h, 2), "%"))), "\n")
+  }
+  
+  # Capitalisation
+  if (!is.null(coin_data$market_data$market_cap)) {
+    cat(success_style("\n=== Capitalisation ===\n"))
+    cat(info_style("Market Cap (USD): $"), format_large_number(coin_data$market_data$market_cap$usd), "\n")
+    cat(info_style("Volume 24h (USD): $"), format_large_number(coin_data$market_data$total_volume$usd), "\n")
+  }
+  
+  # Données sociales
+  if (!is.null(coin_data$community_data)) {
+    cat(success_style("\n=== Métriques Sociales ===\n"))
+    cat(info_style("Twitter Followers: "), format_large_number(coin_data$community_data$twitter_followers), "\n")
+    if (!is.null(coin_data$community_data$reddit_subscribers)) {
+      cat(info_style("Reddit Subscribers: "), format_large_number(coin_data$community_data$reddit_subscribers), "\n")
+    }
+  }
+  
+  # Description
+  if (!is.null(coin_data$description$en)) {
+    cat(success_style("\n=== Description ===\n"))
+    cat(info_style(coin_data$description$en), "\n")
+  }
+  
+  readline(question_style("\nAppuyez sur Entrée pour continuer..."))
+}
+
+##########################################################
+# Fonction pour les informations sur les projets (Option 3)
+project_information <- function() {
+  cat(section_title_style("\n=== Informations sur les Projets ===\n\n"))
+  
+  # Texte introductif
+  cat(highlight_style("Cette section vous permet d'explorer des informations détaillées sur les projets des cryptomonnaies disponibles.\n\n"))
+  cat(info_style("Vous pouvez :\n"))
+  cat(info_style("- Rechercher des détails sur les projets d'une cryptomonnaie spécifique en entrant son ID ou son nom.\n"))
+  cat(info_style("- Explorer les 15 projets les plus populaires et en tendance actuellement.\n"))
+  cat(info_style("- Parcourir les cryptos disponibles dans des catégories spécifiques comme DeFi, NFT, Gaming, etc.\n\n"))
+  cat(success_style("Les données affichées incluent les noms, symboles, prix, variations, rangs de capitalisation et bien plus encore !\n\n"))
+  
+  
+  repeat {
+    cat(section_title_style("\n=== Informations sur les Projets ===\n\n"))
+    cat(question_style("1) Rechercher une crypto spécifique\n"))
+    cat("2) Voir le top 15 des projets en tendance\n")
+    cat("3) Rechercher par catégorie\n")
+    cat(question_style("0) Retour au menu principal\n"))
+    
+    choix <- suppressWarnings(as.integer(readline(question_style("\nVotre choix (0-3) : "))))
+    
+    if (is.na(choix) || choix < 0 || choix > 3) {
+      cat(warning_style("\nChoix invalide. Veuillez réessayer.\n"))
+      next
+    }
+    
+    if (choix == 0) break
+    
+    switch(choix,
+           "1" = search_specific_crypto(),
+           "2" = show_top_15_projects(),
+           "3" = search_by_category())
+  }
+}
+
+# Sous-fonctions pour l'option 3
+search_specific_crypto <- function() {
+  repeat {
+    cat(section_title_style("\nRecherche d'une Crypto Spécifique\n"))
+    connait_id <- tolower(readline(question_style("\nConnaissez-vous l'ID de la crypto ? (oui/non) : ")))
+    
+    if (connait_id %in% c("oui", "non")) {
+      if (connait_id == "oui") {
+        id <- readline(question_style("Entrez l'ID de la crypto : "))
+        coin_data <- get_coin_info(id)
+        
+        if (!is.null(coin_data)) {
+          display_coin_info(coin_data)
+        }
+      } else {
+        show_available_coins()
+      }
+      break
+    }
+    
+    cat(warning_style("\nVeuillez répondre par 'oui' ou 'non'.\n"))
+  }
+}
+
+##############
+show_top_15_projects <- function() {
+  cat(section_title_style("\n=== Top 15 Projets en Tendance ===\n\n"))
+  
+  # Texte explicatif
+  cat(highlight_style("Ce classement reflète les cryptomonnaies actuellement en tendance sur CoinGecko.\n\n"))
+  cat(info_style("Les tendances sont calculées en fonction de :\n"))
+  cat(info_style("- Le volume de recherches des utilisateurs sur CoinGecko.\n"))
+  cat(info_style("- Les interactions sur des plateformes sociales comme Twitter et Reddit.\n"))
+  cat(info_style("- L'engagement global des utilisateurs (listes de favoris, consultations fréquentes).\n\n"))
+  cat(info_style("Ce classement est dynamique et se concentre sur l'intérêt récent, souvent sur les 7 derniers jours.\n"))
+  cat(info_style("Les cryptomonnaies affichées peuvent inclure des projets émergents ou moins connus,\n"))
+  cat(info_style("attirant soudainement l'attention des utilisateurs.\n\n"))
+  cat(success_style("Vous trouverez ci-dessous les 15 projets les plus populaires actuellement :\n\n"))
+  
+  # Récupération des tendances
+  trends_data <- get_trends()
+  if (!is.null(trends_data)) {
+    # Construction du tableau avec des informations supplémentaires
+    trending_projects <- data.frame(
+      name = trends_data$coins$item$name,
+      symbol = toupper(trends_data$coins$item$symbol),
+      market_cap_rank = trends_data$coins$item$market_cap_rank,
+      url = paste0("https://www.coingecko.com/en/coins/", trends_data$coins$item$id) # Génération de l'URL
+    )
+    
+    # Affichage des résultats
+    for (i in 1:min(15, nrow(trending_projects))) {
+      project <- trending_projects[i, ]
+      cat(success_style(paste0("\n", i, ". ", project$name, " (", project$symbol, ")\n")))
+      cat(info_style("   Rang Market Cap : ", project$market_cap_rank, "\n"))
+      cat(info_style("   URL du Projet : ", project$url, "\n"))
+      
+      # Appel de l'API pour récupérer les détails du projet avec gestion des erreurs
+      details <- tryCatch({
+        get_coin_info(trends_data$coins$item$id[i])
+      }, error = function(e) {
+        NULL
+      })
+      
+      if (!is.null(details)) {
+        # Extraction de la capitalisation boursière
+        market_cap_billion <- ifelse(!is.null(details$market_data$market_cap$usd), 
+                                     details$market_data$market_cap$usd / 1e9, NA)
+        
+        # Formatage des nombres
+        formatted_market_cap <- ifelse(!is.na(market_cap_billion), 
+                                       paste0(format(round(market_cap_billion, 2), big.mark = " "), " Mds $"), 
+                                       "N/A")
+        
+        # Affichage des données supplémentaires
+        cat(info_style("   Capitalisation : ", formatted_market_cap, "\n"))
+      } else {
+        cat(warning_style("   Impossible de récupérer les détails supplémentaires.\n"))
+      }
+      
+      # Pause de 1 seconde entre les requêtes pour limiter le débit
+      Sys.sleep(1)
+    }
+  } else {
+    cat(warning_style("\nAucune donnée disponible pour les projets en tendance.\n"))
+  }
+}
+
+
+#########################
+
+search_by_category <- function() {
+  categories <- get_categories()
+  if (!is.null(categories)) {
+    cat(section_title_style("\nCatégories Disponibles\n\n"))
+    
+    for (i in 1:length(categories$name)) {
+      cat(sprintf("%d) %s\n", i, categories$name[i]))
+    }
+    
+    cat(question_style("\n0) Retour\n"))
+    
+    choix <- suppressWarnings(as.integer(readline(question_style("\nChoisissez une catégorie (0-", length(categories$name), ") : "))))
+    
+    if (!is.na(choix) && choix > 0 && choix <= length(categories$name)) {
+      show_category_projects(categories$id[choix])
+    }
+  }
+}
+
+# Fonction pour afficher les projets d'une catégorie
+show_category_projects <- function(category_id) {
+  tryCatch({
+    url <- paste0("https://api.coingecko.com/api/v3/coins/markets")
+    params <- list(
+      vs_currency = "usd",
+      category = category_id,
+      order = "market_cap_desc",
+      per_page = 50,
+      page = 1,
+      sparkline = FALSE
+    )
+    
+    response <- GET(url, query = params)
+    
+    if (status_code(response) == 200) {
+      data <- fromJSON(rawToChar(response$content))
+      
+      if (length(data) > 0) {
+        projects_df <- data.frame(
+          name = data$name,
+          symbol = toupper(data$symbol),
+          market_cap = format_large_number(data$market_cap),
+          price_change = paste0(round(data$price_change_percentage_24h, 2), "%")
+        )
+        
+        cat(section_title_style(paste("\nProjets dans la catégorie :", category_id, "\n")))
+        display_table_fixed_colored_generique(projects_df)
+        
+        # Options pour voir plus de détails
+        repeat {
+          cat(question_style("\nOptions :\n"))
+          cat("1) Voir les détails d'un projet\n")
+          cat("0) Retour\n")
+          
+          choix <- suppressWarnings(as.integer(readline(question_style("\nVotre choix (0-1) : "))))
+          
+          if (is.na(choix) || choix < 0 || choix > 1) {
+            cat(warning_style("\nChoix invalide.\n"))
+            next
+          }
+          
+          if (choix == 0) break
+          
+          if (choix == 1) {
+            project_id <- readline(question_style("\nEntrez l'ID du projet à consulter : "))
+            coin_data <- get_coin_info(project_id)
+            if (!is.null(coin_data)) {
+              display_coin_info(coin_data)
+            }
+          }
+        }
+      } else {
+        cat(warning_style("\nAucun projet trouvé dans cette catégorie.\n"))
+      }
+    } else {
+      cat(error_style("\nErreur lors de la récupération des projets. Code:", status_code(response), "\n"))
+    }
+  }, error = function(e) {
+    cat(error_style("\nErreur lors de la récupération des projets:", e$message, "\n"))
+  })
+}
+
+#################################################################
+## Fonction pour l'analyse des catégories (Option 4)
+category_analysis <- function() {
+  cat(section_title_style("\n=== Analyse des Catégories et Secteurs ===\n\n"))
+  cat(highlight_style("Cette section explore les dynamiques des différentes catégories de cryptomonnaies.\n\n"))
+  cat(info_style("Les catégories regroupent les projets selon leur utilité, écosystème ou secteur d'activité.\n"))
+  cat(info_style("Les données affichées incluent :\n"))
+  cat(info_style("- Le nom de chaque catégorie.\n"))
+  cat(info_style("- La capitalisation de marché totale (en milliards de dollars).\n"))
+  cat(info_style("- La variation de capitalisation sur 24 heures, exprimée en pourcentage.\n\n"))
+  cat(info_style("Ces informations sont utiles pour :\n"))
+  cat(info_style("- Repérer les secteurs en forte croissance ou en déclin.\n"))
+  cat(info_style("- Comprendre les tendances générales du marché crypto.\n"))
+  cat(info_style("- Découvrir de nouvelles niches et opportunités d'investissement.\n\n"))
+  cat(success_style("Les catégories les plus importantes et leurs variations sur 24 heures sont affichées ci-dessous :\n"))
+  
+  categories <- get_categories()
+  if (!is.null(categories)) {
+    # Vue d'ensemble économique
+    cat(success_style("\nVue d'ensemble des catégories :\n"))
+    
+    # Construction du tableau avec gestion des valeurs NA
+    summary_df <- data.frame(
+      name = ifelse(is.na(categories$name), "N/A", categories$name),
+      market_cap = ifelse(is.na(categories$market_cap), 
+                          "N/A", 
+                          paste0(format(round(as.numeric(categories$market_cap) / 1e9, 2), big.mark = " "), " Mds $")),
+      change_24h = ifelse(is.na(categories$market_cap_change_24h), "N/A", paste0(round(categories$market_cap_change_24h, 2), "%"))
+    )
+    
+    # Limiter l'affichage aux 20 premières catégories
+    summary_df <- head(summary_df, 20)
+    
+    # Affichage du tableau
+    display_table_fixed_colored_option4(summary_df, "Résumé des Catégories")
+    
+    # Catégories en croissance/déclin
+    top_growing <- head(arrange(summary_df, desc(as.numeric(gsub("%", "", change_24h)))), 10)
+    top_declining <- head(arrange(summary_df, as.numeric(gsub("%", "", change_24h))), 10)
+    
+    cat(success_style("\nTop 10 Catégories en Croissance :\n"))
+    display_table_fixed_colored_option4(top_growing)
+    
+    cat(warning_style("\nTop 10 Catégories en Déclin :\n"))
+    display_table_fixed_colored_option4(top_declining)
+  } else {
+    cat(warning_style("\nAucune donnée disponible pour les catégories.\n"))
+  }
+  
+  readline(question_style("\nAppuyez sur Entrée pour revenir au menu..."))
+}
+
+
+# Fonction pour l'analyse des variations horaires (Option 5)
+hot_hour_analysis <- function() {
+  cat(section_title_style("\n=== Hot Hour Analysis ===\n\n"))
+  cat(highlight_style("Cette section met en évidence les plus fortes variations de prix des cryptomonnaies\n"))
+  cat(info_style("et des NFTs sur une période récente (24 heures).\n\n"))
+  cat(info_style("Les données incluent :\n"))
+  cat(info_style("- Les cryptomonnaies avec les plus fortes hausses ou baisses de prix.\n"))
+  cat(info_style("- Les NFTs avec les variations de prix planchers les plus significatives.\n\n"))
+  cat(info_style("Utilité de cette analyse :\n"))
+  cat(info_style("- Identifier les projets les plus volatils et dynamiques du moment.\n"))
+  cat(info_style("- Repérer des opportunités d'investissement ou des points d'entrée sur le marché.\n"))
+  cat(info_style("- Suivre les tendances du marché en temps réel.\n\n"))
+  cat(success_style("Les cryptomonnaies et NFTs les plus dynamiques des dernières 24 heures sont affichés ci-dessous :\n\n"))
+  
+  
+  trends_data <- get_trends()
+  if (!is.null(trends_data)) {
+    # Cryptos
+    crypto_changes <- data.frame(
+      name = trends_data$coins$item$name,
+      symbol = toupper(trends_data$coins$item$symbol),
+      price_change = sapply(trends_data$coins$item$data$price_change_percentage_24h$usd, function(x) {
+        if (is.null(x) || is.na(x)) {
+          "N/A"
+        } else {
+          paste0(round(as.numeric(x), 2), "%")
+        }
+      })
+    )
+    
+    # Top 50 hausses
+    cat(success_style("\n Top Hausses Cryptos (24h) :\n"))
+    valid_changes <- crypto_changes[crypto_changes$price_change != "N/A", ]
+    if (nrow(valid_changes) > 0) {
+      top_gainers <- head(arrange(valid_changes, desc(as.numeric(gsub("%", "", price_change)))), 50)
+      display_table_fixed_colored_generique(top_gainers)
+    } else {
+      cat(warning_style("Aucune donnée de variation disponible.\n"))
+    }
+    
+    # Top 50 baisses
+    cat(warning_style("\nTop Baisses Cryptos (24h) :\n"))
+    if (nrow(valid_changes) > 0) {
+      top_losers <- head(arrange(valid_changes, as.numeric(gsub("%", "", price_change))), 50)
+      display_table_fixed_colored_generique(top_losers)
+    } else {
+      cat(warning_style("Aucune donnée de variation disponible.\n"))
+    }
+    
+    # NFTs
+    if (length(trends_data$nfts) > 0) {
+      nft_changes <- data.frame(
+        name = trends_data$nfts$name,
+        symbol = toupper(trends_data$nfts$symbol),
+        price_change = sapply(trends_data$nfts$floor_price_24h_percentage_change, function(x) {
+          if (is.null(x) || is.na(x)) {
+            "N/A"
+          } else {
+            paste0(round(as.numeric(x), 2), "%")
+          }
+        })
+      )
+      
+      valid_nft_changes <- nft_changes[nft_changes$price_change != "N/A", ]
+      
+      # Top 10 NFT hausses
+      cat(success_style("\nTop NFTs en Hausse :\n"))
+      if (nrow(valid_nft_changes) > 0) {
+        top_nft_gainers <- head(arrange(valid_nft_changes, desc(as.numeric(gsub("%", "", price_change)))), 10)
+        display_table_fixed_colored_generique(top_nft_gainers)
+      } else {
+        cat(warning_style("Aucune donnée de variation disponible.\n"))
+      }
+      
+      # Top 10 NFT baisses
+      cat(warning_style("\nTop NFTs en Baisse :\n"))
+      if (nrow(valid_nft_changes) > 0) {
+        top_nft_losers <- head(arrange(valid_nft_changes, as.numeric(gsub("%", "", price_change))), 10)
+        display_table_fixed_colored_generique(top_nft_losers)
+      } else {
+        cat(warning_style("Aucune donnée de variation disponible.\n"))
+      }
+    }
+  }
+  
+  readline(question_style("\nAppuyez sur Entrée pour revenir au menu..."))
+}
+
+
+# Menu 
+################################
+
+trend_menu <- function() {
+  repeat {
+    # Message d'introduction
+    cat(section_title_style("\n=== Analyse des Tendances du Marché Crypto ===\n"))
+    cat(info_style("\nBienvenue dans l'analyseur de tendances. Cet outil vous permet d'explorer\n"))
+    cat(info_style("les tendances actuelles du marché des cryptomonnaies et des NFTs.\n"))
+    
+    # Options du menu
+    cat(section_title_style("\nOptions Disponibles :\n\n"))
+    cat(question_style("0) Retour au menu Pépite\n"))
+    cat("1) Analyse des tendances (Top Cryptos et Top NFTs)\n")
+    cat("2) Score de tendance et popularité\n")
+    cat("3) Information détaillée sur les projets\n")
+    cat("4) Analyse des catégories et secteurs\n")
+    cat("5) Hot Hour (Variations horaires)\n")
+    
+    # Lecture et validation du choix
+    repeat {
+      choix <- suppressWarnings(as.integer(readline(question_style("\nVeuillez entrer votre choix (0-5) : "))))
+      
+      if (!is.na(choix) && choix >= 0 && choix <= 5) {
+        break
+      }
+      cat(warning_style("\nChoix invalide. Veuillez entrer un nombre entre 0 et 5.\n"))
+    }
+    
+    # Traitement du choix
+    if (choix == 0) {
+      cat(info_style("\nRetour au menu Pépite...\n"))
+      break
+    }
+    
+    # Exécution de la fonction correspondante
+    switch(choix,
+           "1" = analyze_trends(),
+           "2" = trend_score_analysis(),
+           "3" = project_information(),
+           "4" = category_analysis(),
+           "5" = hot_hour_analysis())
+  }
+}
+
+# Exécution du menu principal des tendances
+
+
+
+
 ################################################################################
 #########                  LUNAR CRUSH (API Payante)
 ################################################################################
@@ -879,7 +1679,7 @@ pepite_hunter <- function() {
     } else if (choix == "3") {
       social_main_menu()
     } else if (choix == "4") {
-      cat("\nFonctionnalité en cours de développement.\n")
+      trend_menu()
     } else if (choix == "5") {
       cat(warning_style("\nGoogle Trend est en cours de développement.\n"))
     } else if (choix == "6") {
