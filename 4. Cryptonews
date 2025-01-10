@@ -1,0 +1,309 @@
+library(httr)
+library(stringr)
+library(xml2)
+library(rvest)
+library(lubridate)
+library(tibble)
+library(dplyr)
+library(crayon)
+
+# Définition des styles
+question_style <- blue$bold
+info_style <- white$italic
+warning_style <- red$bold
+success_style <- green$bold
+highlight_style <- yellow$bold
+info_secondary_style <- cyan$italic
+error_style <- red$bold$underline
+section_title_style <- magenta$bold$underline
+pro_style <- red$bold  # Style pour PRO
+
+cryptonews <- function() {
+  # Message d'accueil avec styles
+  cat(success_style("=== Bienvenue sur CryptoNews ===\n\n"),
+      info_style("Notre application vous permet de suivre l'actualité crypto en temps réel :\n"),
+      highlight_style("• Accédez aux 25 dernières dépêches les plus récentes\n"),
+      highlight_style("• Informations triées chronologiquement\n"),
+      highlight_style("• Mises à jour en temps réel\n\n"),
+      info_secondary_style("Restez informé des dernières tendances du marché crypto !\n\n"))
+  
+  # Message de chargement
+  cat(info_style("\nChargement des données en cours"), info_style("..."))
+  Sys.sleep(1)
+  cat(info_style("."))
+  Sys.sleep(1)
+  cat(info_style("."))
+  Sys.sleep(1)
+  cat(info_style(".\n\n"))
+  
+  # Définition du user agent
+  user_agent <- user_agent(
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 \
+     (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+  )
+  
+  # URL de base
+  urlpage <- "https://coinmarketcap.com/fr/"
+  
+  #### Function to get the HTML page ####
+  get_page <- function(urlpage) {
+    Sys.sleep(7 + runif(1, 0, 8))  # Pause "anti-bot"
+    res <- httr::GET(urlpage, user_agent)
+    html <- xml2::read_html(httr::content(res, "text"))
+    clean_html <- str_replace_all(as.character(html), "[\\t\\r\\n\\f]", "")
+    return(clean_html)
+  }
+  
+  # On récupère la page CoinMarketCap Community (en français)
+  html_coinmarket <- get_page("https://coinmarketcap.com/community/fr/articles/browse/?sort=-publishedOn")
+  
+  # Regex pour extraire les données
+  title_pattern       <- '"title":"(.*?)","subtitle"'
+  url_pattern         <- '"sourceUrl":"(.*?)","id"'
+  datetime_pattern    <- '"releasedAt":"(.*?)"'
+  likes_pattern       <- '"likes":(\\d+),'
+  shares_pattern      <- '"shares":(\\d+),'
+  views_pattern       <- '"views":(\\d+),'
+  announcement_pattern<- '"announcement":(true|false)'
+  avatar_pattern      <- '"avatarUrl":"(.*?)"'
+  cover_pattern       <- '"cover":"(.*?)"'
+  subtitle_pattern    <- '"subtitle":"(.*?)","sourceName"'
+  source_pattern      <- '"sourceName":"(.*?)","language"'
+  language_pattern    <- '"language":"(.*?)","sourceUrl"'
+  assets_pattern      <- '"assets":\\[(.*?)\\]'
+  
+  # Extraction des blocs "assets" de type JSON (crypto mentionnées)
+  articles <- str_match_all(html_coinmarket, assets_pattern)[[1]][, 2]
+  
+  # Fonction pour extraire les Noms, IDs, Symboles de chaque article
+  extract_crypto_info <- function(article) {
+    slugs    <- str_match_all(article, '"slug":"(.*?)"')[[1]][, 2]
+    coin_ids <- str_match_all(article, '"coinId":(\\d+)')[[1]][, 2]
+    symbols  <- str_match_all(article, '"symbol":"(.*?)"')[[1]][, 2]
+    
+    list(
+      CryptoNames = paste(slugs, collapse = " - "),
+      CoinIDs     = paste(coin_ids, collapse = " - "),
+      Symbols     = paste(symbols, collapse = " - ")
+    )
+  }
+  
+  # Appliquer la fonction pour chaque bloc "assets"
+  crypto_data    <- lapply(articles, extract_crypto_info)
+  crypto_data_df <- do.call(rbind, lapply(crypto_data, as.data.frame))
+  
+  # Extraire les autres informations
+  titles        <- unlist(str_match_all(html_coinmarket, title_pattern)[[1]][, 2])
+  urls          <- unlist(str_match_all(html_coinmarket, url_pattern)[[1]][, 2])
+  datetimes_raw <- unlist(str_match_all(html_coinmarket, datetime_pattern)[[1]][, 2])
+  
+  # Conversion de la date/heure UTC en fuseau Europe/Paris
+  datetimes_utc <- ymd_hms(datetimes_raw, tz = "UTC")
+  dates_paris   <- as.Date(with_tz(datetimes_utc, tzone = "Europe/Paris"))
+  times_paris   <- format(with_tz(datetimes_utc, tzone = "Europe/Paris"), "%H:%M:%S")
+  
+  likes         <- as.integer(unlist(str_match_all(html_coinmarket, likes_pattern)[[1]][, 2]))
+  shares        <- as.integer(unlist(str_match_all(html_coinmarket, shares_pattern)[[1]][, 2]))
+  views         <- as.integer(unlist(str_match_all(html_coinmarket, views_pattern)[[1]][, 2]))
+  announcements <- as.logical(unlist(str_match_all(html_coinmarket, announcement_pattern)[[1]][, 2]))
+  avatars       <- unlist(str_match_all(html_coinmarket, avatar_pattern)[[1]][, 2])
+  covers        <- unlist(str_match_all(html_coinmarket, cover_pattern)[[1]][, 2])
+  subtitles     <- unlist(str_match_all(html_coinmarket, subtitle_pattern)[[1]][, 2])
+  sources       <- unlist(str_match_all(html_coinmarket, source_pattern)[[1]][, 2])
+  languages     <- unlist(str_match_all(html_coinmarket, language_pattern)[[1]][, 2])
+  
+  # Vérification des longueurs
+  if (!all(lengths(list(
+    titles, urls, dates_paris, likes, shares, views, announcements,
+    avatars, covers, subtitles, sources, languages, crypto_data_df$CryptoNames
+  )) == length(titles))) {
+    stop("Les longueurs des variables extraites ne correspondent pas.")
+  }
+  
+  # Tableau final
+  data <- data.frame(
+    Title        = titles,
+    URL          = urls,
+    Date         = dates_paris,
+    Time         = times_paris,
+    Likes        = likes,
+    Shares       = shares,
+    Views        = views,
+    Announcement = announcements,
+    AvatarURL    = avatars,
+    CoverURL     = covers,
+    Subtitles    = subtitles,
+    Source       = sources,
+    Language     = languages,
+    CryptoNames  = crypto_data_df$CryptoNames,
+    CoinIDs      = crypto_data_df$CoinIDs,
+    Symbols      = crypto_data_df$Symbols,
+    stringsAsFactors = FALSE
+  )
+  
+  # Conversion en tibble
+  data_tibble <- as_tibble(data)
+  
+  # =======================
+  # Fonctions annexes
+  # =======================
+  
+  #### Fonction 10 articles "SYMBOLS" récents ####
+  get_recent_articles_by_symbol <- function(data, symbol, n = 10) {
+    filtered_articles <- data %>%
+      filter(grepl(paste0("\\b", symbol, "\\b"), Symbols)) %>%
+      arrange(desc(Date), desc(Time))
+    
+    selected_articles <- filtered_articles %>%
+      select(Title, Subtitles, Symbols, Date, Time, URL, Likes, Shares, Views)
+    
+    head(selected_articles, n)
+  }
+  
+  #### Fonction pour générer un tableau HTML stylisé ####
+  generate_html_table <- function(data) {
+    rows <- apply(data, 1, function(row) {
+      title_link <- sprintf('<a href="%s" target="_blank">%s</a>', row["URL"], row["Title"])
+      sprintf('<tr>
+                 <td>%s</td>
+                 <td>%s</td>
+                 <td>%s</td>
+                 <td>%s</td>
+                 <td>%s</td>
+                 <td>%d</td>
+                 <td>%d</td>
+                 <td>%d</td>
+               </tr>',
+              title_link, row["Subtitles"], row["Symbols"], row["Date"], row["Time"],
+              as.integer(row["Likes"]), as.integer(row["Shares"]), as.integer(row["Views"]))
+    })
+    
+    table_html <- sprintf('
+      <table border="1" style="border-collapse: collapse; width: 100%%; text-align: left;">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Subtitles</th>
+            <th>Symbols</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Likes</th>
+            <th>Shares</th>
+            <th>Views</th>
+          </tr>
+        </thead>
+        <tbody>
+          %s
+        </tbody>
+      </table>', paste(rows, collapse = "\n"))
+    
+    return(table_html)
+  }
+  
+  #### Fonction 10 articles qui ont le + de : Likes / Shares / Views ####
+  get_top_articles <- function(data, metric = c("Likes", "Shares", "Views"), n = 10) {
+    metric <- match.arg(metric)
+    
+    top_articles <- data %>%
+      arrange(desc(!!sym(metric))) %>%
+      select(Title, Subtitles, Symbols, Date, Time, URL, Likes, Shares, Views)
+    
+    head(top_articles, n)
+  }
+  
+  #### Fonction 10 articles en choisissant "Symbol" + Likes/Shares/Views ####
+  get_top_articles_by_symbol_and_metric <- function(data, symbol, metric = c("Likes", "Shares", "Views"), n = 10) {
+    metric <- match.arg(metric)
+    
+    filtered_articles <- data %>%
+      filter(grepl(paste0("\\b", symbol, "\\b"), Symbols))
+    
+    sorted_articles <- filtered_articles %>%
+      arrange(desc(!!sym(metric))) %>%
+      select(Title, Subtitles, Symbols, Date, Time, URL, Likes, Shares, Views)
+    
+    head(sorted_articles, n)
+  }
+  
+  #### Sortie articles en Html ####
+  generate_styled_html <- function(data, symbol, metric = c("Likes", "Shares", "Views"), n = 10, output_file = "top_articles.html") {
+    filtered_data <- get_top_articles_by_symbol_and_metric(data, symbol, metric, n)
+    
+    rows <- apply(filtered_data, 1, function(row) {
+      title_link <- sprintf('<a href="%s" target="_blank">%s</a>', row["URL"], row["Title"])
+      sprintf('<tr>
+                 <td>%s</td>
+                 <td>%s</td>
+                 <td>%s</td>
+                 <td>%s</td>
+                 <td>%s</td>
+                 <td>%d</td>
+                 <td>%d</td>
+                 <td>%d</td>
+               </tr>',
+              title_link, row["Subtitles"], row["Symbols"], row["Date"], row["Time"],
+              as.integer(row["Likes"]), as.integer(row["Shares"]), as.integer(row["Views"]))
+    })
+    
+    css <- "
+      <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; color: #333; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tr:hover { background-color: #f1f1f1; }
+        a { color: #007bff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        h1 { color: #333; }
+      </style>
+    "
+    
+    table_html <- sprintf('
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Top Articles</title>
+        %s
+      </head>
+      <body>
+        <h1>Top %d Articles for %s Sorted by %s</h1>
+        <table>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Subtitles</th>
+              <th>Symbols</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Likes</th>
+              <th>Shares</th>
+              <th>Views</th>
+            </tr>
+          </thead>
+          <tbody>
+            %s
+          </tbody>
+        </table>
+      </body>
+      </html>
+    ', css, n, symbol, metric, paste(rows, collapse = "\n"))
+    
+    writeLines(table_html, output_file)
+  }
+  
+  # Affichage des 25 premiers titres
+  cat(section_title_style("\nVoici les 25 premiers titres des articles :\n\n"))
+  cat(paste(seq_along(head(data$Title, 25)), " - ", head(data$Title, 25), sep = ""), sep = "\n")
+  
+  # Message pour quitter après l'affichage
+  cat("\n", question_style("\nAppuyez sur Entrée pour revenir au menu principal..."))
+  invisible(readline())
+  cat(success_style("\nRetour au menu principal...\n"))
+  return(invisible())
+}
+
+# Pour exécuter la fonction :
+cryptonews()
