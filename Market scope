@@ -1,0 +1,2054 @@
+############### Market scope ###################
+##########################################
+######################################
+#################################
+##########################
+###############
+
+
+# Chargement des bibliothèques nécessaires
+library(crayon)      # Pour des styles de couleur dans la console
+library(dplyr)       # Pour la manipulation de données
+library(ggplot2)     # Pour les graphiques
+library(httr)        # Pour les appels API
+library(jsonlite)    # Pour les données JSON
+library(curl)
+library(kableExtra)
+library(cli)
+library(scales)      # Pour formater les nombres
+library(gtrendsR)
+library(TTR)         # Pour les indicateurs techniques
+library(plotly)      # Optionnel : graphiques interactifs
+library(lubridate)   # Pour manipuler les dates
+library(zoo)         # Pour na.approx()
+library(gridExtra)   # Pour grid.arrange()
+
+
+# Définition des styles
+question_style <- blue$bold
+info_style <- white$italic
+warning_style <- red$bold
+success_style <- green$bold
+highlight_style <- yellow$bold
+info_secondary_style <- cyan$italic
+error_style <- red$bold$underline
+section_title_style <- magenta$bold$underline
+pro_style <- red$bold  # Style pour PRO
+
+################################################################################
+##########################
+##################                      BITCOIN PULSE
+#############
+#########@
+################################################################################
+# Fonction pour récupérer les données CoinGecko
+get_coingecko_data <- function(endpoint, params = list()) {
+  base_url <- "https://api.coingecko.com/api/v3"
+  url <- paste0(base_url, endpoint)
+  
+  response <- tryCatch({
+    GET(url, query = params)
+  }, error = function(e) {
+    cat(error_style("\nErreur de connexion à l'API CoinGecko. Vérifiez votre connexion internet.\n"))
+    return(NULL)
+  })
+  
+  if (is.null(response)) return(NULL)
+  
+  if (status_code(response) == 200) {
+    return(fromJSON(rawToChar(response$content)))
+  } else if (status_code(response) == 429) {
+    cat(warning_style("\nLimite d'API atteinte. Pause de 60 secondes...\n"))
+    Sys.sleep(61)
+    return(get_coingecko_data(endpoint, params))
+  } else {
+    cat(error_style(paste("\nErreur API:", status_code(response), "\n")))
+    return(NULL)
+  }
+}
+
+##########################
+# Fonction pour calculer les moyennes mobiles
+calculate_moving_averages <- function(data, horizon_days) {
+  if (as.numeric(horizon_days) == 1) return(list())
+  
+  ma_periods <- if (as.numeric(horizon_days) <= 7) {
+    c(4, 6, 7)
+  } else if (as.numeric(horizon_days) <= 30) {
+    c(7, 14, 21)
+  } else {
+    c(20, 50, 200)
+  }
+  
+  ma_list1 <- list()
+  for (period in ma_periods) {
+    if (period <= length(data)) {
+      ma_list1[[paste0("MA", period)]] <- list(
+        values      = SMA(data, n = period),
+        period      = period,
+        description = paste0("Moyenne mobile sur ", period, " jours")
+      )
+    }
+  }
+  return(ma_list1)
+}
+
+##########################
+# Fonction d'analyse des tendances
+analyze_trend <- function(price, ma_values) {
+  if (length(ma_values) < 2) return(NULL)
+  
+  ma_short <- tail(ma_values[[1]]$values, 1)
+  ma_long  <- tail(ma_values[[length(ma_values)]]$values, 1)
+  
+  trend_strength <- abs((price - ma_long) / ma_long) * 100
+  
+  if (price > ma_short && price > ma_long) {
+    list(
+      direction   = "HAUSSIÈRE",
+      strength    = trend_strength,
+      description = sprintf("Tendance haussière confirmée (%.2f%% au-dessus de la MM longue)", trend_strength)
+    )
+  } else if (price < ma_short && price < ma_long) {
+    list(
+      direction   = "BAISSIÈRE",
+      strength    = trend_strength,
+      description = sprintf("Tendance baissière confirmée (%.2f%% en-dessous de la MM longue)", trend_strength)
+    )
+  } else {
+    list(
+      direction   = "NEUTRE",
+      strength    = trend_strength,
+      description = "Phase de consolidation - pas de tendance claire"
+    )
+  }
+}
+
+##########################
+# Fonction pour calculer des métriques sur les données
+calculate_metrics <- function(data) {
+  # On calcule diff(log(data$price)) = rendements log
+  price_diff <- diff(log(data$price))
+  
+  variance   <- var(price_diff, na.rm = TRUE)
+  std_dev    <- sqrt(variance)
+  volatility <- std_dev * 100
+  
+  list(
+    volatility = volatility,
+    variance   = variance,
+    std_dev    = std_dev * 100,
+    expectation= mean(data$price, na.rm = TRUE),
+    current    = tail(data$price, 1),
+    max        = max(data$price, na.rm = TRUE),
+    min        = min(data$price, na.rm = TRUE),
+    from_high  = ((tail(data$price, 1) - max(data$price)) / max(data$price)) * 100,
+    from_low   = ((tail(data$price, 1) - min(data$price)) / min(data$price))  * 100,
+    max_volume = max(data$volume, na.rm = TRUE),
+    min_volume = min(data$volume, na.rm = TRUE)
+  )
+}
+
+##########################
+# Fonction pour créer et configurer les graphiques (comme dans CryptoFocus)
+create_analysis_plot <- function(data, y_col, ma_cols, title, y_label, is_volume = FALSE) {
+  suppressWarnings({
+    
+    p <- ggplot(data, aes(x = date)) +
+      geom_line(aes_string(y = y_col), color = "#2E86C1", size = 1)
+    
+    # Ajouter les moyennes mobiles s'il y en a
+    if (length(ma_cols) > 0) {
+      for (i in seq_along(ma_cols)) {
+        p <- p + geom_line(aes_string(y = ma_cols[i]),
+                           color    = c("#E74C3C", "#F39C12", "#27AE60")[i],
+                           size     = 0.8,
+                           linetype = "dashed")
+      }
+    }
+    
+    # Échelle Y
+    if (is_volume) {
+      p <- p + scale_y_continuous(labels = function(x) paste0(format(x / 1e9, digits = 2), " Mds $"))
+    } else {
+      p <- p + scale_y_continuous(labels = scales::label_number(big.mark = " "))
+    }
+    
+    # Échelle X : date en POSIXct
+    p <- p + scale_x_datetime(date_breaks = "7 days", date_labels = "%Y-%m-%d")
+    
+    p + labs(
+      title = title,
+      x     = "Date",
+      y     = y_label
+    ) +
+      theme_minimal() +
+      theme(
+        plot.title       = element_text(size = 14, face = "bold"),
+        axis.title       = element_text(size = 12),
+        axis.text        = element_text(size = 10),
+        panel.grid.minor = element_blank()
+      )
+  })
+}
+
+##########################
+# Fonction principale
+bitcoin_pulse <- function() {
+  
+  repeat {
+    cat(section_title_style("\n=== BitcoinPulse : Une Analyse Technique du Bitcoin ===\n\n"))
+    cat(highlight_style("BitcoinPulse vous offre une analyse détaillée et pédagogique du marché Bitcoin.\n"))
+    cat("Grâce à des indicateurs techniques (moyennes mobiles, volatilité, volumes), vous comprendrez mieux la dynamique du marché.\n")
+    cat("Chaque section présente des explications pour interpréter ces indicateurs.\n\n")
+    
+    # Menu d'horizon
+    horizons <- list(
+      "1" = list(days = "7",   label = "7 jours - Analyse court terme"),
+      "2" = list(days = "14",  label = "14 jours - Analyse swing trading"),
+      "3" = list(days = "30",  label = "30 jours - Analyse mensuelle"),
+      "4" = list(days = "90",  label = "90 jours - Analyse trimestrielle"),
+      "5" = list(days = "180", label = "180 jours - Analyse semestrielle"),
+      "6" = list(days = "365", label = "365 jours - Analyse annuelle")
+    )
+    
+    cat(section_title_style("\nSélection de l'horizon d'analyse :\n\n"))
+    for (i in seq_along(horizons)) {
+      cat(sprintf("%d) %s\n", i, horizons[[as.character(i)]]$label))
+    }
+    cat(question_style("0) Retour (quitter BitcoinPulse)\n\n"))
+    
+    choix <- readline(question_style("Votre choix (0-6) : "))
+    if (!choix %in% c("0", "1", "2", "3", "4", "5", "6")) {
+      cat(error_style("Option invalide. Veuillez choisir entre 0 et 6.\n"))
+      next
+    }
+    
+    if (choix == "0") {
+      cat(info_style("\nVous avez choisi de quitter BitcoinPulse. À bientôt!\n"))
+      break
+    }
+    
+    # Récupération du nombre de jours
+    days <- horizons[[choix]]$days
+    
+    # Récupération des données Bitcoin
+    btc_data <- get_coingecko_data(
+      "/coins/bitcoin/market_chart",
+      list(vs_currency = "usd", days = days, interval = "daily")
+    )
+    
+    if (is.null(btc_data)) {
+      cat(error_style("\nErreur de récupération des données. Réessayez plus tard.\n"))
+      next
+    }
+    
+    # Préparation du data.frame
+    # On utilise POSIXct (millisecondes => division par 1000), comme dans CryptoFocus
+    market_data <- data.frame(
+      date   = as.POSIXct(btc_data$prices[, 1] / 1000, origin = "1970-01-01"),
+      price  = btc_data$prices[, 2],
+      volume = btc_data$total_volumes[, 2]
+    ) %>%
+      distinct(date, .keep_all = TRUE) %>%
+      arrange(date)
+    
+    # Interpolation des éventuels NA
+    market_data$price  <- zoo::na.approx(market_data$price,  rule = 2)
+    market_data$volume <- zoo::na.approx(market_data$volume, rule = 2)
+    
+    # Calcul des moyennes mobiles
+    ma_price  <- calculate_moving_averages(market_data$price, days)
+    ma_volume <- calculate_moving_averages(market_data$volume, days)
+    
+    # Intégrer les moyennes mobiles dans le data.frame
+    for (ma_type in c("price", "volume")) {
+      ma_list1 <- if (ma_type == "price") ma_price else ma_volume
+      for (ma_name in names(ma_list1)) {
+        market_data[[paste0(ma_type, "_", ma_name)]] <- ma_list1[[ma_name]]$values
+      }
+    }
+    
+    # Création des graphiques (mêmes fonctions que dans CryptoFocus)
+    price_plot <- create_analysis_plot(
+      market_data,
+      "price",
+      paste0("price_MA", sapply(ma_price, function(x) x$period)),
+      paste("Bitcoin - Évolution du Prix sur", days, "jours"),
+      "Prix (USD)"
+    )
+    
+    volume_plot <- create_analysis_plot(
+      market_data,
+      "volume",
+      paste0("volume_MA", sapply(ma_volume, function(x) x$period)),
+      paste("Bitcoin - Évolution du Volume sur", days, "jours"),
+      "Volume (USD)",
+      is_volume = TRUE
+    )
+    
+    # Affichage des graphiques
+    print(price_plot)
+    cat(warning_style("\nNote : Les données historiques ne présagent pas des performances futures.\n"))
+    print(volume_plot)
+    
+    # Calcul des métriques et analyse
+    metrics <- calculate_metrics(market_data)
+    trend   <- analyze_trend(metrics$current, ma_price)
+    
+    # Affichage du rapport
+    cat(section_title_style("\n=== RAPPORT D'ANALYSE BITCOIN ===\n\n"))
+    
+    cat(highlight_style("MÉTRIQUES DE PRIX\n"))
+    cat("--------------------------------\n")
+    cat("Prix actuel     : ", cli::col_green(paste("$", format(metrics$current, big.mark = " "))), "\n")
+    cat("Plus haut       : ", cli::col_yellow(paste("$", format(metrics$max,    big.mark = " "))), "\n")
+    cat("Plus bas        : ", cli::col_yellow(paste("$", format(metrics$min,    big.mark = " "))), "\n")
+    cat("Écart du haut   : ", ifelse(
+      metrics$from_high >= 0,
+      cli::col_green(paste0("+", format(metrics$from_high, digits = 2), "%")),
+      cli::col_red(paste0(format(metrics$from_high, digits = 2), "%"))
+    ), "\n")
+    cat("Écart du bas    : ", ifelse(
+      metrics$from_low >= 0,
+      cli::col_green(paste0("+", format(metrics$from_low, digits = 2), "%")),
+      cli::col_red(paste0(format(metrics$from_low, digits = 2), "%"))
+    ), "\n")
+    
+    cat("\n", highlight_style("MÉTRIQUES DE VOLUME\n"))
+    cat("--------------------------------\n")
+    cat("Volume actuel (fin période) : ", cli::col_blue(paste(format(tail(market_data$volume, 1) / 1e9, digits = 2), "Mds $")), "\n")
+    cat("Volume moyen                : ", cli::col_blue(paste(format(mean(market_data$volume) / 1e9, digits = 2), "Mds $")), "\n")
+    cat("Volume max                  : ", cli::col_green(paste(format(metrics$max_volume / 1e9, digits = 2), "Mds $")), "\n")
+    cat("Volume min                  : ", cli::col_red(paste(format(metrics$min_volume / 1e9, digits = 2), "Mds $")), "\n")
+    
+    cat("\n", highlight_style("ANALYSE TECHNIQUE\n"))
+    cat("--------------------------------\n")
+    cat("Volatilité (écart-type) : ", cli::col_blue(paste0(format(metrics$volatility, digits = 2), "%")), "\n")
+    cat("Espérance (moyenne)     : ", cli::col_blue(paste("$", format(metrics$expectation, big.mark = " "))), "\n")
+    
+    if (!is.null(trend)) {
+      trend_color <- switch(
+        trend$direction,
+        "HAUSSIÈRE" = cli::col_green,
+        "BAISSIÈRE" = cli::col_red,
+        cli::col_white
+      )
+      cat("Tendance               : ", trend_color(trend$description), "\n")
+    } else {
+      cat("Tendance               : Neutre / Indéterminée\n")
+    }
+    
+    cat("\n", highlight_style("MOYENNES MOBILES\n"))
+    cat("--------------------------------\n")
+    for (ma in ma_price) {
+      current_price <- tail(market_data$price, 1)
+      ma_value      <- tail(ma$values, 1)
+      position <- if (current_price > ma_value) {
+        cli::col_green(" (Prix au-dessus)")
+      } else {
+        cli::col_red(" (Prix en-dessous)")
+      }
+      cat(sprintf("• MM%d : $%s%s\n", ma$period, format(ma_value, big.mark = " "), position))
+    }
+    
+    cat(highlight_style("\nDéfinitions et Conseils :\n\n"))
+    
+    cat(highlight_style("Moyennes Mobiles (MM) :\n"))
+    cat("Les moyennes mobiles lissent les fluctuations de prix, révélant la tendance sous-jacente.\n\n")
+    
+    cat(highlight_style("Analyse de la Tendance :\n"))
+    cat("- Haussière : le prix se maintient au-dessus des MM (courte et longue).\n")
+    cat("- Baissière : le prix se maintient en dessous de ces MM.\n")
+    cat("- Neutre    : le prix oscille autour des MM sans direction claire.\n\n")
+    
+    cat(highlight_style("Volatilité :\n"))
+    cat("Mesure l'intensité des fluctuations de prix (calculée via l'écart type des rendements log).\n\n")
+    
+    cat(highlight_style("Volume :\n"))
+    cat("Représente la quantité de BTC échangée. Les volumes importants peuvent signifier un marché plus actif.\n\n")
+    
+    cat(section_title_style("Conclusion :\n"))
+    cat("Cette analyse technique donne un aperçu du comportement récent du Bitcoin.\n")
+    cat("Pour une stratégie d'investissement complète, combinez ces informations à d'autres facteurs (actualité, macro-économie, etc.).\n")
+    cat("Rappel : Les performances passées ne garantissent pas les performances futures.\n")
+    
+    cat(warning_style("\nNote : Les données historiques ne présagent pas des performances futures.\n"))
+    
+    readline(info_secondary_style("\nAppuyez sur Entrée pour continuer..."))
+  }
+}
+
+
+#################### fonction nécessaire altcoin tracker
+
+# D'abord les fonctions utilitaires nécessaires
+safe_format_number <- function(x) {
+  if (is.null(x) || length(x) == 0 || is.na(x)) return("N/A")
+  return(format_number(x))
+}
+
+safe_format_percent <- function(x) {
+  if (is.null(x) || length(x) == 0 || is.na(x)) return("N/A")
+  return(paste0(format(round(x, 2)), "%"))
+}
+
+
+####################
+# Fonction AltcoinTracker corrigée
+# Version améliorée d'AltcoinTracker
+altcoin_tracker <- function() {
+  cat(section_title_style("\n=== AltcoinTracker : Analyse de la Dominance du Marché ===\n\n"))
+  
+  cat(info_style("AltcoinTracker analyse la répartition de la capitalisation\n"))
+  cat(info_style("entre Bitcoin, Ethereum et les altcoins.\n\n"))
+  
+  # Récupération des données des 250 premières cryptos
+  cat(info_secondary_style("Récupération des données de marché...\n"))
+  
+  tryCatch({
+    market_data <- get_coingecko_data(
+      "/coins/markets",
+      list(
+        vs_currency = "usd",
+        order = "market_cap_desc",
+        per_page = 250,
+        sparkline = FALSE
+      )
+    )
+    
+    if (is.null(market_data)) {
+      cat(error_style("\nImpossible de récupérer les données. Veuillez réessayer plus tard.\n"))
+      return()
+    }
+    
+    # Calcul des capitalisations
+    total_market_cap <- sum(market_data$market_cap, na.rm = TRUE)
+    btc_market_cap <- market_data$market_cap[market_data$id == "bitcoin"]
+    eth_market_cap <- market_data$market_cap[market_data$id == "ethereum"]
+    alt_market_cap <- total_market_cap - btc_market_cap - eth_market_cap
+    
+    # Calcul des dominances
+    btc_dominance <- (btc_market_cap / total_market_cap) * 100
+    eth_dominance <- (eth_market_cap / total_market_cap) * 100
+    alt_dominance <- (alt_market_cap / total_market_cap) * 100
+    
+    # Affichage des résultats
+    cat(section_title_style("\nAnalyse de la Dominance du Marché\n"))
+    cat(info_style("(Basé sur les 250 plus grandes capitalisations)\n\n"))
+    
+    # Tableau de dominance
+    cat(cli::col_yellow(paste(
+      sprintf("%-20s", "ACTIF"),
+      sprintf("%-15s", "DOMINANCE"),
+      sprintf("%-20s", "MARKET CAP"),
+      "\n"
+    )))
+    
+    cat(paste(rep("-", 55), collapse = ""), "\n")
+    
+    # Bitcoin
+    cat(paste0(
+      cli::col_yellow(sprintf("%-20s", "Bitcoin")),
+      cli::col_green(sprintf("%-15s", sprintf("%.2f%%", btc_dominance))),
+      cli::col_white(sprintf("%-20s", safe_format_number(btc_market_cap))),
+      "\n"
+    ))
+    
+    # Ethereum
+    cat(paste0(
+      cli::col_yellow(sprintf("%-20s", "Ethereum")),
+      cli::col_green(sprintf("%-15s", sprintf("%.2f%%", eth_dominance))),
+      cli::col_white(sprintf("%-20s", safe_format_number(eth_market_cap))),
+      "\n"
+    ))
+    
+    # Altcoins
+    cat(paste0(
+      cli::col_yellow(sprintf("%-20s", "Autres Altcoins")),
+      cli::col_green(sprintf("%-15s", sprintf("%.2f%%", alt_dominance))),
+      cli::col_white(sprintf("%-20s", safe_format_number(alt_market_cap))),
+      "\n"
+    ))
+    
+    # Capitalisation totale
+    cat(paste(rep("-", 55), collapse = ""), "\n")
+    cat(paste0(
+      cli::col_yellow(sprintf("%-20s", "Total")),
+      cli::col_green(sprintf("%-15s", "100%")),
+      cli::col_white(sprintf("%-20s", safe_format_number(total_market_cap))),
+      "\n\n"
+    ))
+    
+    # Résumé en texte
+    cat(highlight_style("Répartition actuelle du marché :\n\n"))
+    cat(sprintf("• Bitcoin représente %.2f%% du marché avec une capitalisation de %s\n", 
+                btc_dominance, safe_format_number(btc_market_cap)))
+    cat(sprintf("• Ethereum représente %.2f%% du marché avec une capitalisation de %s\n", 
+                eth_dominance, safe_format_number(eth_market_cap)))
+    cat(sprintf("• Les autres altcoins représentent %.2f%% du marché avec une capitalisation totale de %s\n\n", 
+                alt_dominance, safe_format_number(alt_market_cap)))
+    
+    cat(info_secondary_style("Note : Ces calculs sont basés sur les 250 plus grandes capitalisations du marché.\n"))
+    
+    cat("\n", info_secondary_style("Appuyez sur Entrée pour retourner au menu..."))
+    readline()
+    
+  }, error = function(e) {
+    cat(error_style("\nUne erreur est survenue lors de l'analyse. Veuillez réessayer plus tard.\n"))
+    cat(error_style("Détails de l'erreur : ", conditionMessage(e), "\n"))
+  })
+}
+
+
+# Fonction pour afficher la liste des cryptos disponibles
+display_available_cryptos <- function() {
+  cat(info_secondary_style("\nRécupération de la liste des cryptomonnaies...\n"))
+  
+  coins <- get_coingecko_data("/coins/markets", 
+                              list(vs_currency = "usd",
+                                   order = "market_cap_desc",
+                                   per_page = 250,
+                                   page = 1))
+  
+  if (is.null(coins)) {
+    cat(error_style("\nImpossible de récupérer la liste. Veuillez réessayer plus tard.\n"))
+    return(NULL)
+  }
+  
+  # Créer un dataframe formaté
+  coins_df <- data.frame(
+    Rang = 1:nrow(coins),
+    ID = coins$id,
+    Nom = coins$name,
+    Symbole = toupper(coins$symbol),
+    "Market Cap" = sapply(coins$market_cap, format_number),
+    stringsAsFactors = FALSE
+  )
+  
+  # Afficher le tableau
+  cat(cli::col_yellow(paste(
+    sprintf("%-6s", "RANG"),
+    sprintf("%-25s", "NOM"),
+    sprintf("%-10s", "SYMBOLE"),
+    sprintf("%-15s", "MARKET CAP"),
+    sprintf("%-25s", "ID"),
+    "\n"
+  )))
+  
+  cat(paste(rep("-", 81), collapse = ""), "\n")
+  
+  for(i in 1:nrow(coins_df)) {
+    cat(paste0(
+      cli::col_white(sprintf("%-6s", coins_df$Rang[i])),
+      cli::col_cyan(sprintf("%-25s", substr(coins_df$Nom[i], 1, 24))),
+      cli::col_green(sprintf("%-10s", coins_df$Symbole[i])),
+      cli::col_yellow(sprintf("%-15s", coins_df$`Market Cap`[i])),
+      cli::col_blue(sprintf("%-25s", substr(coins_df$ID[i], 1, 24))),
+      "\n"
+    ))
+  }
+  
+  return(coins_df$ID)
+}
+
+################################
+
+# Fonction pour calculer la corrélation entre deux séries de prix
+calculate_correlation <- function(prices1, prices2) {
+  # Assurer la même longueur
+  min_length <- min(length(prices1), length(prices2))
+  prices1 <- tail(prices1, min_length)
+  prices2 <- tail(prices2, min_length)
+  
+  # Calculer les rendements
+  returns1 <- diff(log(prices1))
+  returns2 <- diff(log(prices2))
+  
+  # Calculer la corrélation
+  correlation <- cor(returns1, returns2, use = "complete.obs")
+  return(correlation)
+}
+
+# Fonction pour afficher l'analyse comparative
+display_comparative_analysis <- function(crypto_data, btc_data, days) {
+  cat(section_title_style("\nAnalyse Comparative avec Bitcoin\n\n"))
+  
+  # Calcul des variations
+  crypto_change <- ((tail(crypto_data$price, 1) - crypto_data$price[1]) / crypto_data$price[1]) * 100
+  btc_change <- ((tail(btc_data$price, 1) - btc_data$price[1]) / btc_data$price[1]) * 100
+  
+  # Calcul de la corrélation
+  correlation <- calculate_correlation(crypto_data$price, btc_data$price)
+  beta <- (correlation * sd(diff(log(crypto_data$price)))) / sd(diff(log(btc_data$price)))
+  
+  # Affichage des résultats
+  cat(highlight_style("Performance sur la période :\n"))
+  cat(sprintf("%-20s : ", "Votre crypto"), 
+      ifelse(crypto_change >= 0,
+             cli::col_green(paste0("+", format_percent(crypto_change))),
+             cli::col_red(format_percent(crypto_change))), "\n")
+  
+  cat(sprintf("%-20s : ", "Bitcoin"), 
+      ifelse(btc_change >= 0,
+             cli::col_green(paste0("+", format_percent(btc_change))),
+             cli::col_red(format_percent(btc_change))), "\n\n")
+  
+  cat(highlight_style("Métriques de corrélation :\n"))
+  cat(sprintf("Corrélation avec BTC : %.2f\n", correlation))
+  cat(sprintf("Beta : %.2f\n", beta))
+  
+  interpretation <- if(abs(correlation) >= 0.7) {
+    "Forte corrélation avec Bitcoin"
+  } else if(abs(correlation) >= 0.3) {
+    "Corrélation modérée avec Bitcoin"
+  } else {
+    "Faible corrélation avec Bitcoin"
+  }
+  
+  cat("\n", info_secondary_style("Interprétation : "), interpretation, "\n")
+}
+
+######################################################################################
+####   
+#######
+#################         CRYPTO FOCUS
+#########
+####
+######################################################
+
+#############################
+# Fonctions utilitaires pour le formatage des données
+
+format_number <- function(x) {
+  if (is.na(x)) return("N/A")
+  suffixes  <- c("", "k", "M", "B", "T")
+  magnitude <- floor(log10(abs(x)) / 3)
+  magnitude <- min(magnitude, length(suffixes) - 1)
+  if (magnitude == 0) {
+    return(format(round(x, 2), big.mark = " "))
+  }
+  scaled <- x / 10^(magnitude * 3)
+  return(paste0(format(round(scaled, 2), big.mark = " "), suffixes[magnitude + 1]))
+}
+
+format_percent <- function(x) {
+  if (is.na(x)) return("N/A")
+  return(paste0(format(round(x, 2)), "%"))
+}
+
+#############################
+# Fonction pour récupérer les données CoinGecko
+get_coingecko_data <- function(endpoint, params = list()) {
+  base_url <- "https://api.coingecko.com/api/v3"
+  url <- paste0(base_url, endpoint)
+  
+  response <- tryCatch({
+    GET(url, query = params)
+  }, error = function(e) {
+    cat(error_style("\n[ERREUR] Connexion à l'API CoinGecko échouée. Vérifiez votre connexion internet.\n"))
+    return(NULL)
+  })
+  
+  if (is.null(response)) return(NULL)
+  
+  if (status_code(response) == 200) {
+    return(fromJSON(rawToChar(response$content)))
+  } else if (status_code(response) == 429) {
+    cat(warning_style("\n[AVERTISSEMENT] Limite d'API atteinte. Pause de 60 secondes...\n"))
+    Sys.sleep(61)
+    return(get_coingecko_data(endpoint, params))
+  } else {
+    cat(error_style(paste("\n[ERREUR API]:", status_code(response), "\n")))
+    return(NULL)
+  }
+}
+
+#############################
+# Fonction pour afficher la liste des cryptos disponibles
+display_available_cryptos <- function() {
+  cat(info_secondary_style("\n>> Récupération de la liste des cryptomonnaies en cours...\n"))
+  
+  # Ici, on va chercher 250 cryptos au lieu de 100
+  coins <- get_coingecko_data(
+    "/coins/markets", 
+    list(
+      vs_currency = "usd",
+      order       = "market_cap_desc",
+      per_page    = 250,
+      page        = 1
+    )
+  )
+  
+  if (is.null(coins)) {
+    cat(error_style("\n[ERREUR] Impossible de récupérer la liste. Réessayez plus tard.\n"))
+    return(NULL)
+  }
+  
+  cat(cli::col_yellow(paste(
+    sprintf("%-6s", "RANG"),
+    sprintf("%-30s", "NOM"),
+    sprintf("%-15s", "SYMBOLE"),
+    sprintf("%-25s", "ID"),
+    "\n"
+  )))
+  cat(paste(rep("-", 76), collapse = ""), "\n")
+  
+  for (i in seq_along(coins$id)) {
+    cat(paste0(
+      cli::col_white(sprintf("%-6s", i)),
+      cli::col_cyan(sprintf("%-30s", substr(coins$name[i], 1, 29))),
+      cli::col_green(sprintf("%-15s", toupper(coins$symbol[i]))),
+      cli::col_blue(sprintf("%-25s", substr(coins$id[i], 1, 24))),
+      "\n"
+    ))
+  }
+  
+  cat("\n", question_style("Tapez 'exit' pour revenir en arrière ou entrez l'ID de la crypto choisie : "))
+  choice <- readline()
+  if (tolower(choice) == "exit") return(NULL)
+  return(choice)
+}
+
+#############################
+# Fonction pour calculer les moyennes mobiles
+calculate_moving_averages <- function(data, horizon_days) {
+  # Si horizon = 1 jour, on n'affiche pas de moyennes mobiles
+  if (as.numeric(horizon_days) == 1) return(list())
+  
+  ma_periods <- if (as.numeric(horizon_days) <= 7) {
+    c(4, 6, 7)
+  } else if (as.numeric(horizon_days) <= 30) {
+    c(7, 14, 21)
+  } else {
+    c(20, 50, 200)
+  }
+  
+  ma_list2 <- list()
+  for (period in ma_periods) {
+    if (period <= length(data)) {
+      ma_list2[[paste0("MA", period)]] <- list(
+        values      = SMA(data, n = period),
+        period      = period,
+        description = paste0("Moyenne mobile sur ", period, " jours")
+      )
+    }
+  }
+  return(ma_list2)
+}
+
+#############################
+# Fonction pour créer les graphiques (avec marquage min/max)
+create_analysis_plot <- function(data, y_col, ma_cols, title, y_label, is_volume = FALSE) {
+  suppressWarnings({
+    # 1) Graphique de base
+    p <- ggplot(data, aes(x = date, group = 1)) +
+      geom_line(aes_string(y = y_col), color = "#2E86C1", size = 1)
+    
+    # 2) Ajout des moyennes mobiles si présentes
+    if (length(ma_cols) > 0) {
+      for (i in seq_along(ma_cols)) {
+        p <- p + geom_line(aes_string(y = ma_cols[i]), 
+                           color     = c("#E74C3C", "#F39C12", "#27AE60")[i],
+                           size      = 0.8, 
+                           linetype  = "dashed")
+      }
+    }
+    
+    # 3) Marquage du plus haut et plus bas
+    #    (sauf si c'est du volume => pourquoi pas, on peut le faire aussi)
+    max_idx <- which.max(data[[y_col]])
+    min_idx <- which.min(data[[y_col]])
+    if (length(max_idx) == 1 && length(min_idx) == 1) {
+      # Point max
+      p <- p + 
+        geom_point(aes(x = data$date[max_idx], y = data[[y_col]][max_idx]), 
+                   color = "red", size = 2) +
+        geom_text(
+          aes(
+            x = data$date[max_idx],
+            y = data[[y_col]][max_idx],
+            label = "Max"
+          ),
+          vjust = -1, color = "red", size = 3
+        )
+      # Point min
+      p <- p + 
+        geom_point(aes(x = data$date[min_idx], y = data[[y_col]][min_idx]),
+                   color = "green", size = 2) +
+        geom_text(
+          aes(
+            x = data$date[min_idx],
+            y = data[[y_col]][min_idx],
+            label = "Min"
+          ),
+          vjust = 1.5, color = "green", size = 3
+        )
+    }
+    
+    # 4) Echelle de l'axe Y
+    if (is_volume) {
+      p <- p + scale_y_continuous(labels = function(x) paste0(format(x / 1e9, digits = 2), " Mds $"))
+    } else {
+      p <- p + scale_y_continuous(labels = scales::label_number(big.mark = " "))
+    }
+    
+    # 5) Echelle de l'axe X : date en POSIXct
+    p <- p + scale_x_datetime(
+      date_breaks = "7 days", 
+      date_labels = "%Y-%m-%d"
+    )
+    
+    # 6) Labels et thème
+    p + labs(
+      title = title, 
+      x     = "Date", 
+      y     = y_label
+    ) +
+      theme_minimal() +
+      theme(
+        plot.title       = element_text(size = 14, face = "bold"),
+        axis.title       = element_text(size = 12),
+        axis.text        = element_text(size = 10),
+        panel.grid.minor = element_blank()
+      )
+  })
+}
+
+#############################
+# Fonction de sélection de l'horizon temporel
+select_timeframe <- function() {
+  cat(section_title_style("\n[CHOIX DE L'HORIZON] Sélection de l'horizon temporel d'analyse :\n\n"))
+  cat("1) 7 jours  - Analyse court terme\n")
+  cat("2) 14 jours - Analyse swing trading\n")
+  cat("3) 30 jours - Analyse mensuelle\n")
+  cat("4) 90 jours - Analyse trimestrielle\n")
+  cat("5) 180 jours - Analyse semestrielle\n")
+  cat("6) 365 jours - Analyse annuelle\n")
+  cat(question_style("0) Retour\n\n"))
+  
+  repeat {
+    choix <- readline(question_style("Votre choix (0-6) : "))
+    if (choix %in% c("0", "1", "2", "3", "4", "5", "6")) {
+      break
+    }
+    cat(error_style("Option invalide. Veuillez choisir entre 0 et 6.\n"))
+  }
+  
+  days <- switch(
+    choix,
+    "0" = NULL,
+    "1" = "7",
+    "2" = "14",
+    "3" = "30",
+    "4" = "90",
+    "5" = "180",
+    "6" = "365"
+  )
+  
+  return(days)
+}
+
+#############################
+# Fonction pour calculer les métriques
+calculate_metrics <- function(data) {
+  # On calcule la volatilité sur la base de diff(log()) (rendement log)
+  price_diff <- diff(log(data$price))
+  variance   <- var(price_diff, na.rm = TRUE)
+  std_dev    <- sqrt(variance)
+  volatility <- std_dev * 100
+  
+  list(
+    volatility   = volatility,
+    variance     = variance,
+    std_dev      = std_dev * 100,
+    expectation  = mean(data$price, na.rm = TRUE),
+    current      = tail(data$price, 1),
+    max          = max(data$price, na.rm = TRUE),
+    min          = min(data$price, na.rm = TRUE),
+    from_high    = ((tail(data$price, 1) - max(data$price)) / max(data$price)) * 100,
+    from_low     = ((tail(data$price, 1) - min(data$price))  / min(data$price))  * 100,
+    max_volume   = max(data$volume, na.rm = TRUE),
+    min_volume   = min(data$volume, na.rm = TRUE)
+  )
+}
+
+#############################
+# Fonction d'analyse des tendances
+analyze_trend <- function(price, ma_values) {
+  if (length(ma_values) < 2) return(NULL)
+  
+  ma_short <- tail(ma_values[[1]]$values, 1)
+  ma_long  <- tail(ma_values[[length(ma_values)]]$values, 1)
+  trend_strength <- abs((price - ma_long) / ma_long) * 100
+  
+  if (price > ma_short && price > ma_long) {
+    list(
+      direction   = "HAUSSIÈRE",
+      strength    = trend_strength,
+      description = sprintf("Tendance haussière confirmée (%.2f%% au-dessus de la MM longue)", trend_strength)
+    )
+  } else if (price < ma_short && price < ma_long) {
+    list(
+      direction   = "BAISSIÈRE",
+      strength    = trend_strength,
+      description = sprintf("Tendance baissière confirmée (%.2f%% en-dessous de la MM longue)", trend_strength)
+    )
+  } else {
+    list(
+      direction   = "NEUTRE",
+      strength    = trend_strength,
+      description = "Phase de consolidation - pas de tendance claire"
+    )
+  }
+}
+
+#############################
+calculate_correlation <- function(prices1, prices2) {
+  # Vérifier longueur
+  if (length(prices1) != length(prices2)) {
+    stop("Les séries de prix doivent avoir la même longueur pour calculer la corrélation.")
+  }
+  
+  returns1 <- c(NA, diff(log(prices1)))
+  returns2 <- c(NA, diff(log(prices2)))
+  
+  valid_indices <- !is.na(returns1) & !is.na(returns2)
+  returns1 <- returns1[valid_indices]
+  returns2 <- returns2[valid_indices]
+  
+  if (length(returns1) < 2 || length(returns2) < 2) {
+    warning("Pas assez de données pour calculer la corrélation")
+    return(NA)
+  }
+  
+  cor(returns1, returns2)
+}
+
+#############################
+# Analyse Comparative : crypto vs. un autre actif (Bitcoin ou autre)
+display_comparative_analysis <- function(crypto_df, other_df, days, other_name = "Bitcoin") {
+  
+  cat(section_title_style("\n=== Analyse Comparative ===\n\n"))
+  cat(info_style("Cette section compare la performance de votre crypto à celle de "), highlight_style(other_name), info_style(".\n"))
+  cat(info_style("Un graphique base 100 est tracé, et nous calculons la corrélation\n"))
+  cat(info_style("et le bêta pour évaluer la sensibilité de la crypto par rapport à "), highlight_style(other_name), info_style(".\n\n"))
+  
+  cat(highlight_style("Définitions :\n"))
+  cat("- Corrélation : mesure la linéarité entre deux séries de prix. Une corrélation élevée (proche de 1) signifie qu'elles\n")
+  cat("  évoluent souvent dans le même sens. Une corrélation proche de 0 indique peu de lien, et négative indique une opposition.\n\n")
+  cat("- Bêta : mesure la sensibilité de l'actif par rapport à la référence. Un bêta > 1 indique que l'actif\n")
+  cat("  amplifie les mouvements de la référence, tandis qu'un bêta < 1 indique qu'il réagit plus faiblement.\n")
+  cat("  Par exemple, un bêta de 1.5 signifie que si la référence (ex: Bitcoin) monte de 1%, l'actif monte en moyenne de 1.5%.\n\n")
+  
+  if (nrow(crypto_df) < 2 || nrow(other_df) < 2) {
+    cat(error_style("Données insuffisantes : moins de 2 points disponibles pour cette période.\n"))
+    return()
+  }
+  
+  # Variation sur la période
+  crypto_change <- ((tail(crypto_df$price, 1) - head(crypto_df$price, 1)) / head(crypto_df$price, 1)) * 100
+  other_change  <- ((tail(other_df$price,   1) - head(other_df$price,   1)) / head(other_df$price,   1)) * 100
+  relative_perf <- crypto_change - other_change
+  
+  # Dates communes
+  common_dates <- sort(intersect(crypto_df$date, other_df$date))
+  if (length(common_dates) < 2) {
+    cat(error_style("Pas assez de dates communes pour comparer la crypto et "), highlight_style(other_name), ".\n")
+    return()
+  }
+  
+  crypto_idx <- match(common_dates, crypto_df$date)
+  other_idx  <- match(common_dates, other_df$date)
+  
+  prices_crypto <- crypto_df$price[crypto_idx]
+  prices_other  <- other_df$price[other_idx]
+  
+  crypto_returns <- diff(log(prices_crypto))
+  other_returns  <- diff(log(prices_other))
+  
+  if (length(crypto_returns) < 2 || length(other_returns) < 2) {
+    cat(error_style("Pas assez de points (rendements) pour calculer la corrélation.\n"))
+    return()
+  }
+  
+  correlation <- cor(crypto_returns, other_returns, use = "complete.obs")
+  sd_crypto   <- sd(crypto_returns, na.rm = TRUE)
+  sd_other    <- sd(other_returns,  na.rm = TRUE)
+  beta_calc   <- correlation * (sd_crypto / sd_other)
+  
+  cat(highlight_style("Performance sur la période :\n"))
+  period_str <- if (days == "1") "24 heures" else paste(days, "jours")
+  cat(sprintf("Période d'analyse : %s\n\n", period_str))
+  
+  cat(sprintf("%-20s : ", "Votre crypto"), 
+      ifelse(crypto_change >= 0,
+             cli::col_green(paste0("+", format_percent(crypto_change))),
+             cli::col_red(format_percent(crypto_change))),
+      "\n")
+  
+  cat(sprintf("%-20s : ", other_name), 
+      ifelse(other_change >= 0,
+             cli::col_green(paste0("+", format_percent(other_change))),
+             cli::col_red(format_percent(other_change))),
+      "\n")
+  
+  cat(sprintf("%-20s : ", "Performance relative"),
+      ifelse(relative_perf >= 0,
+             cli::col_green(paste0("+", format_percent(relative_perf))),
+             cli::col_red(format_percent(relative_perf))),
+      " vs ", other_name, "\n\n", sep = "")
+  
+  cat(highlight_style("Métriques de corrélation :\n"))
+  cat(sprintf("Corrélation avec %s : %.2f\n", other_name, correlation))
+  cat(sprintf("Beta : %.2f\n\n", beta_calc))
+  
+  correlation_text <- if (is.na(correlation) || is.nan(correlation)) {
+    "Corrélation non calculable (données insuffisantes)"
+  } else if (abs(correlation) >= 0.7) {
+    "Forte corrélation"
+  } else if (abs(correlation) >= 0.3) {
+    "Corrélation modérée"
+  } else {
+    "Faible corrélation"
+  }
+  
+  cat(info_secondary_style("Interprétation : "), correlation_text, " avec ", other_name, "\n")
+  
+  # Graphique base 100
+  base_crypto <- prices_crypto[1]
+  base_other  <- prices_other[1]
+  
+  if (is.na(base_crypto) || base_crypto == 0 ||
+      is.na(base_other)  || base_other == 0) {
+    cat(error_style("Impossible de tracer le graphique : prix de base invalide.\n"))
+    return()
+  }
+  
+  crypto_norm <- (prices_crypto / base_crypto) * 100
+  other_norm  <- (prices_other  / base_other)  * 100
+  
+  df_plot <- data.frame(
+    date         = common_dates,
+    crypto_price = crypto_norm,
+    other_price  = other_norm
+  )
+  
+  # Conversion en POSIXct (millisecondes => / 1000) si besoin
+  # Si ton "common_dates" est déjà POSIXct, pas besoin de reconvertir.
+  # Sinon :
+  df_plot$date <- as.POSIXct(df_plot$date, origin = "1970-01-01")
+  
+  p <- ggplot(df_plot, aes(x = date)) +
+    geom_line(aes(y = crypto_price), color = "#E74C3C", size = 1) +
+    geom_line(aes(y = other_price),  color = "#F39C12", size = 1, linetype = "dashed") +
+    theme_minimal() +
+    labs(
+      title = paste("Performance Relative (Base 100) - vs", other_name),
+      x     = "Date",
+      y     = "Performance (%)"
+    ) +
+    scale_y_continuous(labels = function(x) paste0(round(x, 1), "%")) +
+    scale_x_datetime(date_breaks = "7 days", date_labels = "%Y-%m-%d") +
+    theme(
+      plot.title       = element_text(size = 14, face = "bold"),
+      axis.title       = element_text(size = 12),
+      axis.text        = element_text(size = 10),
+      legend.position  = "bottom",
+      panel.grid.major = element_line(color = "gray80"),
+      panel.grid.minor = element_line(color = "gray90")
+    )
+  
+  cat(info_style("\nNote : Les performances passées ne présagent pas des performances futures.\n"))
+  print(p)
+}
+
+#############################
+# Fonction principale
+crypto_focus <- function() {
+  final_result <- NULL
+  
+  cat(success_style("--------------------------------------------------------------\n"))
+  cat(success_style("    BIENVENUE DANS CRYPTO FOCUS : Votre Outil d'Analyse\n"))
+  cat(success_style("--------------------------------------------------------------\n\n"))
+  
+  cat(info_style("Cet outil vous permet d'explorer une cryptomonnaie à travers :\n"))
+  cat(info_style("- Une analyse technique (prix, moyennes mobiles, volatilité, etc.)\n"))
+  cat(info_style("- Une analyse comparative par rapport à Bitcoin ou un autre actif\n"))
+  cat(info_style("\nATTENTION : Les performances passées ne présagent pas des performances futures.\n"))
+  cat(info_style("Cet outil ne constitue pas un conseil financier. Utilisez-le à vos propres risques.\n\n"))
+  
+  repeat {
+    cat(section_title_style("\n=== CryptoFocus : Menu Principal ===\n\n"))
+    cat(info_style("À tout moment, vous pouvez taper 'exit' pour quitter l'application.\n\n"))
+    
+    # Demande à l'utilisateur s'il connaît l'ID de la crypto
+    repeat {
+      cat(question_style("Connaissez-vous l'ID (CoinGecko) de la crypto à analyser ? (oui/non/exit) : "))
+      connait_id <- tolower(readline())
+      
+      # Possibilité de quitter immédiatement
+      if (connait_id == "exit") {
+        cat(info_style("\nVous avez choisi de quitter l'application. À bientôt!\n"))
+        return(final_result)
+      }
+      
+      if (connait_id %in% c("oui", "non")) {
+        break
+      }
+      
+      cat(error_style("\nVeuillez répondre par 'oui', 'non' ou 'exit'.\n"))
+    }
+    
+    ### Fonction pour sélectionner l'ID
+    analyze_crypto <- function() {
+      crypto_id <- NULL
+      
+      repeat {
+        if (connait_id == "oui") {
+          cat(question_style("\nEntrez l'ID de la crypto (ou 'exit' pour quitter) : "))
+          crypto_id <- readline()
+          if (tolower(crypto_id) == "exit") return(NULL)
+        } else {
+          # Si l'utilisateur ne connaît pas l'ID, on affiche la liste
+          crypto_id <- display_available_cryptos()
+          if (is.null(crypto_id)) return(NULL)
+        }
+        
+        # Vérifier si l'ID existe via l'API
+        coin_data <- get_coingecko_data(paste0("/coins/", crypto_id))
+        if (!is.null(coin_data)) {
+          return(list(id = crypto_id, data = coin_data))
+        }
+        
+        cat(error_style("\nL'ID communiqué ne semble pas fonctionner.\n"))
+        cat("1) Essayer un autre ID\n")
+        cat("0) Retourner au menu principal\n")
+        
+        choix <- readline(question_style("Votre choix (0-1) : "))
+        if (choix == "0") return(NULL)
+      }
+    }
+    
+    crypto_result <- analyze_crypto()
+    if (is.null(crypto_result)) {
+      cat(info_style("\nVous avez choisi de revenir au menu principal ou de quitter.\n"))
+      next  # On revient au repeat principal
+    }
+    
+    crypto_id  <- crypto_result$id
+    coin_data  <- crypto_result$data
+    coin_name  <- toupper(coin_data$name)
+    
+    cat(section_title_style(paste0("\n=== Analyse de ", coin_name, " ===\n\n")))
+    cat(info_style("Vous pouvez maintenant choisir le type d'analyse. À tout moment, tapez 'exit' pour quitter.\n\n"))
+    
+    ### Nouveau menu (analyse technique / analyse comparative / retour)
+    repeat {
+      cat(section_title_style("Choisissez le type d'analyse :\n"))
+      cat("1) Analyse technique et graphique\n")
+      cat("2) Analyse comparative\n")
+      cat(question_style("0) Retour au menu principal (ou 'exit' pour quitter)\n\n"))
+      
+      choix_type <- tolower(readline(question_style("Votre choix (0-2) : ")))
+      if (choix_type == "exit") {
+        cat(info_style("\nFermeture de l'application. À bientôt!\n"))
+        return(final_result)
+      }
+      
+      if (choix_type == "0") {
+        cat(info_style("\nRetour au menu principal...\n"))
+        break
+      }
+      else if (choix_type == "1") {
+        ### Analyse technique
+        cat(info_style("\nVous avez choisi l'analyse technique et graphique.\n"))
+        cat(info_style("Nous allons maintenant définir l'horizon d'analyse (en jours).\n\n"))
+        
+        repeat {
+          days <- select_timeframe()
+          if (is.null(days)) {
+            cat(info_style("\nRetour au choix d'analyse précédent...\n"))
+            break  # On revient au menu 1/2/0
+          }
+          
+          cat(info_secondary_style("\n>> Récupération des données historiques sur "), days, " jours...\n", sep = "")
+          
+          # Récupération des données de marché (crypto + BTC)
+          hist_data <- get_coingecko_data(
+            paste0("/coins/", crypto_id, "/market_chart"),
+            list(vs_currency = "usd", days = days, interval = if (days == "1") "minute" else "daily")
+          )
+          btc_data <- get_coingecko_data(
+            "/coins/bitcoin/market_chart",
+            list(vs_currency = "usd", days = days, interval = if (days == "1") "minute" else "daily")
+          )
+          
+          if (is.null(hist_data) || is.null(btc_data)) {
+            cat(error_style("\nImpossible de récupérer les données historiques. Réessayez plus tard.\n"))
+            break
+          }
+          
+          # Préparation du data.frame
+          # CoinGecko renvoie le temps en millisecondes => division par 1000
+          market_data <- data.frame(
+            date   = as.POSIXct(hist_data$prices[, 1] / 1000, origin = "1970-01-01"),
+            price  = hist_data$prices[, 2],
+            volume = hist_data$total_volumes[, 2]
+          ) %>% arrange(date)
+          
+          # Remplir d'éventuels NA par interpolation
+          market_data$price  <- zoo::na.approx(market_data$price,  rule = 2)
+          market_data$volume <- zoo::na.approx(market_data$volume, rule = 2)
+          
+          # Calcul des moyennes mobiles
+          ma_price  <- calculate_moving_averages(market_data$price, days)
+          ma_volume <- calculate_moving_averages(market_data$volume, days)
+          
+          # Ajouter les colonnes MA au data.frame
+          for (ma_type in c("price", "volume")) {
+            ma_list2 <- if (ma_type == "price") ma_price else ma_volume
+            for (ma_name in names(ma_list2)) {
+              market_data[[paste0(ma_type, "_", ma_name)]] <- ma_list2[[ma_name]]$values
+            }
+          }
+          
+          # Création des graphiques
+          price_plot <- create_analysis_plot(
+            market_data,
+            "price",
+            paste0("price_MA", sapply(ma_price, function(x) x$period)),
+            paste(coin_name, "- Évolution du Prix sur", days, "jours"),
+            "Prix (USD)"
+          )
+          volume_plot <- create_analysis_plot(
+            market_data,
+            "volume",
+            paste0("volume_MA", sapply(ma_volume, function(x) x$period)),
+            paste(coin_name, "- Évolution du Volume sur", days, "jours"),
+            "Volume (USD)",
+            is_volume = TRUE
+          )
+          
+          # Affichage
+          print(price_plot)
+          cat(warning_style("\nIMPORTANT : Les performances passées ne présagent pas des performances futures.\n"))
+          print(volume_plot)
+          
+          # Calcul et affichage des métriques
+          metrics <- calculate_metrics(market_data)
+          trend   <- analyze_trend(metrics$current, ma_price)
+          
+          cat(section_title_style("\n=== RAPPORT D'ANALYSE TECHNIQUE ===\n"))
+          cat(highlight_style("MÉTRIQUES DE PRIX\n"))
+          cat("------------------------------------\n")
+          cat("Prix actuel    : ", cli::col_green(paste("$", format(metrics$current, big.mark = " "))), "\n")
+          cat("Plus haut      : ", cli::col_yellow(paste("$", format(metrics$max,    big.mark = " "))), "\n")
+          cat("Plus bas       : ", cli::col_yellow(paste("$", format(metrics$min,    big.mark = " "))), "\n")
+          cat("Écart du haut  : ", ifelse(
+            metrics$from_high >= 0,
+            cli::col_green(paste0("+", format(metrics$from_high, digits = 2), "%")),
+            cli::col_red(paste0(format(metrics$from_high, digits = 2), "%"))
+          ), "\n")
+          cat("Écart du bas   : ", ifelse(
+            metrics$from_low >= 0,
+            cli::col_green(paste0("+", format(metrics$from_low, digits = 2), "%")),
+            cli::col_red(paste0(format(metrics$from_low, digits = 2), "%"))
+          ), "\n")
+          
+          cat("\n", highlight_style("MÉTRIQUES DE VOLUME\n"))
+          cat("------------------------------------\n")
+          cat("Volume 24h     : ", cli::col_blue(paste(format(tail(market_data$volume, 1) / 1e9, digits = 2), "Mds $")), "\n")
+          cat("Volume moyen   : ", cli::col_blue(paste(format(mean(market_data$volume) / 1e9, digits = 2), "Mds $")), "\n")
+          cat("Volume max     : ", cli::col_green(paste(format(metrics$max_volume / 1e9, digits = 2), "Mds $")), "\n")
+          cat("Volume min     : ", cli::col_red(paste(format(metrics$min_volume / 1e9, digits = 2), "Mds $")), "\n")
+          
+          cat("\n", highlight_style("ANALYSE TECHNIQUE\n"))
+          cat("------------------------------------\n")
+          cat("Volatilité (écart-type): ", cli::col_blue(paste0(format(metrics$volatility, digits = 2), "%")), "\n")
+          cat("Espérance (moyenne)    : ", cli::col_blue(paste("$", format(metrics$expectation, big.mark = " "))), "\n")
+          
+          if (!is.null(trend)) {
+            trend_color <- switch(trend$direction,
+                                  "HAUSSIÈRE" = cli::col_green,
+                                  "BAISSIÈRE" = cli::col_red,
+                                  cli::col_white)
+            cat("Tendance               : ", trend_color(trend$description), "\n")
+          } else {
+            cat("Tendance               : Indisponible / Neutre\n")
+          }
+          
+          cat("\n", highlight_style("MOYENNES MOBILES\n"))
+          cat("------------------------------------\n")
+          for (ma in ma_price) {
+            current_price <- tail(market_data$price, 1)
+            ma_value      <- tail(ma$values, 1)
+            if (is.na(ma_value)) next
+            position <- if (current_price > ma_value) {
+              cli::col_green(" (Prix au-dessus)")
+            } else {
+              cli::col_red(" (Prix en-dessous)")
+            }
+            cat(sprintf("• MM%d : $%s%s\n", ma$period, format(ma_value, big.mark = " "), position))
+          }
+          
+          cat(info_style("\nAnalyse technique terminée. Les données ci-dessus sont purement indicatives.\n"))
+          cat(info_style("N'oubliez pas que ce n'est pas un conseil financier.\n"))
+          
+          final_result <<- list(
+            raw_crypto_data    = hist_data,
+            raw_btc_data       = btc_data,
+            prepared_crypto_df = market_data,
+            coin_id            = crypto_id
+          )
+        }
+        
+      }
+      else if (choix_type == "2") {
+        ### Analyse comparative
+        cat(info_style("\nVous avez choisi l'analyse comparative.\n"))
+        cat(info_style("1) Comparer à Bitcoin\n"))
+        cat(info_style("2) Comparer à une autre crypto (ou actif) via un ID CoinGecko\n"))
+        cat(info_style("0) Retour\n\n"))
+        
+        choix_comp <- tolower(readline(question_style("Votre choix (0-2) : ")))
+        if (choix_comp == "0") {
+          cat(info_style("\nRetour au menu précédent...\n"))
+          next
+        } else if (choix_comp == "1") {
+          # Comparaison avec Bitcoin
+          days <- select_timeframe()
+          if (is.null(days)) {
+            cat(info_style("\nRetour au menu précédent...\n"))
+            next
+          }
+          
+          cat(info_secondary_style("\n>> Récupération des données historiques...\n"))
+          hist_data <- get_coingecko_data(
+            paste0("/coins/", crypto_id, "/market_chart"),
+            list(vs_currency = "usd", days = days, interval = if (days == "1") "minute" else "daily")
+          )
+          btc_data <- get_coingecko_data(
+            "/coins/bitcoin/market_chart",
+            list(vs_currency = "usd", days = days, interval = if (days == "1") "minute" else "daily")
+          )
+          
+          if (is.null(hist_data) || is.null(btc_data)) {
+            cat(error_style("\nImpossible de récupérer les données historiques.\n"))
+            next
+          }
+          
+          # Préparation
+          market_data <- data.frame(
+            date   = as.POSIXct(hist_data$prices[, 1] / 1000, origin = "1970-01-01"),
+            price  = hist_data$prices[, 2],
+            volume = hist_data$total_volumes[, 2]
+          ) %>% arrange(date)
+          
+          market_data$price  <- zoo::na.approx(market_data$price,  rule = 2)
+          market_data$volume <- zoo::na.approx(market_data$volume, rule = 2)
+          
+          btc_market_data <- data.frame(
+            date  = as.POSIXct(btc_data$prices[, 1] / 1000, origin = "1970-01-01"),
+            price = btc_data$prices[, 2]
+          ) %>% arrange(date)
+          
+          # Alignement
+          common_dates   <- intersect(market_data$date, btc_market_data$date)
+          crypto_aligned <- market_data[market_data$date %in% common_dates, ]
+          btc_aligned    <- btc_market_data[btc_market_data$date %in% common_dates, ]
+          
+          crypto_aligned <- crypto_aligned[order(crypto_aligned$date), ]
+          btc_aligned    <- btc_aligned[order(btc_aligned$date), ]
+          
+          # Appel de la fonction d'analyse comparative
+          display_comparative_analysis(crypto_aligned, btc_aligned, days, other_name = "Bitcoin")
+          readline(info_secondary_style("\nAppuyez sur Entrée pour continuer..."))
+          
+        } else if (choix_comp == "2") {
+          # Comparaison avec un autre ID
+          cat(question_style("\nEntrez l'ID de la crypto (ou actif) à comparer (ex: ethereum, dogecoin...) : "))
+          other_id <- readline()
+          if (tolower(other_id) == "exit") {
+            cat(info_style("\nRetour au menu précédent...\n"))
+            next
+          }
+          
+          days <- select_timeframe()
+          if (is.null(days)) {
+            cat(info_style("\nRetour au menu précédent...\n"))
+            next
+          }
+          
+          cat(info_secondary_style("\n>> Récupération des données historiques...\n"))
+          hist_data <- get_coingecko_data(
+            paste0("/coins/", crypto_id, "/market_chart"),
+            list(vs_currency = "usd", days = days, interval = if (days == "1") "minute" else "daily")
+          )
+          other_data <- get_coingecko_data(
+            paste0("/coins/", other_id, "/market_chart"),
+            list(vs_currency = "usd", days = days, interval = if (days == "1") "minute" else "daily")
+          )
+          
+          if (is.null(hist_data) || is.null(other_data)) {
+            cat(error_style("\nImpossible de récupérer les données historiques pour l'un des actifs.\n"))
+            next
+          }
+          
+          market_data <- data.frame(
+            date   = as.POSIXct(hist_data$prices[, 1] / 1000, origin = "1970-01-01"),
+            price  = hist_data$prices[, 2],
+            volume = hist_data$total_volumes[, 2]
+          ) %>% arrange(date)
+          
+          market_data$price  <- zoo::na.approx(market_data$price,  rule = 2)
+          market_data$volume <- zoo::na.approx(market_data$volume, rule = 2)
+          
+          other_market_data <- data.frame(
+            date  = as.POSIXct(other_data$prices[, 1] / 1000, origin = "1970-01-01"),
+            price = other_data$prices[, 2]
+          ) %>% arrange(date)
+          
+          common_dates   <- intersect(market_data$date, other_market_data$date)
+          crypto_aligned <- market_data[market_data$date %in% common_dates, ]
+          other_aligned  <- other_market_data[other_market_data$date %in% common_dates, ]
+          
+          crypto_aligned <- crypto_aligned[order(crypto_aligned$date), ]
+          other_aligned  <- other_aligned[order(other_aligned$date), ]
+          
+          display_comparative_analysis(
+            crypto_aligned, 
+            other_aligned, 
+            days, 
+            other_name = paste0(other_id)
+          )
+          readline(info_secondary_style("\nAppuyez sur Entrée pour continuer..."))
+          
+        } else {
+          cat(error_style("\nOption invalide. Veuillez choisir entre 0, 1 ou 2.\n"))
+        }
+      } else {
+        cat(error_style("\nOption invalide. Veuillez choisir entre 0, 1 ou 2.\n"))
+      }
+    } # Fin du repeat (choix de type d'analyse)
+    
+  }  # Fin du repeat principal
+  
+  cat(info_style("\nFin de CryptoFocus. Merci de votre visite !\n"))
+  return(final_result)
+}
+
+
+########################################
+market_view <- function() {
+  tryCatch({
+    cat(section_title_style("\n=== Market View : Vue Globale du Marché ===\n\n"))
+    
+    cat(info_style("Market View vous offre une vue d'ensemble du marché des cryptomonnaies,\n"))
+    cat(info_style("en présentant les 100 cryptos les plus capitalisées.\n\n"))
+    
+    # Introduction pédagogique
+    cat(highlight_style("Comprendre les métriques affichées :\n"))
+    cat("• Market Cap : Valeur totale = Prix × Nombre de tokens en circulation\n")
+    cat("• Variation 24h : Changement de prix sur les dernières 24 heures\n")
+    cat("• Volume 24h : Valeur totale des échanges sur 24 heures\n")
+    cat("• Ratio Vol/Cap : Volume 24h / Market Cap (indicateur de liquidité)\n")
+    cat("• Circulation : Quantité de tokens actuellement en circulation\n")
+    cat("• Max Limit : Plafond maximum de tokens émis (si défini)\n")
+    cat("• Saturation : (Circulation / Max Limit) × 100 : Indique à quel point la création de tokens\n")
+    cat("               est proche du maximum autorisé.\n\n")
+    
+    cat(info_secondary_style("Récupération des données de marché...\n"))
+    
+    # Récupérer les données
+    market_data <- get_coingecko_data(
+      "/coins/markets",
+      list(
+        vs_currency = "usd",
+        order       = "market_cap_desc",
+        per_page    = 100,  # On récupère 100 cryptos
+        sparkline   = FALSE
+      )
+    )
+    
+    if (is.null(market_data)) {
+      cat(error_style("\nImpossible de récupérer les données. Veuillez réessayer plus tard.\n"))
+      return()
+    }
+    
+    # Éviter les doublons éventuels (par l'ID coingecko)
+    market_data <- market_data %>%
+      distinct(id, .keep_all = TRUE)
+    
+    # Calculer les statistiques globales
+    total_market_cap <- sum(market_data$market_cap, na.rm = TRUE)
+    total_volume     <- sum(market_data$total_volume, na.rm = TRUE)
+    avg_change       <- mean(market_data$price_change_percentage_24h, na.rm = TRUE)
+    
+    # Afficher les statistiques globales
+    cat(section_title_style("\nStatistiques Globales du Marché :\n"))
+    cat("Market Cap Total    : ", cli::col_green(safe_format_number(total_market_cap)), " $\n")
+    cat("Volume Total 24h    : ", cli::col_blue(safe_format_number(total_volume)), " $\n")
+    cat("Variation Moyenne   : ", 
+        ifelse(avg_change >= 0,
+               cli::col_green(paste0("+", safe_format_percent(avg_change))),
+               cli::col_red(safe_format_percent(avg_change))), "\n\n")
+    
+    # Construire l'entête du tableau
+    cat(cli::col_yellow(
+      paste(
+        sprintf("%-4s",  "RANG"),
+        sprintf("%-20s","NOM"),
+        sprintf("%-8s", "SYMBOLE"),
+        sprintf("%-15s","PRIX"),
+        sprintf("%-15s","VAR 24H"),
+        sprintf("%-15s","VOLUME 24H"),
+        sprintf("%-15s","MARKET CAP"),
+        sprintf("%-12s","CIRC"),
+        sprintf("%-12s","MAX LIMIT"),
+        sprintf("%-10s","SAT (%)"),
+        "\n"
+      )
+    ))
+    
+    cat(paste(rep("-", 130), collapse = ""), "\n")
+    
+    # Boucle pour afficher chaque crypto
+    for(i in 1:nrow(market_data)) {
+      
+      # Extraire les champs
+      price     <- safe_format_number(market_data$current_price[i])
+      change    <- market_data$price_change_percentage_24h[i]
+      volume    <- safe_format_number(market_data$total_volume[i])
+      mcap      <- safe_format_number(market_data$market_cap[i])
+      circ_val  <- market_data$circulating_supply[i]
+      max_val   <- market_data$max_supply[i]
+      
+      # Format circulation & max limit en abrégé (k, M, B)
+      circ_str  <- safe_format_number(circ_val)
+      max_str   <- if (!is.na(max_val)) safe_format_number(max_val) else "N/A"
+      
+      # Calculer la saturation
+      # => si max_val est NA ou 0, on ne calcule pas
+      if (!is.na(max_val) && max_val > 0) {
+        sat_percent <- (circ_val / max_val) * 100
+      } else {
+        sat_percent <- NA
+      }
+      
+      sat_str <- if (!is.na(sat_percent)) {
+        paste0(round(sat_percent, 2), "%")
+      } else {
+        "N/A"
+      }
+      
+      # Déterminer la couleur pour la variation
+      change_color <- if (is.na(change)) {
+        cli::col_white
+      } else if (change >= 0) {
+        cli::col_green
+      } else {
+        cli::col_red
+      }
+      
+      # Affichage de la ligne
+      cat(paste0(
+        cli::col_white(sprintf("%-4d", i)),                               # RANG
+        cli::col_cyan(sprintf("%-20s", substr(market_data$name[i], 1, 19))), # NOM
+        cli::col_yellow(sprintf("%-8s", toupper(substr(market_data$symbol[i], 1, 7)))),  # SYMBOLE
+        cli::col_white(sprintf("%-15s", price)),                          # PRIX
+        change_color(sprintf("%-15s", ifelse(is.na(change),
+                                             "N/A",
+                                             paste0(round(change, 2), "%")))),
+        cli::col_blue(sprintf("%-15s", volume)),                         # VOLUME 24H
+        cli::col_green(sprintf("%-15s", mcap)),                          # MARKET CAP
+        cli::col_white(sprintf("%-12s", circ_str)),                      # CIRC
+        cli::col_white(sprintf("%-12s", max_str)),                       # MAX LIMIT
+        cli::col_white(sprintf("%-10s", sat_str))                        # SAT (%)
+      ))
+      
+      cat("\n")
+      
+      # Ligne de séparation tous les 10 rangs
+      if(i %% 10 == 0) {
+        cat(cli::col_white(paste(rep("-", 130), collapse = "")), "\n")
+      }
+    }
+    
+    cat("\n", highlight_style("NOTE : "), info_style("Les données sont actualisées en temps réel depuis CoinGecko.\n"))
+    cat("\n", info_secondary_style("Appuyez sur Entrée pour retourner au menu..."))
+    readline()
+    
+  }, error = function(e) {
+    cat(error_style("\nUne erreur est survenue lors de l'analyse. Veuillez réessayer plus tard.\n"))
+    cat(error_style("Détails de l'erreur : ", conditionMessage(e), "\n"))
+    cat("\n", info_secondary_style("Appuyez sur Entrée pour retourner au menu..."))
+    readline()
+  })
+}
+
+
+##############
+################## Fear 
+##########
+#########
+# ---------------------------------------------------------------------------
+# 1) Fonction pour récupérer l'index Fear & Greed "actuel" (dernier point)
+# ---------------------------------------------------------------------------
+get_fear_greed_data <- function() {
+  url <- "https://api.alternative.me/fng/"
+  response <- GET(url)
+  
+  if (status_code(response) != 200) {
+    cat(red("Erreur : Impossible de récupérer les données (statut != 200).\n"))
+    return(NULL)
+  }
+  
+  raw_text <- rawToChar(response$content)
+  raw <- fromJSON(raw_text, simplifyVector = FALSE)
+  
+  if (!is.null(raw$data) && length(raw$data) > 0) {
+    first_entry <- raw$data[[1]]
+    if (is.list(first_entry) && "value" %in% names(first_entry)) {
+      return(first_entry)
+    } else {
+      cat(red("Format inattendu des données reçues.\n"))
+      return(NULL)
+    }
+  } else {
+    cat(red("Les données reçues sont vides ou mal formatées.\n"))
+    return(NULL)
+  }
+}
+
+# ---------------------------------------------------------------------------
+# 2) Fonction pour récupérer l'historique Fear & Greed (par défaut 30 jours)
+# ---------------------------------------------------------------------------
+get_fear_greed_history <- function(limit = 30) {
+  url <- paste0("https://api.alternative.me/fng/?limit=", limit)
+  response <- GET(url)
+  
+  if (status_code(response) != 200) {
+    cat(red("Erreur : Impossible de récupérer l'historique (statut != 200).\n"))
+    return(NULL)
+  }
+  
+  raw_text <- rawToChar(response$content)
+  raw <- fromJSON(raw_text, simplifyVector = FALSE)
+  
+  if (!is.null(raw$data) && length(raw$data) > 0) {
+    df <- do.call(rbind, lapply(raw$data, function(entry) {
+      data.frame(
+        value = as.numeric(entry$value),
+        value_classification = entry$value_classification,
+        timestamp = as.POSIXct(as.numeric(entry$timestamp), origin = "1970-01-01"),
+        stringsAsFactors = FALSE
+      )
+    }))
+    return(df)
+  } else {
+    cat(red("Les données historiques sont vides ou mal formatées.\n"))
+    return(NULL)
+  }
+}
+
+# ---------------------------------------------------------------------------
+# 3) Fonction principale d'affichage du Fear & Greed Index
+# ---------------------------------------------------------------------------
+display_fear_greed_index <- function() {
+  cat("\n", bgBlue$white("=== Fear & Greed Index : Sentiment du Marché ==="), "\n\n")
+  
+  cat(white$italic("L'indice Fear & Greed reflète le sentiment général du marché crypto\n"))
+  cat(white$italic("en combinant plusieurs métriques : volatilité, volume, dominance Bitcoin,\n"))
+  cat(white$italic("tendances sociales et enquêtes de marché.\n\n"))
+  
+  cat(yellow$bold("Échelle d'interprétation :\n"))
+  cat("0-24    : ", red("Peur Extrême"), " (Possible opportunité d'achat)\n")
+  cat("25-44   : ", yellow("Peur"), "\n")
+  cat("45-55   : ", white("Neutre"), "\n")
+  cat("56-75   : ", green("Avidité"), "\n")
+  cat("76-100  : ", green("Avidité Extrême"), " (Possible zone de vente)\n\n")
+  
+  # 1) Récupération de la donnée actuelle
+  fng_data <- get_fear_greed_data()
+  if (is.null(fng_data)) {
+    cat(red("Erreur : Impossible de récupérer les données actuelles.\n"))
+    return()
+  }
+  
+  current_value <- as.numeric(fng_data$value)
+  current_classification <- fng_data$value_classification
+  current_timestamp <- as.POSIXct(as.numeric(fng_data$timestamp), origin = "1970-01-01")
+  
+  cat(yellow$bold("\nIndice Fear & Greed Actuel :\n"))
+  
+  # Déterminer la couleur
+  if (current_value <= 24) {
+    color_func <- red
+  } else if (current_value <= 44) {
+    color_func <- yellow
+  } else if (current_value <= 55) {
+    color_func <- white
+  } else if (current_value <= 75) {
+    color_func <- green
+  } else {
+    color_func <- green
+  }
+  
+  cat("Valeur         : ", color_func(paste0(current_value, " /100")), "\n")
+  cat("Classification : ", color_func(toupper(current_classification)), "\n")
+  cat("Mise à jour    : ", cyan$italic(format(current_timestamp, "%Y-%m-%d %H:%M:%S")), "\n\n")
+  
+  # 2) Historique
+  hist_data <- get_fear_greed_history(limit = 30)
+  if (!is.null(hist_data)) {
+    avg_7d <- mean(head(hist_data$value, 7), na.rm = TRUE)
+    avg_30d <- mean(hist_data$value, na.rm = TRUE)
+    
+    cat(yellow$bold("Moyennes historiques :\n"))
+    cat("7 derniers jours  : ", round(avg_7d, 1), "\n")
+    cat("30 derniers jours : ", round(avg_30d, 1), "\n\n")
+    
+    cat(yellow$bold("Évolution du sentiment :\n"))
+    if (current_value > avg_7d && avg_7d > avg_30d) {
+      cat("Tendance : ", green("AMÉLIORATION"), "\n\n")
+    } else if (current_value < avg_7d && avg_7d < avg_30d) {
+      cat("Tendance : ", red("DÉTÉRIORATION"), "\n\n")
+    } else {
+      cat("Tendance : ", yellow("STABLE"), "\n\n")
+    }
+  } else {
+    cat(red("Erreur : Impossible de récupérer les données historiques.\n"))
+  }
+  
+  # Recommandations
+  cat(yellow$bold("Recommandations :\n"))
+  if (current_value <= 24) {
+    cat("• ", green("Peur extrême : zone d'accumulation possible.\n"))
+  } else if (current_value <= 44) {
+    cat("• ", yellow("Peur : surveillez les supports.\n"))
+  } else if (current_value <= 55) {
+    cat("• ", white("Neutre : appliquez votre stratégie habituelle.\n"))
+  } else if (current_value <= 75) {
+    cat("• ", green("Avidité : envisagez des bénéfices partiels.\n"))
+  } else {
+    cat("• ", red("Avidité extrême : soyez prudent, prenez des bénéfices.\n"))
+  }
+  
+  # Attente pour revenir au menu
+  cat("\n", cyan$italic("Appuyez sur Entrée pour revenir au menu...\n"))
+  readline()
+}
+
+###############################################################################
+#  
+#
+#.     TREND
+#
+###############################################################################
+
+# Calcul du Z-score
+calculate_zscore <- function(x) {
+  (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
+}
+
+# Format d'affichage tendance (vert pour positif, rouge pour négatif)
+format_trend <- function(value, format = "%s") {
+  if (is.na(value)) {
+    return(sprintf(format, "N/A"))
+  }
+  formatted <- sprintf("%.1f%%", value)
+  if (value > 0) {
+    cli::col_green(sprintf(format, paste0("+", formatted)))
+  } else {
+    cli::col_red(sprintf(format, formatted))
+  }
+}
+
+# Format de nombre abrégé (k, M, B, etc.)
+format_number <- function(x) {
+  if (is.na(x)) return("N/A")
+  suffixes <- c("", "k", "M", "B", "T")
+  ix <- 0
+  val <- x
+  while (abs(val) >= 1000 && ix < length(suffixes) - 1) {
+    val <- val / 1000
+    ix <- ix + 1
+  }
+  sprintf("%.2f%s", val, suffixes[ix + 1])
+}
+
+#
+# 1) Fonction : Trend Scanner
+################################
+trend_scanner <- function() {
+  cat(section_title_style("\n=== Trend Scanner : Détection des Tendances Émergentes ===\n\n"))
+  
+  # Texte introductif et pédagogique
+  cat(info_style("Cet outil scanne le marché des cryptomonnaies afin de repérer\n"))
+  cat(info_style("les actifs présentant un élan de prix et/ou un volume significatif,\n"))
+  cat(info_style("indicateur d'une potentielle tendance émergente.\n\n"))
+  
+  cat(highlight_style("Principes :\n"))
+  cat("• Observation des variations de prix sur 1h, 24h et 7 jours.\n")
+  cat("• Comparaison des volumes par rapport à la capitalisation.\n")
+  cat("• Attribution d'un score de tendance combiné (court / moyen / long terme).\n\n")
+  
+  cat(info_secondary_style("Récupération des données de marché (top 250 cryptos)...\n"))
+  
+  market_data <- get_coingecko_data(
+    "/coins/markets",
+    list(
+      vs_currency = "usd",
+      order = "market_cap_desc",
+      per_page = 250,
+      sparkline = TRUE,
+      price_change_percentage = "1h,24h,7d"
+    )
+  )
+  
+  if (is.null(market_data)) {
+    cat(error_style("\nImpossible de récupérer les données. Veuillez réessayer plus tard.\n"))
+    cat(info_secondary_style("Appuyez sur Entrée pour retourner au menu..."))
+    readline()
+    return()
+  }
+  
+  # Préparation d'un data.frame des tendances
+  trends <- data.frame(
+    name  = market_data$name,
+    symbol = toupper(market_data$symbol),
+    price_change_1h  = market_data$price_change_percentage_1h_in_currency,
+    price_change_24h = market_data$price_change_percentage_24h,
+    price_change_7d  = market_data$price_change_percentage_7d_in_currency,
+    volume_market_cap_ratio = market_data$total_volume / market_data$market_cap,
+    market_cap = market_data$market_cap
+  )
+  
+  # Calcul des Z-scores pour chaque période
+  trends$z_score_1h    = calculate_zscore(trends$price_change_1h)
+  trends$z_score_24h   = calculate_zscore(trends$price_change_24h)
+  trends$z_score_7d    = calculate_zscore(trends$price_change_7d)
+  trends$z_score_volume= calculate_zscore(trends$volume_market_cap_ratio)
+  
+  # Score combiné de tendance
+  trends$trend_score <- with(trends, {
+    # Pondération : 1h (0.3), 24h (0.4), 7d (0.3)
+    0.3 * z_score_1h + 0.4 * z_score_24h + 0.3 * z_score_7d
+  })
+  
+  # Trier par score décroissant
+  trends <- trends[order(-trends$trend_score), ]
+  
+  cat(section_title_style("\nTendances Émergentes Détectées :\n\n"))
+  
+  # En-tête du tableau : CRYPTO, SYMBOLE, 1H, 24H, 7D, TENDANCE
+  cat(cli::col_yellow(sprintf("%-18s %-8s %-10s %-10s %-10s %-15s\n",
+                              "CRYPTO", "SYMBOLE", "1H", "24H", "7D", "TENDANCE")))
+  cat(paste(rep("-", 68), collapse = ""), "\n")
+  
+  # Afficher les 20 premières cryptos
+  top_n <- min(20, nrow(trends))
+  for (i in seq_len(top_n)) {
+    # Évaluer la force de la tendance
+    trend_strength <- trends$trend_score[i]
+    label_strength <- if (trend_strength > 2) {
+      cli::col_green("TRÈS FORTE")
+    } else if (trend_strength > 1) {
+      cli::col_green("FORTE")
+    } else if (trend_strength > 0) {
+      cli::col_yellow("MODÉRÉE")
+    } else {
+      cli::col_red("FAIBLE")
+    }
+    
+    cat(
+      cli::col_cyan(sprintf("%-18s", substr(trends$name[i], 1, 17))),
+      cli::col_yellow(sprintf("%-8s", trends$symbol[i])),
+      format_trend(trends$price_change_1h[i],  "%-10s"),
+      format_trend(trends$price_change_24h[i], "%-10s"),
+      format_trend(trends$price_change_7d[i],  "%-10s"),
+      sprintf("%-15s", label_strength),
+      "\n"
+    )
+  }
+  
+  cat(highlight_style("\nCritères de détection :\n"))
+  cat("• Évolution des prix 1h / 24h / 7j (pondération 0.3 / 0.4 / 0.3)\n")
+  cat("• Volume relatif à la capitalisation (indicateur d'intérêt du marché)\n")
+  cat("• Score global = combinaison pondérée des Z-scores\n\n")
+  
+  cat(info_secondary_style("Appuyez sur Entrée pour retourner au menu..."))
+  readline()
+}
+
+###############################################################################
+#
+# 2) Fonction : Volume Anomaly
+#
+###############################################################################
+
+volume_anomaly <- function() {
+  cat(section_title_style("\n=== Volume Anomaly : Détection des Anomalies de Volume ===\n\n"))
+  
+  cat(info_style("Cet outil inspecte les volumes d'échange afin de repérer\n"))
+  cat(info_style("des pics ou chutes soudaines (anomalies) susceptibles d'indiquer\n"))
+  cat(info_style("un événement majeur ou un changement de comportement du marché.\n\n"))
+  
+  cat(info_secondary_style("Récupération des données de marché (top 250 cryptos)...\n"))
+  
+  market_data <- get_coingecko_data(
+    "/coins/markets",
+    list(
+      vs_currency = "usd",
+      order = "market_cap_desc",
+      per_page = 250,
+      sparkline = TRUE
+    )
+  )
+  
+  if (is.null(market_data)) {
+    cat(error_style("\nImpossible de récupérer les données. Veuillez réessayer plus tard.\n"))
+    cat(info_secondary_style("Appuyez sur Entrée pour retourner au menu..."))
+    readline()
+    return()
+  }
+  
+  # Préparation data.frame
+  volumes <- data.frame(
+    name            = market_data$name,
+    symbol          = toupper(market_data$symbol),
+    current_volume  = market_data$total_volume,
+    market_cap      = market_data$market_cap,
+    price_change_24h= market_data$price_change_percentage_24h
+  )
+  
+  # Ratio volume / market cap
+  volumes$volume_mcap_ratio <- volumes$current_volume / volumes$market_cap
+  
+  # Z-score du ratio
+  volumes$z_score_volume <- calculate_zscore(volumes$volume_mcap_ratio)
+  
+  # Sélection des anomalies (Z-score absolu > 2)
+  anomalies <- volumes[abs(volumes$z_score_volume) > 2, ]
+  anomalies <- anomalies[order(-abs(anomalies$z_score_volume)), ]
+  
+  cat(section_title_style("\nAnomalies de Volume Détectées :\n\n"))
+  
+  cat(cli::col_yellow(sprintf("%-18s %-8s %-15s %-15s %-10s %-15s\n",
+                              "CRYPTO", "SYMBOLE", "VOLUME 24H", "VOL/MCAP", "PRIX 24H", "ANOMALIE")))
+  cat(paste(rep("-", 85), collapse = ""), "\n")
+  
+  if (nrow(anomalies) == 0) {
+    cat(cli::col_cyan("Aucune anomalie de volume détectée (Z-score ≤ 2).\n"))
+  } else {
+    top_n <- min(20, nrow(anomalies))
+    for (i in seq_len(top_n)) {
+      rowi <- anomalies[i,]
+      anomaly_type <- if (rowi$z_score_volume > 0) {
+        cli::col_green("VOLUME ÉLEVÉ")
+      } else {
+        cli::col_red("VOLUME FAIBLE")
+      }
+      cat(
+        cli::col_cyan(sprintf("%-18s", substr(rowi$name, 1, 17))),
+        cli::col_yellow(sprintf("%-8s", rowi$symbol)),
+        cli::col_white(sprintf("%-15s", format_number(rowi$current_volume))),
+        cli::col_white(sprintf("%-15s", sprintf("%.2fx", rowi$volume_mcap_ratio))),
+        format_trend(rowi$price_change_24h, "%-10s"),
+        sprintf("%-15s", anomaly_type),
+        "\n"
+      )
+    }
+  }
+  
+  cat(highlight_style("\nCritères de détection :\n"))
+  cat("• Z-score du ratio Volume/Market Cap supérieur à ±2\n")
+  cat("• Variation soudaine de la participation du marché\n\n")
+  
+  cat(info_style("Une anomalie de volume peut révéler :\n"))
+  cat("- L'arrivée de nouveaux acteurs (accumulation / distribution)\n")
+  cat("- Un évènement fondamental (annonce, partenariat, listing)\n")
+  cat("- Des mouvements spéculatifs ou manipulations ponctuelles\n\n")
+  
+  cat(info_secondary_style("Appuyez sur Entrée pour retourner au menu..."))
+  readline()
+}
+
+
+##############################
+####################
+# Fonction principale MarketScope avec menu complet
+market_scope <- function() {
+  repeat {
+    # Nettoyer l'écran pour une meilleure lisibilité
+    cat("\014")
+    
+    cat(section_title_style("\n====== MarketScope : Analyse Approfondie du Marché Crypto ======\n\n"))
+    
+    # Introduction pédagogique
+    cat(highlight_style("Bienvenue dans MarketScope !\n\n"))
+    cat(info_style("MarketScope est votre outil d'analyse approfondie du marché des cryptomonnaies.\n"))
+    cat(info_style("Il vous permet de suivre les tendances, d'analyser les performances et\n"))
+    cat(info_style("d'identifier les opportunités potentielles sur le marché.\n\n"))
+    
+    cat(info_secondary_style("Fonctionnalités disponibles :\n"))
+    cat("• Analyse technique et indicateurs avancés\n")
+    cat("• Suivi des tendances et de la dominance\n")
+    cat("• Détection des anomalies et opportunités\n")
+    cat("• Données en temps réel depuis CoinGecko\n\n")
+    
+    # Menu principal
+    cat(section_title_style("Options disponibles :\n\n"))
+    
+    cat("1) ", highlight_style("BitcoinPulse"), " - Analyse santé du Bitcoin\n")
+    cat("   → Moyennes mobiles, tendances et autres indicateurs techniques\n\n")
+    
+    cat("2) ", highlight_style("AltcoinTracker"), " - Suivi des altcoins\n")
+    cat("   → Dominance du marché\n\n")
+    
+    cat("3) ", highlight_style("CryptoFocus"), " - Analyse d'une crypto spécifique\n")
+    cat("   → Performance détaillée, comparaisons et graphiques\n\n")
+    
+    cat("4) ", highlight_style("Market View"), " - Vue d'ensemble du marché\n")
+    cat("   → Top 100 des cryptos par capitalisation\n\n")
+    
+    cat("5) ", highlight_style("Fear & Greed Index"), " - Sentiment du marché\n")
+    cat("   → Indicateur de peur et d'avidité\n\n")
+    
+    cat("6) ", highlight_style("Trend Scanner"), " - Détection des tendances\n")
+    cat("   → Identification des mouvements émergents\n\n")
+    
+    cat("7) ", highlight_style("Volume Anomaly"), " - Anomalies de volume\n")
+    cat("   → Détection des volumes inhabituels\n\n")
+    
+    cat(question_style("0) Retour au menu principal\n\n"))
+    
+    # Sélection de l'option
+    choix <- readline(question_style("Votre choix (0-7) : "))
+    
+    if (!choix %in% c("0", "1", "2", "3", "4", "5", "6", "7")) {
+      cat(error_style("\nOption invalide. Veuillez choisir une option entre 0 et 7.\n"))
+      Sys.sleep(2)
+      next
+    }
+    
+    # Traitement du choix
+    switch(choix,
+           "0" = {
+             cat(info_style("\nRetour au menu principal...\n"))
+             break
+           },
+           "1" = bitcoin_pulse(),
+           "2" = altcoin_tracker(),
+           "3" = crypto_focus(),
+           "4" = market_view(),
+           "5" = display_fear_greed_index(),
+           "6" = trend_scanner(),
+           "7" = volume_anomaly()
+    )
+  }
+}
+
+# Pour lancer l'application
+market_scope()
